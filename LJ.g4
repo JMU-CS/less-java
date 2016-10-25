@@ -1,6 +1,7 @@
 grammar LJ;
 
-// Parser
+/* Parser */
+
 program:    (statement | function)*;
 
 block:      '{'statement*'}';
@@ -8,18 +9,19 @@ block:      '{'statement*'}';
 function:   ID ('('paramList')')? block;
 
 statement:  var '=' expr NL
-            | functionCall NL
-            | if '(' expr ')' block (else block)?
-            | while '(' expr ')' block
-            | return expr NL
-            | break NL
-            | continue NL
+//            | functionCall NL
+            | IF '(' expr ')' block (ELSE block)?
+            | WHILE '(' expr ')' block
+            | RETURN expr NL
+            | BREAK NL
+            | CONTINUE NL
             | NL
             ;
 
-paramList:  ID ((','ID)*)?
+paramList:  ID ((','ID)+)?;
 
-expr:       var binOP expr
+expr:       expr binOp expr
+ //           | functionCall
             | LIT
             ;
 
@@ -27,13 +29,21 @@ binOp:      ADD | MULT | DIV | SUB;
 
 var:        ID;
 
+/* Lexer */
 
-// Lexer
-NL:         '\r'? '\n';
+// Key Words
+IF:         'if';
+ELSE:       'else';
+WHILE:      'while';
+RETURN:     'return';
+BREAK:      'break';
+CONTINUE:   'continue';
+
 ID:         [a-zA-Z]+;
-WS:         [ \t]+ -> skip;
 ADD:        '+';
 MULT:       '*';
 DIV:        '/';
 SUB:        '-';
 LIT:        [0-9]+;
+WS:         [ \t]+ -> skip;
+NL:         '\r'? '\n';
