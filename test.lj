@@ -1,7 +1,15 @@
-a = 2 + 5
-a = 7 * 7
+a = 1 + 2
+b = "hi"
+add(a, b) {
+    print(b)
 
-add {
-    2 + 2
+    if (a + 2 > 7) {
+        return false
+    } else {
+        return true
+    }
 
+    while (true) {
+        return false;
+    }
 }
