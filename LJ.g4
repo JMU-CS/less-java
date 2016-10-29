@@ -1,35 +1,40 @@
 grammar LJ;
 
-/* Parser */
+/* Parser Grammar */
 
 program:    (statement | function)*;
 
+function:   ID ('('paramList')')? block;
+paramList:  (loc | lit)(((','(loc|lit))+))?;
 block:      '{'statement*'}';
 
-function:   ID ('('paramList')')? block;
-
-statement:  var '=' expr NL
-//            | functionCall NL
+statement:  loc '=' expr NL
+            | funcCall NL
             | IF '(' expr ')' block (ELSE block)?
             | WHILE '(' expr ')' block
+            // FOR LOOP
             | RETURN expr NL
             | BREAK NL
             | CONTINUE NL
             | NL
             ;
 
-paramList:  ID ((','ID)+)?;
-
-expr:       expr binOp expr
- //           | functionCall
-            | LIT
+expr:       expr BINOP expr
+            | funcCall
+            | loc
+            | lit
             ;
 
-binOp:      ADD | MULT | DIV | SUB;
+loc:        ID ('['DEC']')?;
 
-var:        ID;
+funcCall:   ID '('paramList')';
 
-/* Lexer */
+lit:        DEC | BOOL | STR;
+
+
+
+
+/* Lexer Rules */
 
 // Key Words
 IF:         'if';
@@ -39,11 +44,39 @@ RETURN:     'return';
 BREAK:      'break';
 CONTINUE:   'continue';
 
-ID:         [a-zA-Z]+;
+BINOP:      ADD
+            | MULT
+            | DIV
+            | SUB
+            | GT
+            | GTE
+            | LT
+            | LTE
+            | ET
+            | NET
+            | OR
+            | AND
+            ;
+
 ADD:        '+';
 MULT:       '*';
 DIV:        '/';
 SUB:        '-';
-LIT:        [0-9]+;
+GT:         '>';
+GTE:       '>=';
+LT:         '<';
+LTE:       '<=';
+ET:        '==';
+NET:       '!=';
+OR:        '||';
+AND:       '&&';
+
+// Literals
+DEC:        [0-9]+;
+BOOL:       'true'|'false';
+STR:        '\"'.*?'\"';
+
+ID:         [a-zA-Z]+;
+
 WS:         [ \t]+ -> skip;
 NL:         '\r'? '\n';
