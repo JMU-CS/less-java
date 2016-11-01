@@ -10,6 +10,7 @@ block:      '{'statement*'}';
 
 statement:  loc '=' expr NL
             | funcCall NL
+            | TEST funcCall '=' expr
             | IF '(' expr ')' block (ELSE block)?
             | WHILE '(' expr ')' block
             // FOR LOOP
@@ -43,6 +44,7 @@ WHILE:      'while';
 RETURN:     'return';
 BREAK:      'break';
 CONTINUE:   'continue';
+TEST:       'test';
 
 BINOP:      ADD
             | MULT

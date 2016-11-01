@@ -12,7 +12,7 @@ compile:
 test:
 	$(grun) LJ program test.lj
 
-gui-test:
+gui:
 	$(grun) LJ program test.lj -gui
 
 clean:

@@ -1,5 +1,6 @@
 a = 1 + 2
 b = "hi"
+
 add(a, b) {
     print(b)
 
@@ -10,6 +11,8 @@ add(a, b) {
     }
 
     while (true) {
-        return false;
+        return false
     }
 }
+
+test add(1, 2) = 3
