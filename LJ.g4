@@ -5,7 +5,8 @@ grammar LJ;
 program:        (statement | function)*;
 
 function:       ID ('('paramList')')? block;
-paramList:      expr((','expr)+)?;
+paramList:      ID((','ID)+)?;
+argList:        expr((','expr)+)?;
 block:          '{'statement*'}';
 
 statement:      assignment_t
@@ -33,7 +34,7 @@ expr:           expr BINOP expr
                 | lit
                 ;
 
-funcCall:       ID '('paramList')';
+funcCall:       ID '('argList')';
 loc:            ID ('['DEC']')?;
 lit:            DEC | BOOL | STR;
 
