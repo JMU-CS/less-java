@@ -2,35 +2,42 @@ grammar LJ;
 
 /* Parser Grammar */
 
-program:    (statement | function)*;
+program:        (statement | function)*;
 
-function:   ID ('('paramList')')? block;
-paramList:  (loc | lit)(((','(loc|lit))+))?;
-block:      '{'statement*'}';
+function:       ID ('('paramList')')? block;
+paramList:      expr((','expr)+)?;
+block:          '{'statement*'}';
 
-statement:  loc '=' expr NL
-            | funcCall NL
-            | TEST funcCall '=' expr
-            | IF '(' expr ')' block (ELSE block)?
-            | WHILE '(' expr ')' block
-            // FOR LOOP
-            | RETURN expr NL
-            | BREAK NL
-            | CONTINUE NL
-            | NL
-            ;
+statement:      assignment_t
+                | conditional_t
+                | whileLoop_t
+                | return_t
+                | break_t
+                | continue_t
+                | test_t
+                | terminator
+                | funcCall
+                ;
 
-expr:       expr BINOP expr
-            | funcCall
-            | loc
-            | lit
-            ;
+assignment_t:     loc '=' expr NL;
+conditional_t:    IF '(' expr ')' block (ELSE block)?;
+whileLoop_t:      WHILE '(' expr ')' block;
+return_t:         RETURN expr NL;
+break_t:          BREAK NL;
+continue_t:       CONTINUE NL;
+test_t:           TEST funcCall '=' expr;
 
-loc:        ID ('['DEC']')?;
+expr:           expr BINOP expr
+                | funcCall
+                | loc
+                | lit
+                ;
 
-funcCall:   ID '('paramList')';
+funcCall:       ID '('paramList')';
+loc:            ID ('['DEC']')?;
+lit:            DEC | BOOL | STR;
 
-lit:        DEC | BOOL | STR;
+terminator:     NL;
 
 
 
