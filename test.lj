@@ -1,7 +1,7 @@
 a = 1 + 2
 b = "hi"
 
-add(a, b) {
+add(a, b, c, d, e) {
     print(b)
 
     if (a + 2 > 7) {
