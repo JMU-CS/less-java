@@ -18,4 +18,4 @@ gui:
 	$(grun) LJ program test.lj -gui
 
 clean:
-	rm build/* *.java *.class *.tokens
+	rm build/*.class build/*.tokens 
