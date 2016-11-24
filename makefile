@@ -3,11 +3,13 @@ grun=java -cp "/usr/local/lib/antlr-4.5.3-complete.jar:$$CLASSPATH" org.antlr.v4
 
 all: antlr compile test
 
-antlr: 
+antlr:
 	$(antlr4) LJ.g4 -o build
 
 compile:
-	javac build/*.java
+	mv build/*.java src
+	javac src/*.java
+	mv src/*.class build/
 
 test:
 	$(grun) LJ program test.lj
