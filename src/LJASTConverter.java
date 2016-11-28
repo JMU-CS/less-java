@@ -38,7 +38,8 @@ public class LJASTConverter extends LJBaseListener {
         if (ctx.paramList() != null) {
             if (ctx.paramList().ID().size() > 0) {
                 for (TerminalNode tn: ctx.paramList().ID()) {
-                    parameter = new ASTFunction.Parameter(tn.getText(), ASTNode.DataType.UNKNOWN);
+                    parameter = new ASTFunction.Parameter(tn.getText(),
+                            ASTNode.DataType.UNKNOWN);
                     function.parameters.add(parameter);
                 }
             }
@@ -160,6 +161,24 @@ public class LJASTConverter extends LJBaseListener {
         }
 
         map.put(ctx, cont);
+    }
+
+    @Override
+    public void exitTest_t(LJParser.Test_tContext ctx) {
+        ASTTest test;
+        ASTFunctionCall function;
+        ASTExpression expectedValue;
+
+        function = (ASTFunctionCall) map.get(ctx.funcCall());
+        expectedValue = (ASTExpression) map.get(ctx.expr());
+
+        test = new ASTTest(function, expectedValue);
+
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(test);
+        }
+
+        map.put(ctx, test);
     }
 
     public ASTProgram getAST() {
