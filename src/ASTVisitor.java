@@ -31,6 +31,8 @@ public interface ASTVisitor
     public void postVisit(ASTBreak node);
     public void preVisit (ASTContinue node);
     public void postVisit(ASTContinue node);
+    public void preVisit (ASTTest node);
+    public void postVisit(ASTTest node);
 
     public void preVisit (ASTBinaryExpr node);
     public void inVisit  (ASTBinaryExpr node);
