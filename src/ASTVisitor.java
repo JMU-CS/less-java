@@ -1,6 +1,6 @@
 /**
  * Definition of a Visitor interface for AST trees.
- * 
+ *
  * Because there are so many functions, it is recommended that new visitor
  * classes extend {@link DefaultASTVisitor} (which contains empty default stubs
  * for all of these functions) rather than attempt to implement {@link

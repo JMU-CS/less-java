@@ -25,6 +25,7 @@ public class LJCompiler {
         LJASTConverter converter = null;
         ParseTreeWalker walker = null;
         ASTProgram program = null;
+        PrintDebugTree printTree = null;
 
         try {
             for (String s: args) {
@@ -43,5 +44,8 @@ public class LJCompiler {
         walker.walk(converter, pTree);
 
         program = converter.getAST();
+        printTree = new PrintDebugTree();
+
+        program.traverse(printTree);
     }
 }

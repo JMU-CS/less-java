@@ -181,6 +181,32 @@ public class LJASTConverter extends LJBaseListener {
         map.put(ctx, test);
     }
 
+    @Override
+    public void exitExpr(LJParser.ExprContext ctx) {
+        //TODO
+        if (ctx.funcCall() != null) {
+        } else if(ctx.lit() != null) {
+        } else if(ctx.loc() !=null) {
+        } else {
+        }
+    }
+
+    @Override
+    public void exitLit(LJParser.LitContext ctx) {
+        ASTLiteral lit;
+
+        if (ctx.BOOL() != null) {
+            lit = (ASTLiteral) map.get(ctx.BOOL());
+        } else if (ctx.DEC() != null) {
+            lit = (ASTLiteral) map.get(ctx.DEC());
+        } else {
+            assert(map.get(ctx.STR()) != null);
+            lit = (ASTLiteral) map.get(ctx.STR());
+        }
+
+        map.put(ctx, lit);
+    }
+
     public ASTProgram getAST() {
         return ast;
     }
