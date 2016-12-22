@@ -1,18 +1,10 @@
-a = 1 + 2
 b = "hi"
+a = 1
+c = true
 
 add(a) {
-    print(b)
-
-    if (a + 2 > 7) {
-        return false
-    } else {
-        return true
-    }
-
-    while (true) {
-        return false
-    }
+    print(a)
 }
 
 test add(1, 2) = 3
+test add(3, 2) = 5
