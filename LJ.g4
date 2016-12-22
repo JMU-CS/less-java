@@ -9,38 +9,27 @@ paramList:      ID((','ID)+)?;
 argList:        expr((','expr)+)?;
 block:          '{'statement*'}';
 
-statement:      assignment_t
-                | conditional_t
-                | whileLoop_t
-                | return_t
-                | break_t
-                | continue_t
-                | test_t
-                | terminator
-                | funcCall
+statement:      loc '=' expr NL                         #Assignment
+                | IF '(' expr ')' block (ELSE block)?   #Conditional
+                | WHILE '(' expr ')' block              #While
+                | RETURN expr NL                        #Return
+                | BREAK NL                              #Break
+                | CONTINUE NL                           #Continue
+                | TEST funcCall '=' expr                #Test
+                | NL                                    #Terminator
                 ;
 
-assignment_t:     loc '=' expr NL;
-conditional_t:    IF '(' expr ')' block (ELSE block)?;
-whileLoop_t:      WHILE '(' expr ')' block;
-return_t:         RETURN expr NL;
-break_t:          BREAK NL;
-continue_t:       CONTINUE NL;
-test_t:           TEST funcCall '=' expr;
-
-expr:           expr BINOP expr
-                | funcCall
-                | loc
-                | lit
+expr:           expr BINOP expr                         #BinExpr
+                | loc                                   #Location
+                | lit                                   #Literal
+                | funcCall                              #FuncCall
                 ;
 
 funcCall:       ID '('argList')';
+voidFuncCall:   ^ID '('argList')'NL$;
+
 loc:            ID ('['DEC']')?;
 lit:            DEC | BOOL | STR;
-
-terminator:     NL;
-
-
 
 
 /* Lexer Rules */
