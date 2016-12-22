@@ -19,7 +19,7 @@ public class LJLexer extends Lexer {
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, IF=9, 
 		ELSE=10, WHILE=11, RETURN=12, BREAK=13, CONTINUE=14, TEST=15, BINOP=16, 
 		ADD=17, MULT=18, DIV=19, SUB=20, GT=21, GTE=22, LT=23, LTE=24, ET=25, 
-		NET=26, OR=27, AND=28, DEC=29, BOOL=30, STR=31, ID=32, WS=33, NL=34;
+		NET=26, OR=27, AND=28, DEC=29, BOOL=30, STR=31, ID=32, WS=33, EOL=34;
 	public static String[] modeNames = {
 		"DEFAULT_MODE"
 	};
@@ -28,7 +28,7 @@ public class LJLexer extends Lexer {
 		"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "IF", 
 		"ELSE", "WHILE", "RETURN", "BREAK", "CONTINUE", "TEST", "BINOP", "ADD", 
 		"MULT", "DIV", "SUB", "GT", "GTE", "LT", "LTE", "ET", "NET", "OR", "AND", 
-		"DEC", "BOOL", "STR", "ID", "WS", "NL"
+		"DEC", "BOOL", "STR", "ID", "WS", "EOL"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
@@ -41,7 +41,7 @@ public class LJLexer extends Lexer {
 		null, null, null, null, null, null, null, null, null, "IF", "ELSE", "WHILE", 
 		"RETURN", "BREAK", "CONTINUE", "TEST", "BINOP", "ADD", "MULT", "DIV", 
 		"SUB", "GT", "GTE", "LT", "LTE", "ET", "NET", "OR", "AND", "DEC", "BOOL", 
-		"STR", "ID", "WS", "NL"
+		"STR", "ID", "WS", "EOL"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 

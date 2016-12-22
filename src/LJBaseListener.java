@@ -75,109 +75,157 @@ public class LJBaseListener implements LJListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStatement(LJParser.StatementContext ctx) { }
+	@Override public void enterAssignment(LJParser.AssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStatement(LJParser.StatementContext ctx) { }
+	@Override public void exitAssignment(LJParser.AssignmentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAssignment_t(LJParser.Assignment_tContext ctx) { }
+	@Override public void enterConditional(LJParser.ConditionalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAssignment_t(LJParser.Assignment_tContext ctx) { }
+	@Override public void exitConditional(LJParser.ConditionalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterConditional_t(LJParser.Conditional_tContext ctx) { }
+	@Override public void enterWhile(LJParser.WhileContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitConditional_t(LJParser.Conditional_tContext ctx) { }
+	@Override public void exitWhile(LJParser.WhileContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterWhileLoop_t(LJParser.WhileLoop_tContext ctx) { }
+	@Override public void enterReturn(LJParser.ReturnContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitWhileLoop_t(LJParser.WhileLoop_tContext ctx) { }
+	@Override public void exitReturn(LJParser.ReturnContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterReturn_t(LJParser.Return_tContext ctx) { }
+	@Override public void enterBreak(LJParser.BreakContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitReturn_t(LJParser.Return_tContext ctx) { }
+	@Override public void exitBreak(LJParser.BreakContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBreak_t(LJParser.Break_tContext ctx) { }
+	@Override public void enterContinue(LJParser.ContinueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBreak_t(LJParser.Break_tContext ctx) { }
+	@Override public void exitContinue(LJParser.ContinueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterContinue_t(LJParser.Continue_tContext ctx) { }
+	@Override public void enterTest(LJParser.TestContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitContinue_t(LJParser.Continue_tContext ctx) { }
+	@Override public void exitTest(LJParser.TestContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTest_t(LJParser.Test_tContext ctx) { }
+	@Override public void enterVoidFunctionCall(LJParser.VoidFunctionCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTest_t(LJParser.Test_tContext ctx) { }
+	@Override public void exitVoidFunctionCall(LJParser.VoidFunctionCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExpr(LJParser.ExprContext ctx) { }
+	@Override public void enterTerminator(LJParser.TerminatorContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExpr(LJParser.ExprContext ctx) { }
+	@Override public void exitTerminator(LJParser.TerminatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLiteral(LJParser.LiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLiteral(LJParser.LiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFunctionCall(LJParser.FunctionCallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFunctionCall(LJParser.FunctionCallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBinExpr(LJParser.BinExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBinExpr(LJParser.BinExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLocation(LJParser.LocationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLocation(LJParser.LocationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -214,18 +262,6 @@ public class LJBaseListener implements LJListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLit(LJParser.LitContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterTerminator(LJParser.TerminatorContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitTerminator(LJParser.TerminatorContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

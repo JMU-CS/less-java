@@ -21,9 +21,14 @@ public class LJASTConverter extends LJBaseListener {
         ast = new ASTProgram();
         map.put(ctx, ast);
 
+        //TODO: Remove Debug Statements
         for (LJParser.StatementContext s: ctx.statement()) {
             if (!s.getText().equals("\n")) {
-                System.err.printf("in: %s\tout: %s\n", s.getText(), (ASTStatement) map.get(s));
+                /*
+                System.err.printf("in: %s\tout: %s\n",
+                        s.getText(),
+                        (ASTStatement) map.get(s));
+                */
                 ast.statements.add((ASTStatement) map.get(s));
             }
         }
@@ -67,7 +72,7 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitAssignment_t(LJParser.Assignment_tContext ctx) {
+    public void exitAssignment(LJParser.AssignmentContext ctx) {
         ASTAssignment assignment;
         ASTLocation location;
         ASTExpression expression;
@@ -85,7 +90,7 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitConditional_t(LJParser.Conditional_tContext ctx) {
+    public void exitConditional(LJParser.ConditionalContext ctx) {
         ASTConditional conditional;
         ASTExpression condition;
         ASTBlock ifBlock;
@@ -109,7 +114,7 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitWhileLoop_t(LJParser.WhileLoop_tContext ctx) {
+    public void exitWhile(LJParser.WhileContext ctx) {
         ASTWhileLoop whileLoop;
         ASTExpression guard;
         ASTBlock body;
@@ -127,7 +132,7 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitReturn_t(LJParser.Return_tContext ctx) {
+    public void exitReturn(LJParser.ReturnContext ctx) {
         ASTReturn ret;
         ASTExpression expression;
 
@@ -143,7 +148,7 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitBreak_t(LJParser.Break_tContext ctx) {
+    public void exitBreak(LJParser.BreakContext ctx) {
         ASTBreak br;
 
         br = new ASTBreak();
@@ -156,7 +161,7 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitContinue_t(LJParser.Continue_tContext ctx) {
+    public void exitContinue(LJParser.ContinueContext ctx) {
         ASTContinue cont;
 
         cont = new ASTContinue();
@@ -169,7 +174,7 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitTest_t(LJParser.Test_tContext ctx) {
+    public void exitTest(LJParser.TestContext ctx) {
         ASTTest test;
         ASTFunctionCall function;
         ASTExpression expectedValue;
@@ -187,13 +192,41 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitExpr(LJParser.ExprContext ctx) {
-        //TODO
-        if (ctx.funcCall() != null) {
-        } else if(ctx.lit() != null) {
-        } else if(ctx.loc() !=null) {
-        } else {
+    public void exitBinExpr(LJParser.BinExprContext ctx) {
+        ASTBinaryExpr binExpr;
+        ASTExpression left;
+        ASTExpression right;
+
+        System.err.println(ctx.expr(0).getText());
+        System.err.println(ctx.expr(1).getText());
+        left = (ASTExpression) map.get(ctx.expr(0));
+        right = (ASTExpression) map.get(ctx.expr(1));
+
+        binExpr = new ASTBinaryExpr(findBinOp(ctx.BINOP().getText()), left, right);
+
+        map.put(ctx, binExpr);
+    }
+
+    @Override
+    public void exitFuncCall(LJParser.FuncCallContext ctx) {
+        ASTFunctionCall funcCall;
+
+        funcCall = new ASTFunctionCall(ctx.ID().getText());
+
+        map.put(ctx, funcCall);
+    }
+
+    @Override
+    public void exitLoc(LJParser.LocContext ctx) {
+        ASTLocation loc;
+
+        loc = new ASTLocation(ctx.ID().getText());
+
+        if (ctx.expr() != null) {
+            loc.index = (ASTExpression) map.get(ctx.expr());
         }
+
+        map.put(ctx, loc);
     }
 
     @Override
@@ -216,5 +249,64 @@ public class LJASTConverter extends LJBaseListener {
 
     public ASTProgram getAST() {
         return ast;
+    }
+
+    private ASTBinaryExpr.BinOp findBinOp(String s) {
+        ASTBinaryExpr.BinOp op;
+
+        switch (s) {
+            case "+":
+                op = ASTBinaryExpr.BinOp.ADD;
+                break;
+
+            case "*":
+                op = ASTBinaryExpr.BinOp.MUL;
+                break;
+
+            case "/":
+                op = ASTBinaryExpr.BinOp.DIV;
+                break;
+
+            case "-":
+                op = ASTBinaryExpr.BinOp.SUB;
+                break;
+
+            case ">":
+                op = ASTBinaryExpr.BinOp.GT;
+                break;
+
+            case ">=":
+                op = ASTBinaryExpr.BinOp.GE;
+                break;
+
+            case  "<":
+                op = ASTBinaryExpr.BinOp.LT;
+                break;
+
+            case "<=":
+                op = ASTBinaryExpr.BinOp.LE;
+                break;
+
+            case "==":
+                op = ASTBinaryExpr.BinOp.EQ;
+                break;
+
+            case "!=":
+                op = ASTBinaryExpr.BinOp.NE;
+                break;
+
+            case "||":
+                op = ASTBinaryExpr.BinOp.OR;
+                break;
+
+            case "&&":
+                op = ASTBinaryExpr.BinOp.AND;
+                break;
+
+            default:
+                op = null;
+        }
+
+        return op;
     }
 }

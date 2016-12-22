@@ -21,9 +21,10 @@ public class LJCompiler {
 
         LJLexer lexer = null;
         LJParser parser = null;
-        ParseTree pTree = null;
+        ParseTree parseTree = null;
         LJASTConverter converter = null;
         ParseTreeWalker walker = null;
+        LJStaticAnalysis staticAnalyzer = null;
         ASTProgram program = null;
         PrintDebugTree printTree = null;
 
@@ -39,9 +40,11 @@ public class LJCompiler {
         parser = new LJParser(new CommonTokenStream(lexer));
         converter = new LJASTConverter();
         walker = new ParseTreeWalker();
+        staticAnalyzer = new LJStaticAnalysis();
 
-        pTree = parser.program();
-        walker.walk(converter, pTree);
+        parseTree = parser.program();
+        //walker.walk(staticAnalyzer, parseTree);
+        walker.walk(converter, parseTree);
 
         program = converter.getAST();
         printTree = new PrintDebugTree();

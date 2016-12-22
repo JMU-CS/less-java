@@ -57,95 +57,161 @@ public interface LJListener extends ParseTreeListener {
 	 */
 	void exitBlock(LJParser.BlockContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LJParser#statement}.
+	 * Enter a parse tree produced by the {@code Assignment}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterStatement(LJParser.StatementContext ctx);
+	void enterAssignment(LJParser.AssignmentContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LJParser#statement}.
+	 * Exit a parse tree produced by the {@code Assignment}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitStatement(LJParser.StatementContext ctx);
+	void exitAssignment(LJParser.AssignmentContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LJParser#assignment_t}.
+	 * Enter a parse tree produced by the {@code Conditional}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterAssignment_t(LJParser.Assignment_tContext ctx);
+	void enterConditional(LJParser.ConditionalContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LJParser#assignment_t}.
+	 * Exit a parse tree produced by the {@code Conditional}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitAssignment_t(LJParser.Assignment_tContext ctx);
+	void exitConditional(LJParser.ConditionalContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LJParser#conditional_t}.
+	 * Enter a parse tree produced by the {@code While}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterConditional_t(LJParser.Conditional_tContext ctx);
+	void enterWhile(LJParser.WhileContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LJParser#conditional_t}.
+	 * Exit a parse tree produced by the {@code While}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitConditional_t(LJParser.Conditional_tContext ctx);
+	void exitWhile(LJParser.WhileContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LJParser#whileLoop_t}.
+	 * Enter a parse tree produced by the {@code Return}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterWhileLoop_t(LJParser.WhileLoop_tContext ctx);
+	void enterReturn(LJParser.ReturnContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LJParser#whileLoop_t}.
+	 * Exit a parse tree produced by the {@code Return}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitWhileLoop_t(LJParser.WhileLoop_tContext ctx);
+	void exitReturn(LJParser.ReturnContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LJParser#return_t}.
+	 * Enter a parse tree produced by the {@code Break}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterReturn_t(LJParser.Return_tContext ctx);
+	void enterBreak(LJParser.BreakContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LJParser#return_t}.
+	 * Exit a parse tree produced by the {@code Break}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitReturn_t(LJParser.Return_tContext ctx);
+	void exitBreak(LJParser.BreakContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LJParser#break_t}.
+	 * Enter a parse tree produced by the {@code Continue}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterBreak_t(LJParser.Break_tContext ctx);
+	void enterContinue(LJParser.ContinueContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LJParser#break_t}.
+	 * Exit a parse tree produced by the {@code Continue}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitBreak_t(LJParser.Break_tContext ctx);
+	void exitContinue(LJParser.ContinueContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LJParser#continue_t}.
+	 * Enter a parse tree produced by the {@code Test}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterContinue_t(LJParser.Continue_tContext ctx);
+	void enterTest(LJParser.TestContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LJParser#continue_t}.
+	 * Exit a parse tree produced by the {@code Test}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitContinue_t(LJParser.Continue_tContext ctx);
+	void exitTest(LJParser.TestContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LJParser#test_t}.
+	 * Enter a parse tree produced by the {@code VoidFunctionCall}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterTest_t(LJParser.Test_tContext ctx);
+	void enterVoidFunctionCall(LJParser.VoidFunctionCallContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LJParser#test_t}.
+	 * Exit a parse tree produced by the {@code VoidFunctionCall}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitTest_t(LJParser.Test_tContext ctx);
+	void exitVoidFunctionCall(LJParser.VoidFunctionCallContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LJParser#expr}.
+	 * Enter a parse tree produced by the {@code Terminator}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void enterExpr(LJParser.ExprContext ctx);
+	void enterTerminator(LJParser.TerminatorContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LJParser#expr}.
+	 * Exit a parse tree produced by the {@code Terminator}
+	 * labeled alternative in {@link LJParser#statement}.
 	 * @param ctx the parse tree
 	 */
-	void exitExpr(LJParser.ExprContext ctx);
+	void exitTerminator(LJParser.TerminatorContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Literal}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterLiteral(LJParser.LiteralContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Literal}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitLiteral(LJParser.LiteralContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code FunctionCall}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionCall(LJParser.FunctionCallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code FunctionCall}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionCall(LJParser.FunctionCallContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code BinExpr}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterBinExpr(LJParser.BinExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code BinExpr}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitBinExpr(LJParser.BinExprContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code Location}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterLocation(LJParser.LocationContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code Location}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitLocation(LJParser.LocationContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LJParser#funcCall}.
 	 * @param ctx the parse tree
@@ -176,14 +242,4 @@ public interface LJListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLit(LJParser.LitContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link LJParser#terminator}.
-	 * @param ctx the parse tree
-	 */
-	void enterTerminator(LJParser.TerminatorContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link LJParser#terminator}.
-	 * @param ctx the parse tree
-	 */
-	void exitTerminator(LJParser.TerminatorContext ctx);
 }
