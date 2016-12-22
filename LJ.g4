@@ -9,26 +9,26 @@ paramList:      ID((','ID)+)?;
 argList:        expr((','expr)+)?;
 block:          '{'statement*'}';
 
-statement:      loc '=' expr NL                         #Assignment
+statement:      loc '=' expr EOL                        #Assignment
                 | IF '(' expr ')' block (ELSE block)?   #Conditional
                 | WHILE '(' expr ')' block              #While
-                | RETURN expr NL                        #Return
-                | BREAK NL                              #Break
-                | CONTINUE NL                           #Continue
-                | TEST funcCall '=' expr                #Test
-                | NL                                    #Terminator
+                | RETURN expr EOL                       #Return
+                | BREAK EOL                             #Break
+                | CONTINUE EOL                          #Continue
+                | TEST funcCall '=' expr EOL            #Test
+                | funcCall EOL                          #VoidFunctionCall
+                | EOL                                   #Terminator
                 ;
 
 expr:           expr BINOP expr                         #BinExpr
+                | funcCall                              #FunctionCall
                 | loc                                   #Location
                 | lit                                   #Literal
-                | funcCall                              #FuncCall
                 ;
 
 funcCall:       ID '('argList')';
-voidFuncCall:   ^ID '('argList')'NL$;
 
-loc:            ID ('['DEC']')?;
+loc:            ID ('['expr']')?;
 lit:            DEC | BOOL | STR;
 
 
@@ -78,4 +78,4 @@ STR:        '\"'.*?'\"';
 ID:         [a-zA-Z]+;
 
 WS:         [ \t]+ -> skip;
-NL:         '\r'? '\n';
+EOL:        '\r'? '\n';
