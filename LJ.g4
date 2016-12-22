@@ -21,9 +21,9 @@ statement:      loc '=' expr EOL                        #Assignment
                 ;
 
 expr:           expr BINOP expr                         #BinExpr
-                | funcCall                              #FunctionCall
-                | loc                                   #Location
-                | lit                                   #Literal
+                | funcCall                              #ExprFunctionCall
+                | loc                                   #ExprLocation
+                | lit                                   #ExprLiteral
                 ;
 
 funcCall:       ID '('argList')';

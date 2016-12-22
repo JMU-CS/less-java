@@ -39,8 +39,8 @@ class PrintDebugTree extends DefaultASTVisitor
     public void newline(ASTNode node, boolean printSource)
     {
         if (printSource) {
-            output.println(node.getASTTypeStr());
             //output.println("  [" + node.getSourceInfo().toString() + "]");
+            output.println();
         } else {
             output.println();
         }

@@ -183,25 +183,37 @@ public class LJBaseListener implements LJListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLiteral(LJParser.LiteralContext ctx) { }
+	@Override public void enterExprLocation(LJParser.ExprLocationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLiteral(LJParser.LiteralContext ctx) { }
+	@Override public void exitExprLocation(LJParser.ExprLocationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunctionCall(LJParser.FunctionCallContext ctx) { }
+	@Override public void enterExprFunctionCall(LJParser.ExprFunctionCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFunctionCall(LJParser.FunctionCallContext ctx) { }
+	@Override public void exitExprFunctionCall(LJParser.ExprFunctionCallContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterExprLiteral(LJParser.ExprLiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExprLiteral(LJParser.ExprLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -214,18 +226,6 @@ public class LJBaseListener implements LJListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBinExpr(LJParser.BinExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterLocation(LJParser.LocationContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitLocation(LJParser.LocationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -54,6 +54,8 @@ public class LJASTConverter extends LJBaseListener {
                 }
             }
         }
+
+        map.put(ctx, function);
     }
 
     @Override
@@ -193,11 +195,11 @@ public class LJASTConverter extends LJBaseListener {
 
     @Override
     public void exitBinExpr(LJParser.BinExprContext ctx) {
+        //TODO: Need to fix. Expressions aren't being mapped correctly.
         ASTBinaryExpr binExpr;
         ASTExpression left;
         ASTExpression right;
 
-        System.err.println(ctx.expr(0).getText());
         System.err.println(ctx.expr(1).getText());
         left = (ASTExpression) map.get(ctx.expr(0));
         right = (ASTExpression) map.get(ctx.expr(1));
@@ -205,6 +207,46 @@ public class LJASTConverter extends LJBaseListener {
         binExpr = new ASTBinaryExpr(findBinOp(ctx.BINOP().getText()), left, right);
 
         map.put(ctx, binExpr);
+    }
+
+    @Override
+    public void exitExprFunctionCall(LJParser.ExprFunctionCallContext ctx) {
+        ASTFunctionCall funcCall;
+
+        funcCall = new ASTFunctionCall(ctx.funcCall().ID().getText());
+
+        map.put(ctx, funcCall);
+    }
+
+    @Override
+    public void exitExprLocation(LJParser.ExprLocationContext ctx) {
+        ASTLocation loc;
+
+        loc = new ASTLocation(ctx.loc().ID().getText());
+
+        if (ctx.loc().expr() != null) {
+            loc.index = (ASTExpression) map.get(ctx.loc().expr());
+        }
+
+        map.put(ctx, loc);
+    }
+
+    @Override
+    public void exitExprLiteral(LJParser.ExprLiteralContext ctx) {
+        ASTLiteral lit;
+
+        if (ctx.lit().BOOL() != null) {
+            lit = new ASTLiteral(ASTNode.DataType.BOOL,
+                    Boolean.parseBoolean(ctx.lit().BOOL().getText()));
+        } else if (ctx.lit().DEC() != null) {
+            lit = new ASTLiteral(ASTNode.DataType.INT,
+                    Integer.parseInt(ctx.lit().DEC().getText()));
+        } else {
+            assert(map.get(ctx.lit().STR()) != null);
+            lit = new ASTLiteral(ASTNode.DataType.STR, ctx.lit().STR().getText());
+        }
+
+        map.put(ctx, lit);
     }
 
     @Override
