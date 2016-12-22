@@ -13,6 +13,7 @@ public class LJASTConverter extends LJBaseListener {
 
     public LJASTConverter() {
         map = new LinkedHashMap<>();
+        blocks = new Stack<ASTBlock>();
     }
 
     @Override
@@ -21,10 +22,14 @@ public class LJASTConverter extends LJBaseListener {
         map.put(ctx, ast);
 
         for (LJParser.StatementContext s: ctx.statement()) {
-            ast.statements.add((ASTStatement) map.get(s));
+            if (!s.getText().equals("\n")) {
+                System.err.printf("in: %s\tout: %s\n", s.getText(), (ASTStatement) map.get(s));
+                ast.statements.add((ASTStatement) map.get(s));
+            }
         }
 
         for (LJParser.FunctionContext f: ctx.function()) {
+            //System.err.println(f.getText());
             ast.functions.add((ASTFunction) map.get(f));
         }
     }
@@ -196,12 +201,14 @@ public class LJASTConverter extends LJBaseListener {
         ASTLiteral lit;
 
         if (ctx.BOOL() != null) {
-            lit = (ASTLiteral) map.get(ctx.BOOL());
+            lit = new ASTLiteral(ASTNode.DataType.BOOL,
+                    Boolean.parseBoolean(ctx.BOOL().getText()));
         } else if (ctx.DEC() != null) {
-            lit = (ASTLiteral) map.get(ctx.DEC());
+            lit = new ASTLiteral(ASTNode.DataType.INT,
+                    Integer.parseInt(ctx.DEC().getText()));
         } else {
             assert(map.get(ctx.STR()) != null);
-            lit = (ASTLiteral) map.get(ctx.STR());
+            lit = new ASTLiteral(ASTNode.DataType.STR, ctx.STR().getText());
         }
 
         map.put(ctx, lit);
