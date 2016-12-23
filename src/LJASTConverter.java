@@ -20,20 +20,13 @@ public class LJASTConverter extends LJBaseListener {
     public void exitProgram(LJParser.ProgramContext ctx) {
         ast = new ASTProgram();
 
-        //TODO: Remove Debug Statements
         for (LJParser.StatementContext s: ctx.statement()) {
             if (!s.getText().equals("\n")) {
-                /*
-                System.err.printf("in: %s\tout: %s\n",
-                        s.getText(),
-                        (ASTStatement) map.get(s));
-                */
                 ast.statements.add((ASTStatement) map.get(s));
             }
         }
 
         for (LJParser.FunctionContext f: ctx.function()) {
-            //System.err.println(f.getText());
             ast.functions.add((ASTFunction) map.get(f));
         }
 
@@ -217,7 +210,6 @@ public class LJASTConverter extends LJBaseListener {
 
     @Override
     public void exitBinExpr(LJParser.BinExprContext ctx) {
-        //TODO: Need to fix. Expressions aren't being mapped correctly.
         ASTBinaryExpr binExpr;
         ASTExpression left;
         ASTExpression right;
