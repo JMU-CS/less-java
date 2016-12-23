@@ -19,7 +19,6 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitProgram(LJParser.ProgramContext ctx) {
         ast = new ASTProgram();
-        map.put(ctx, ast);
 
         //TODO: Remove Debug Statements
         for (LJParser.StatementContext s: ctx.statement()) {
@@ -37,6 +36,10 @@ public class LJASTConverter extends LJBaseListener {
             //System.err.println(f.getText());
             ast.functions.add((ASTFunction) map.get(f));
         }
+
+        ast.setDepth(ctx.depth());
+
+        map.put(ctx, ast);
     }
 
     @Override
@@ -55,6 +58,8 @@ public class LJASTConverter extends LJBaseListener {
             }
         }
 
+        function.setDepth(ctx.depth());
+
         map.put(ctx, function);
     }
 
@@ -65,6 +70,9 @@ public class LJASTConverter extends LJBaseListener {
         block = new ASTBlock();
 
         blocks.push(block);
+
+        block.setDepth(ctx.depth());
+
         map.put(ctx, block);
     }
 
@@ -87,6 +95,8 @@ public class LJASTConverter extends LJBaseListener {
         if (!blocks.empty()) {
             blocks.peek().statements.add(assignment);
         }
+
+        assignment.setDepth(ctx.depth());
 
         map.put(ctx, assignment);
     }
@@ -112,6 +122,8 @@ public class LJASTConverter extends LJBaseListener {
             blocks.peek().statements.add(conditional);
         }
 
+        conditional.setDepth(ctx.depth());
+
         map.put(ctx, conditional);
     }
 
@@ -130,6 +142,8 @@ public class LJASTConverter extends LJBaseListener {
             blocks.peek().statements.add(whileLoop);
         }
 
+        whileLoop.setDepth(ctx.depth());
+
         map.put(ctx, whileLoop);
     }
 
@@ -146,6 +160,8 @@ public class LJASTConverter extends LJBaseListener {
             blocks.peek().statements.add(ret);
         }
 
+        ret.setDepth(ctx.depth());
+
         map.put(ctx, ret);
     }
 
@@ -159,6 +175,8 @@ public class LJASTConverter extends LJBaseListener {
             blocks.peek().statements.add(br);
         }
 
+        br.setDepth(ctx.depth());
+
         map.put(ctx, br);
     }
 
@@ -171,6 +189,8 @@ public class LJASTConverter extends LJBaseListener {
         if (!blocks.empty()) {
             blocks.peek().statements.add(cont);
         }
+
+        cont.setDepth(ctx.depth());
 
         map.put(ctx, cont);
     }
@@ -190,6 +210,8 @@ public class LJASTConverter extends LJBaseListener {
             blocks.peek().statements.add(test);
         }
 
+        test.setDepth(ctx.depth());
+
         map.put(ctx, test);
     }
 
@@ -200,11 +222,12 @@ public class LJASTConverter extends LJBaseListener {
         ASTExpression left;
         ASTExpression right;
 
-        System.err.println(ctx.expr(1).getText());
         left = (ASTExpression) map.get(ctx.expr(0));
         right = (ASTExpression) map.get(ctx.expr(1));
 
         binExpr = new ASTBinaryExpr(findBinOp(ctx.BINOP().getText()), left, right);
+
+        binExpr.setDepth(ctx.depth());
 
         map.put(ctx, binExpr);
     }
@@ -214,6 +237,8 @@ public class LJASTConverter extends LJBaseListener {
         ASTFunctionCall funcCall;
 
         funcCall = new ASTFunctionCall(ctx.funcCall().ID().getText());
+
+        funcCall.setDepth(ctx.depth());
 
         map.put(ctx, funcCall);
     }
@@ -227,6 +252,8 @@ public class LJASTConverter extends LJBaseListener {
         if (ctx.loc().expr() != null) {
             loc.index = (ASTExpression) map.get(ctx.loc().expr());
         }
+
+        loc.setDepth(ctx.depth());
 
         map.put(ctx, loc);
     }
@@ -246,6 +273,8 @@ public class LJASTConverter extends LJBaseListener {
             lit = new ASTLiteral(ASTNode.DataType.STR, ctx.lit().STR().getText());
         }
 
+        lit.setDepth(ctx.depth());
+
         map.put(ctx, lit);
     }
 
@@ -254,6 +283,8 @@ public class LJASTConverter extends LJBaseListener {
         ASTFunctionCall funcCall;
 
         funcCall = new ASTFunctionCall(ctx.ID().getText());
+
+        funcCall.setDepth(ctx.depth());
 
         map.put(ctx, funcCall);
     }
@@ -267,6 +298,8 @@ public class LJASTConverter extends LJBaseListener {
         if (ctx.expr() != null) {
             loc.index = (ASTExpression) map.get(ctx.expr());
         }
+
+        loc.setDepth(ctx.depth());
 
         map.put(ctx, loc);
     }
@@ -285,6 +318,8 @@ public class LJASTConverter extends LJBaseListener {
             assert(map.get(ctx.STR()) != null);
             lit = new ASTLiteral(ASTNode.DataType.STR, ctx.STR().getText());
         }
+
+        lit.setDepth(ctx.depth());
 
         map.put(ctx, lit);
     }
