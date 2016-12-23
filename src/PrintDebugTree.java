@@ -24,7 +24,7 @@ class PrintDebugTree extends DefaultASTVisitor
     {
         if (node.attributes.containsKey("depth")) {
             int level = ((Integer)node.attributes.get("depth")).intValue();
-            while (level > 0) {
+            while (level > 1) {
                 output.print("  ");
                 level--;
             }
