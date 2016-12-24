@@ -70,10 +70,10 @@ public class BuildSymbolTables extends StaticAnalysis
     /**
      * Add a symbol for the given variable to the current (innermost) scope.
      */
-    protected void insertVariableSymbol(ASTVariable node)
+    protected void insertLocationSymbol(ASTLocation node)
     {
         try {
-            Symbol symbol = new Symbol(node.name, node.type, node.isArray, node.arrayLength);
+            Symbol symbol = new Symbol(node.name, node.type, node.hasIndex(), node.arrayLength);
             getCurrentTable().insert(node.name, symbol);
         } catch (InvalidProgramException ex) {
             addError(ex);
@@ -158,9 +158,9 @@ public class BuildSymbolTables extends StaticAnalysis
     }
 
     @Override
-    public void preVisit(ASTVariable node)
+    public void preVisit(ASTLocation node)
     {
-        insertVariableSymbol(node);
+        insertLocationSymbol(node);
     }
 }
 
