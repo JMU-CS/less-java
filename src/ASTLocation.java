@@ -9,16 +9,18 @@ public class ASTLocation extends ASTExpression
 {
     public String name;
     public ASTExpression index;     // can be null (non-array)
+    public ASTNode.DataType type;
 
     public ASTLocation(String name)
     {
-        this(name, null);
+        this(name, null, ASTNode.DataType.UNKNOWN);
     }
 
-    public ASTLocation(String name, ASTExpression index)
+    public ASTLocation(String name, ASTExpression index, ASTNode.DataType type)
     {
         this.name = name;
         this.index = index;
+        this.type = type;
     }
 
     public boolean hasIndex()
