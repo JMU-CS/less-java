@@ -1,5 +1,3 @@
-package edu.jmu.decaf;
-
 import java.util.*;
 
 /**

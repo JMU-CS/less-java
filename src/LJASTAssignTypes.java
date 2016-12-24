@@ -21,13 +21,13 @@ public class LJASTAssignTypes extends LJBaseASTVisitor {
         ASTNode.DataType type;
 
         if (expr instanceof ASTBinaryExpr) {
-           type = evalExprType(expr); 
+           type = evalExprType(expr);
         } else if(expr instanceof ASTLocation) {
-           type = evalExprType(expr); 
+           type = evalExprType(expr);
         } else if(expr instanceof ASTLiteral) {
-           type = evalExprType(expr); 
+           type = evalExprType(expr);
         } else {
-           type = null; 
+           type = null;
         }
 
         return type;
@@ -38,11 +38,12 @@ public class LJASTAssignTypes extends LJBaseASTVisitor {
     }
 
     public ASTNode.DataType evalExprType(ASTLocation expr) {
+        //look up value in symboltable
         return null;
     }
 
     public ASTNode.DataType evalExprType(ASTLiteral expr) {
-        return null;
+        return expr.type;
     }
 }
 

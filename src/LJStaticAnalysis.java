@@ -1,4 +1,7 @@
 public class LJStaticAnalysis extends LJBaseListener {
+
+    private ASTNode.DataType functionReturnType;
+
     public LJStaticAnalysis() {
     }
 

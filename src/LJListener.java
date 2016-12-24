@@ -189,6 +189,18 @@ public interface LJListener extends ParseTreeListener {
 	 */
 	void exitExprFunctionCall(LJParser.ExprFunctionCallContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code ExprParen}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterExprParen(LJParser.ExprParenContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code ExprParen}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitExprParen(LJParser.ExprParenContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code ExprLiteral}
 	 * labeled alternative in {@link LJParser#expr}.
 	 * @param ctx the parse tree

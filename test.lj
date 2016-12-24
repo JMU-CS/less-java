@@ -2,7 +2,7 @@ a = 1 + 2
 b = "hi"
 
 add(a, b) {
-    return a + b
+    return a * (a + b)
 }
 
 test add(1, 2) = 3
