@@ -24,6 +24,7 @@ expr:           expr BINOP expr                         #BinExpr
                 | funcCall                              #ExprFunctionCall
                 | loc                                   #ExprLocation
                 | lit                                   #ExprLiteral
+                | '(' expr ')'                          #ExprParen
                 ;
 
 funcCall:       ID '('argList')';
