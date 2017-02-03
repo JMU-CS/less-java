@@ -2,3 +2,4 @@ build/
 decaf-compiler-630.zip
 decaf-compiler-reference/
 .gradle/
+compiler.out
