@@ -1,14 +1,15 @@
-A language to introduce students to programming  
+#A language to introduce students to programming  
+---
 
-How to build:  
-    If you have gradle installed:  
+1. How to build:  
+    * If you have gradle installed:  
         `gradle build`  
-    If not:  
+    * If not:  
         `./gradlew build`   #unix  
         `gradlew build`     #windows  
         
-How to run:  
-    `gradle run`  
+2. How to run:  
+    * `gradle run`  
 
 This runs with the test file "test.lj"  
 Replace that file in build.gradle with your desired file.
