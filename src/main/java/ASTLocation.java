@@ -1,5 +1,4 @@
 
-
 /**
  * Decaf location. This could be a local variable or a global variable,
  * depending on the context. It could also be a local or global array location,
@@ -8,8 +7,9 @@
 public class ASTLocation extends ASTExpression
 {
     public String name;
-    public ASTExpression index;     // can be null (non-array)
     public ASTNode.DataType type;
+    public ASTExpression index;     // can be null (non-array)
+    public int arrayLength;         //added to compile
 
     public ASTLocation(String name)
     {

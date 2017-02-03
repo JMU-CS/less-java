@@ -8,9 +8,9 @@ public class Symbol
 {
     /**
      * Memory access locations.
-     * 
+     *
      * May be one of the following:
-     * 
+     *
      * <ul>
      * <li> STATIC_VAR  - static variable w/ global symbol </li>
      * <li> STATIC_FUNC - function w/ global symbol </li>
@@ -25,17 +25,17 @@ public class Symbol
         STACK_PARAM,
         STACK_LOCAL
     };
-    
+
     /**
      * Name in source code
      */
     public String name;
-    
+
     /**
      * Data type
      */
     public ASTNode.DataType type;
-    
+
     /**
      * Data types of formal parameters (for function symbols, empty for others)
      */
@@ -45,33 +45,33 @@ public class Symbol
      * Flag indicating this symbol represents an array
      */
     public boolean isArray;
-    
+
     /**
      * Length of array (for array symbols; should be 1 for others)
      */
     public int length;
-    
+
     /**
      * Size of individual elements (in bytes)
      */
     public int elementSize;
-    
+
     /**
      * Size of overall structure (in bytes); for scalar variables,
      * elementSize == totalSize
      */
     public int totalSize;
-    
+
     /**
      * Memory location information
      */
     public MemLoc location;
-    
+
     /**
      * Memory offset (if needed)
      */
     public int offset;
-    
+
     /**
      * Create a new scalar symbol
      * @param name Name in source code
@@ -102,7 +102,7 @@ public class Symbol
         this.location = MemLoc.UNKNOWN;
         this.offset = 0;
     }
-    
+
     /**
      * Create a new function symbol
      * @param name Name in source code
@@ -121,7 +121,7 @@ public class Symbol
         this.location = MemLoc.STATIC_FUNC;
         this.offset = 0;
     }
-    
+
     /**
      * Simplified string representation
      */

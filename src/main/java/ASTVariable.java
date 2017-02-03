@@ -1,5 +1,4 @@
 
-
 /**
  * Decaf variable declaration. Contains a name, a data type, and an array
  * flag. If the flag is set, the arrayLength field contains the size.
