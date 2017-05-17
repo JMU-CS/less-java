@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-    <classpathentry kind="src" path="src"/>
-    <classpathentry exported="true" kind="lib" path="/usr/local/lib/antlr-4.5.3-complete.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path="build"/>
+    <classpathentry kind="src" path="src/main/java"/>
+    <classpathentry exported="true" kind="lib" path="libs/antlr-4.5.3-complete.jar"/>
+    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+    <classpathentry kind="output" path="build"/>
 </classpath>
