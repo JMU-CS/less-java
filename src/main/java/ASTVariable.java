@@ -5,23 +5,22 @@
  */
 public class ASTVariable extends ASTNode
 {
-    public String name;
+    public ASTLocation loc;
     public ASTNode.DataType type;
     public boolean isArray;
     public int arrayLength;
 
-    public ASTVariable(String name, ASTNode.DataType type)
+    public ASTVariable(ASTLocation loc, ASTNode.DataType type)
     {
-        this.name = name;
+        this.loc = loc;
         this.type = type;
         this.isArray = false;
         this.arrayLength = 1;
     }
 
-    public ASTVariable(String name, ASTNode.DataType type, int arrayLength)
+    public ASTVariable(ASTLocation loc, ASTNode.DataType type, int arrayLength)
     {
-        this.name = name;
-        this.type = type;
+        this (loc, type);
         this.isArray = true;
         this.arrayLength = arrayLength;
     }
