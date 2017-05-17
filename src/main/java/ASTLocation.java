@@ -7,20 +7,17 @@
 public class ASTLocation extends ASTExpression
 {
     public String name;
-    public ASTNode.DataType type;
     public ASTExpression index;     // can be null (non-array)
-    public int arrayLength;         //added to compile
 
     public ASTLocation(String name)
     {
-        this(name, null, ASTNode.DataType.UNKNOWN);
+        this(name, null);
     }
 
-    public ASTLocation(String name, ASTExpression index, ASTNode.DataType type)
+    public ASTLocation(String name, ASTExpression index)
     {
         this.name = name;
         this.index = index;
-        this.type = type;
     }
 
     public boolean hasIndex()
