@@ -10,6 +10,7 @@
 
 2. How to run:
     * `gradle run`
+    * Output is written to compiler.out
 
 This runs with the test file "test.lj"
 Replace that file in build.gradle with your desired file.
