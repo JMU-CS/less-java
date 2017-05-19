@@ -68,7 +68,7 @@ class PrintDebugTree extends DefaultASTVisitor
     public void preVisit(ASTVariable node)
     {
         indent(node);
-        output.print("Variable: " + node.name +
+        output.print("Variable: " + node.loc.name +
                 " : " + ASTNode.typeToString(node.type) +
                 (node.isArray ? "[" + node.arrayLength + "]" : ""));
         newline(node, true);
