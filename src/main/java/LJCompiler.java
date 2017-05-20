@@ -27,6 +27,7 @@ public class LJCompiler {
         LJStaticAnalysis staticAnalyzer = null;
         ASTProgram program = null;
         PrintDebugTree printTree = null;
+        BuildSymbolTables bst = null;
 
         try {
             for (String s: args) {
@@ -48,7 +49,9 @@ public class LJCompiler {
 
         program = converter.getAST();
         printTree = new PrintDebugTree();
+        bst = new BuildSymbolTables();
 
+        program.traverse(bst);
         program.traverse(printTree);
     }
 }

@@ -1,4 +1,6 @@
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -8,12 +10,15 @@ public class LJASTConverter extends LJBaseListener {
     private ASTProgram ast;
     private LinkedHashMap<ParserRuleContext, ASTNode> map;
 
+    private Set<String> locationNames;
+
     //private ASTFunction currentFunction;
     private Stack<ASTBlock> blocks;
 
     public LJASTConverter() {
         map = new LinkedHashMap<>();
         blocks = new Stack<ASTBlock>();
+        locationNames = new HashSet<>();
     }
 
     @Override
@@ -79,11 +84,19 @@ public class LJASTConverter extends LJBaseListener {
         ASTAssignment assignment;
         ASTLocation location;
         ASTExpression expression;
+        ASTVariable variable;
 
         location = (ASTLocation) map.get(ctx.loc());
         expression = (ASTExpression) map.get(ctx.expr());
 
-        assignment = new ASTAssignment(location, expression);
+        // If first encounter with this id
+        if (locationNames.add(location.name)) {
+            variable = new ASTVariable(location, ASTNode.DataType.UNKNOWN);
+            assignment = new ASTAssignment(variable, expression);
+        } else {
+            assignment = new ASTAssignment(location, expression);
+        }
+
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(assignment);
