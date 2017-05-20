@@ -284,6 +284,11 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
+    public void exitExprParen(LJParser.ExprParenContext ctx) {
+        map.put(ctx, map.get(ctx.expr()));
+    }
+
+    @Override
     public void exitFuncCall(LJParser.FuncCallContext ctx) {
         ASTFunctionCall funcCall;
 
