@@ -4,10 +4,11 @@
  *
  * This generated file contains a sample Java project to get you started.
  * For more details take a look at the Java Quickstart chapter in the Gradle
- * user guide available at https://docs.gradle.org/3.2.1/userguide/tutorial_java_projects.html
+ * user guide available at
+ * https://docs.gradle.org/3.2.1/userguide/tutorial_java_projects.html
  */
 
-// Apply the java plugin to add support for Java
+// Add Java support
 apply plugin: 'java'
 
 // In this section you declare where to find the dependencies of your project
@@ -25,10 +26,7 @@ dependencies {
     compile files("libs/classes")
     compile fileTree(dir: "libs", include: "*.jar")
 
-    // Declare the dependency for your favourite test framework you want to use in your tests.
-    // TestNG is also supported by the Gradle Test task. Just change the
-    // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
-    // 'test.useTestNG()' to your build script.
+    // JUnit
     testCompile 'junit:junit:4.12'
 }
 
@@ -43,7 +41,8 @@ task run(type: JavaExec) {
 }
 
 task antlr(type: Exec) {
-    commandLine 'java', '-jar', 'libs/antlr-4.5.3-complete.jar', 'LJ.g4', '-o', 'src/main/java'
+    commandLine 'java', '-jar', 'libs/antlr-4.5.3-complete.jar', 'LJ.g4', '-o',
+        'src/main/java'
 }
 
 build.dependsOn(antlr)
