@@ -195,6 +195,30 @@ public class LJBaseListener implements LJListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBinExprPrec2(LJParser.BinExprPrec2Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBinExprPrec2(LJParser.BinExprPrec2Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBinExprPrec3(LJParser.BinExprPrec3Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBinExprPrec3(LJParser.BinExprPrec3Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterExprFunctionCall(LJParser.ExprFunctionCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -219,6 +243,30 @@ public class LJBaseListener implements LJListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBinExprPrec1(LJParser.BinExprPrec1Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBinExprPrec1(LJParser.BinExprPrec1Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUnExpr(LJParser.UnExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnExpr(LJParser.UnExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterExprLiteral(LJParser.ExprLiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -226,18 +274,6 @@ public class LJBaseListener implements LJListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitExprLiteral(LJParser.ExprLiteralContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterBinExpr(LJParser.BinExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBinExpr(LJParser.BinExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

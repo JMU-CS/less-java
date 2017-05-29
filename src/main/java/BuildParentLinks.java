@@ -102,13 +102,7 @@ class BuildParentLinks extends DefaultASTVisitor
         }
     }
 
-    @Override
-    public void preVisit(ASTLocation node)
-    {
-        if (node.hasIndex()) {
-            node.index.setParent(node);
-        }
-    }
+    // no need for ASTLocation handler (no children)
 
     // no need for ASTLiteral handler (no children)
 }

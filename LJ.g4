@@ -20,7 +20,10 @@ statement:      loc '=' expr EOL                        #Assignment
                 | EOL                                   #Terminator
                 ;
 
-expr:           expr BINOP expr                         #BinExpr
+expr:           left=expr op=PREC1 right=expr           #BinExprPrec1
+                | left=expr op=PREC2 right=expr         #BinExprPrec2
+                | left=expr op=PREC3 right=expr         #BinExprPrec3
+                | op=UNOP expr                          #UnExpr
                 | funcCall                              #ExprFunctionCall
                 | loc                                   #ExprLocation
                 | lit                                   #ExprLiteral
@@ -29,7 +32,7 @@ expr:           expr BINOP expr                         #BinExpr
 
 funcCall:       ID '('argList')';
 
-loc:            ID ('['expr']')?;
+loc:            ID;
 lit:            DEC | BOOL | STR;
 
 
@@ -44,11 +47,16 @@ BREAK:      'break';
 CONTINUE:   'continue';
 TEST:       'test';
 
-BINOP:      ADD
-            | MULT
+PREC1:      MULT
             | DIV
+            | MOD
+            ;
+
+PREC2:      ADD
             | SUB
-            | GT
+            ;
+
+PREC3:      | GT
             | GTE
             | LT
             | LTE
@@ -58,10 +66,13 @@ BINOP:      ADD
             | AND
             ;
 
+UNOP:       NOT;
+
 ADD:        '+';
+SUB:        '-';
 MULT:       '*';
 DIV:        '/';
-SUB:        '-';
+MOD:        '%';
 GT:         '>';
 GTE:       '>=';
 LT:         '<';
@@ -70,6 +81,8 @@ ET:        '==';
 NET:       '!=';
 OR:        '||';
 AND:       '&&';
+
+NOT:        '!';
 
 // Literals
 DEC:        [0-9]+;

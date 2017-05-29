@@ -177,6 +177,30 @@ public interface LJListener extends ParseTreeListener {
 	 */
 	void exitExprLocation(LJParser.ExprLocationContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code BinExprPrec2}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterBinExprPrec2(LJParser.BinExprPrec2Context ctx);
+	/**
+	 * Exit a parse tree produced by the {@code BinExprPrec2}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitBinExprPrec2(LJParser.BinExprPrec2Context ctx);
+	/**
+	 * Enter a parse tree produced by the {@code BinExprPrec3}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterBinExprPrec3(LJParser.BinExprPrec3Context ctx);
+	/**
+	 * Exit a parse tree produced by the {@code BinExprPrec3}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitBinExprPrec3(LJParser.BinExprPrec3Context ctx);
+	/**
 	 * Enter a parse tree produced by the {@code ExprFunctionCall}
 	 * labeled alternative in {@link LJParser#expr}.
 	 * @param ctx the parse tree
@@ -201,6 +225,30 @@ public interface LJListener extends ParseTreeListener {
 	 */
 	void exitExprParen(LJParser.ExprParenContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code BinExprPrec1}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterBinExprPrec1(LJParser.BinExprPrec1Context ctx);
+	/**
+	 * Exit a parse tree produced by the {@code BinExprPrec1}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitBinExprPrec1(LJParser.BinExprPrec1Context ctx);
+	/**
+	 * Enter a parse tree produced by the {@code UnExpr}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnExpr(LJParser.UnExprContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code UnExpr}
+	 * labeled alternative in {@link LJParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnExpr(LJParser.UnExprContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code ExprLiteral}
 	 * labeled alternative in {@link LJParser#expr}.
 	 * @param ctx the parse tree
@@ -212,18 +260,6 @@ public interface LJListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExprLiteral(LJParser.ExprLiteralContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code BinExpr}
-	 * labeled alternative in {@link LJParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterBinExpr(LJParser.BinExprContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code BinExpr}
-	 * labeled alternative in {@link LJParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitBinExpr(LJParser.BinExprContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LJParser#funcCall}.
 	 * @param ctx the parse tree

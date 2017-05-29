@@ -192,12 +192,7 @@ class PrintDebugTree extends DefaultASTVisitor
     public void preVisit(ASTLocation node)
     {
         indent(node);
-        if (node.hasIndex()) {
-            output.print("Location: " + node.name.toString() +
-                    "[" + node.index.toString() + "]");
-        } else {
-            output.print("Location: " + node.name.toString());
-        }
+        output.print("Location: " + node.name.toString());
         newline(node);
     }
 

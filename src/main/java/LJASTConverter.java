@@ -1,6 +1,4 @@
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -10,15 +8,12 @@ public class LJASTConverter extends LJBaseListener {
     private ASTProgram ast;
     private LinkedHashMap<ParserRuleContext, ASTNode> map;
 
-    private Set<String> locationNames;
-
     //private ASTFunction currentFunction;
     private Stack<ASTBlock> blocks;
 
     public LJASTConverter() {
         map = new LinkedHashMap<>();
         blocks = new Stack<ASTBlock>();
-        locationNames = new HashSet<>();
     }
 
     @Override
@@ -84,19 +79,11 @@ public class LJASTConverter extends LJBaseListener {
         ASTAssignment assignment;
         ASTLocation location;
         ASTExpression expression;
-        ASTVariable variable;
 
         location = (ASTLocation) map.get(ctx.loc());
         expression = (ASTExpression) map.get(ctx.expr());
 
-        // If first encounter with this id
-        if (locationNames.add(location.name)) {
-            variable = new ASTVariable(location, ASTNode.DataType.UNKNOWN);
-            assignment = new ASTAssignment(variable, expression);
-        } else {
-            assignment = new ASTAssignment(location, expression);
-        }
-
+        assignment = new ASTAssignment(location, expression);
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(assignment);
@@ -222,19 +209,65 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitBinExpr(LJParser.BinExprContext ctx) {
+    public void exitBinExprPrec1(LJParser.BinExprPrec1Context ctx) {
         ASTBinaryExpr binExpr;
         ASTExpression left;
         ASTExpression right;
 
-        left = (ASTExpression) map.get(ctx.expr(0));
-        right = (ASTExpression) map.get(ctx.expr(1));
+        left = (ASTExpression) map.get(ctx.left);
+        right = (ASTExpression) map.get(ctx.right);
 
-        binExpr = new ASTBinaryExpr(findBinOp(ctx.BINOP().getText()), left, right);
+        binExpr = new ASTBinaryExpr(findBinOp(ctx.op.getText()), left, right);
 
         binExpr.setDepth(ctx.depth());
 
         map.put(ctx, binExpr);
+    }
+
+    @Override
+    public void exitBinExprPrec2(LJParser.BinExprPrec2Context ctx) {
+        ASTBinaryExpr binExpr;
+        ASTExpression left;
+        ASTExpression right;
+
+        left = (ASTExpression) map.get(ctx.left);
+        right = (ASTExpression) map.get(ctx.right);
+
+        binExpr = new ASTBinaryExpr(findBinOp(ctx.op.getText()), left, right);
+
+        binExpr.setDepth(ctx.depth());
+
+        map.put(ctx, binExpr);
+    }
+
+    @Override
+    public void exitBinExprPrec3(LJParser.BinExprPrec3Context ctx) {
+        ASTBinaryExpr binExpr;
+        ASTExpression left;
+        ASTExpression right;
+
+        left = (ASTExpression) map.get(ctx.left);
+        right = (ASTExpression) map.get(ctx.right);
+
+        binExpr = new ASTBinaryExpr(findBinOp(ctx.op.getText()), left, right);
+
+        binExpr.setDepth(ctx.depth());
+
+        map.put(ctx, binExpr);
+    }
+
+    @Override
+    public void exitUnExpr(LJParser.UnExprContext ctx) {
+        ASTUnaryExpr unExpr;
+        ASTUnaryExpr.UnaryOp op;
+        ASTExpression expr;
+
+        op = findUnaryOp(ctx.op.getText());
+        expr = (ASTExpression) map.get(ctx.expr());
+
+        unExpr = new ASTUnaryExpr(op, expr);
+
+        map.put(ctx, unExpr);
     }
 
     @Override
@@ -253,10 +286,6 @@ public class LJASTConverter extends LJBaseListener {
         ASTLocation loc;
 
         loc = new ASTLocation(ctx.loc().ID().getText());
-
-        if (ctx.loc().expr() != null) {
-            loc.index = (ASTExpression) map.get(ctx.loc().expr());
-        }
 
         loc.setDepth(ctx.depth());
 
@@ -305,10 +334,6 @@ public class LJASTConverter extends LJBaseListener {
 
         loc = new ASTLocation(ctx.ID().getText());
 
-        if (ctx.expr() != null) {
-            loc.index = (ASTExpression) map.get(ctx.expr());
-        }
-
         loc.setDepth(ctx.depth());
 
         map.put(ctx, loc);
@@ -336,6 +361,15 @@ public class LJASTConverter extends LJBaseListener {
 
     public ASTProgram getAST() {
         return ast;
+    }
+
+    public ASTUnaryExpr.UnaryOp findUnaryOp(String op) {
+        switch (op) {
+        case "!":
+            return ASTUnaryExpr.UnaryOp.NOT;
+        default:
+            return ASTUnaryExpr.UnaryOp.INVALID;
+        }
     }
 
     private ASTBinaryExpr.BinOp findBinOp(String s) {

@@ -32,4 +32,3 @@ public class ASTVariable extends ASTNode
         visitor.postVisit(this);
     }
 }
-

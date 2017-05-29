@@ -50,10 +50,6 @@ public class LJStaticAnalysis extends LJBaseListener {
     }
 
     @Override
-    public void exitBinExpr(LJParser.BinExprContext ctx) {
-    }
-
-    @Override
     public void exitLit(LJParser.LitContext ctx) {
     }
 }
