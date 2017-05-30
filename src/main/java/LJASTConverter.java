@@ -209,49 +209,21 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitBinExprPrec1(LJParser.BinExprPrec1Context ctx) {
+    public void exitEbin(LJParser.EbinContext ctx) {
         ASTBinaryExpr binExpr;
-        ASTExpression left;
-        ASTExpression right;
+        ASTExpression left, right;
+        ASTBinaryExpr.BinOp op;
+
+        // If unary expression
+        if (ctx.left == null) {
+            return;
+        }
 
         left = (ASTExpression) map.get(ctx.left);
         right = (ASTExpression) map.get(ctx.right);
+        op = findBinOp(ctx.op.getText());
 
-        binExpr = new ASTBinaryExpr(findBinOp(ctx.op.getText()), left, right);
-
-        binExpr.setDepth(ctx.depth());
-
-        map.put(ctx, binExpr);
-    }
-
-    @Override
-    public void exitBinExprPrec2(LJParser.BinExprPrec2Context ctx) {
-        ASTBinaryExpr binExpr;
-        ASTExpression left;
-        ASTExpression right;
-
-        left = (ASTExpression) map.get(ctx.left);
-        right = (ASTExpression) map.get(ctx.right);
-
-        binExpr = new ASTBinaryExpr(findBinOp(ctx.op.getText()), left, right);
-
-        binExpr.setDepth(ctx.depth());
-
-        map.put(ctx, binExpr);
-    }
-
-    @Override
-    public void exitBinExprPrec3(LJParser.BinExprPrec3Context ctx) {
-        ASTBinaryExpr binExpr;
-        ASTExpression left;
-        ASTExpression right;
-
-        left = (ASTExpression) map.get(ctx.left);
-        right = (ASTExpression) map.get(ctx.right);
-
-        binExpr = new ASTBinaryExpr(findBinOp(ctx.op.getText()), left, right);
-
-        binExpr.setDepth(ctx.depth());
+        binExpr = new ASTBinaryExpr(op, left, right);
 
         map.put(ctx, binExpr);
     }
@@ -263,7 +235,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTExpression expr;
 
         op = findUnaryOp(ctx.op.getText());
-        expr = (ASTExpression) map.get(ctx.expr());
+        expr = (ASTExpression) map.get(ctx.expression);
 
         unExpr = new ASTUnaryExpr(op, expr);
 
