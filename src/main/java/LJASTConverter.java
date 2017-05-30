@@ -209,13 +209,13 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitEbin(LJParser.EbinContext ctx) {
+    public void exitExprBin(LJParser.ExprBinContext ctx) {
         ASTBinaryExpr binExpr;
         ASTExpression left, right;
         ASTBinaryExpr.BinOp op;
 
         // If unary expression
-        if (ctx.left == null) {
+        if (ctx.op == null) {
             return;
         }
 
@@ -229,10 +229,15 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitUnExpr(LJParser.UnExprContext ctx) {
+    public void exitExprUn(LJParser.ExprUnContext ctx) {
         ASTUnaryExpr unExpr;
         ASTUnaryExpr.UnaryOp op;
         ASTExpression expr;
+
+        // If base expression
+        if (ctx.op == null) {
+            return;
+        }
 
         op = findUnaryOp(ctx.op.getText());
         expr = (ASTExpression) map.get(ctx.expression);

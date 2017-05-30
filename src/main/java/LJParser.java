@@ -23,11 +23,11 @@ public class LJParser extends Parser {
 		ID=35, WS=36, EOL=37;
 	public static final int
 		RULE_program = 0, RULE_function = 1, RULE_paramList = 2, RULE_argList = 3, 
-		RULE_block = 4, RULE_statement = 5, RULE_expr = 6, RULE_ebin = 7, RULE_eun = 8, 
-		RULE_ebase = 9, RULE_funcCall = 10, RULE_loc = 11, RULE_lit = 12;
+		RULE_block = 4, RULE_statement = 5, RULE_expr = 6, RULE_exprBin = 7, RULE_exprUn = 8, 
+		RULE_exprBase = 9, RULE_funcCall = 10, RULE_loc = 11, RULE_lit = 12;
 	public static final String[] ruleNames = {
 		"program", "function", "paramList", "argList", "block", "statement", "expr", 
-		"ebin", "eun", "ebase", "funcCall", "loc", "lit"
+		"exprBin", "exprUn", "exprBase", "funcCall", "loc", "lit"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
@@ -715,8 +715,8 @@ public class LJParser extends Parser {
 	}
 
 	public static class ExprContext extends ParserRuleContext {
-		public EbinContext ebin() {
-			return getRuleContext(EbinContext.class,0);
+		public ExprBinContext exprBin() {
+			return getRuleContext(ExprBinContext.class,0);
 		}
 		public ExprContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -739,7 +739,7 @@ public class LJParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(109);
-			ebin(0);
+			exprBin(0);
 			}
 		}
 		catch (RecognitionException re) {
@@ -753,54 +753,54 @@ public class LJParser extends Parser {
 		return _localctx;
 	}
 
-	public static class EbinContext extends ParserRuleContext {
-		public EbinContext left;
+	public static class ExprBinContext extends ParserRuleContext {
+		public ExprBinContext left;
 		public Token op;
-		public EbinContext right;
-		public EunContext eun() {
-			return getRuleContext(EunContext.class,0);
+		public ExprBinContext right;
+		public ExprUnContext exprUn() {
+			return getRuleContext(ExprUnContext.class,0);
 		}
-		public List<EbinContext> ebin() {
-			return getRuleContexts(EbinContext.class);
+		public List<ExprBinContext> exprBin() {
+			return getRuleContexts(ExprBinContext.class);
 		}
-		public EbinContext ebin(int i) {
-			return getRuleContext(EbinContext.class,i);
+		public ExprBinContext exprBin(int i) {
+			return getRuleContext(ExprBinContext.class,i);
 		}
 		public TerminalNode PREC1() { return getToken(LJParser.PREC1, 0); }
 		public TerminalNode PREC2() { return getToken(LJParser.PREC2, 0); }
 		public TerminalNode PREC3() { return getToken(LJParser.PREC3, 0); }
-		public EbinContext(ParserRuleContext parent, int invokingState) {
+		public ExprBinContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_ebin; }
+		@Override public int getRuleIndex() { return RULE_exprBin; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).enterEbin(this);
+			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprBin(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).exitEbin(this);
+			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprBin(this);
 		}
 	}
 
-	public final EbinContext ebin() throws RecognitionException {
-		return ebin(0);
+	public final ExprBinContext exprBin() throws RecognitionException {
+		return exprBin(0);
 	}
 
-	private EbinContext ebin(int _p) throws RecognitionException {
+	private ExprBinContext exprBin(int _p) throws RecognitionException {
 		ParserRuleContext _parentctx = _ctx;
 		int _parentState = getState();
-		EbinContext _localctx = new EbinContext(_ctx, _parentState);
-		EbinContext _prevctx = _localctx;
+		ExprBinContext _localctx = new ExprBinContext(_ctx, _parentState);
+		ExprBinContext _prevctx = _localctx;
 		int _startState = 14;
-		enterRecursionRule(_localctx, 14, RULE_ebin, _p);
+		enterRecursionRule(_localctx, 14, RULE_exprBin, _p);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
 			{
 			setState(112);
-			eun();
+			exprUn();
 			}
 			_ctx.stop = _input.LT(-1);
 			setState(125);
@@ -816,44 +816,44 @@ public class LJParser extends Parser {
 					switch ( getInterpreter().adaptivePredict(_input,10,_ctx) ) {
 					case 1:
 						{
-						_localctx = new EbinContext(_parentctx, _parentState);
+						_localctx = new ExprBinContext(_parentctx, _parentState);
 						_localctx.left = _prevctx;
 						_localctx.left = _prevctx;
-						pushNewRecursionContext(_localctx, _startState, RULE_ebin);
+						pushNewRecursionContext(_localctx, _startState, RULE_exprBin);
 						setState(114);
 						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
 						setState(115);
-						((EbinContext)_localctx).op = match(PREC1);
+						((ExprBinContext)_localctx).op = match(PREC1);
 						setState(116);
-						((EbinContext)_localctx).right = ebin(5);
+						((ExprBinContext)_localctx).right = exprBin(5);
 						}
 						break;
 					case 2:
 						{
-						_localctx = new EbinContext(_parentctx, _parentState);
+						_localctx = new ExprBinContext(_parentctx, _parentState);
 						_localctx.left = _prevctx;
 						_localctx.left = _prevctx;
-						pushNewRecursionContext(_localctx, _startState, RULE_ebin);
+						pushNewRecursionContext(_localctx, _startState, RULE_exprBin);
 						setState(117);
 						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
 						setState(118);
-						((EbinContext)_localctx).op = match(PREC2);
+						((ExprBinContext)_localctx).op = match(PREC2);
 						setState(119);
-						((EbinContext)_localctx).right = ebin(4);
+						((ExprBinContext)_localctx).right = exprBin(4);
 						}
 						break;
 					case 3:
 						{
-						_localctx = new EbinContext(_parentctx, _parentState);
+						_localctx = new ExprBinContext(_parentctx, _parentState);
 						_localctx.left = _prevctx;
 						_localctx.left = _prevctx;
-						pushNewRecursionContext(_localctx, _startState, RULE_ebin);
+						pushNewRecursionContext(_localctx, _startState, RULE_exprBin);
 						setState(120);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
 						setState(121);
-						((EbinContext)_localctx).op = match(PREC3);
+						((ExprBinContext)_localctx).op = match(PREC3);
 						setState(122);
-						((EbinContext)_localctx).right = ebin(3);
+						((ExprBinContext)_localctx).right = exprBin(3);
 						}
 						break;
 					}
@@ -876,63 +876,43 @@ public class LJParser extends Parser {
 		return _localctx;
 	}
 
-	public static class EunContext extends ParserRuleContext {
-		public EunContext(ParserRuleContext parent, int invokingState) {
+	public static class ExprUnContext extends ParserRuleContext {
+		public Token op;
+		public ExprUnContext expression;
+		public TerminalNode UNOP() { return getToken(LJParser.UNOP, 0); }
+		public ExprUnContext exprUn() {
+			return getRuleContext(ExprUnContext.class,0);
+		}
+		public ExprBaseContext exprBase() {
+			return getRuleContext(ExprBaseContext.class,0);
+		}
+		public ExprUnContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_eun; }
-	 
-		public EunContext() { }
-		public void copyFrom(EunContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	public static class UnExprContext extends EunContext {
-		public Token op;
-		public EunContext expression;
-		public TerminalNode UNOP() { return getToken(LJParser.UNOP, 0); }
-		public EunContext eun() {
-			return getRuleContext(EunContext.class,0);
-		}
-		public UnExprContext(EunContext ctx) { copyFrom(ctx); }
+		@Override public int getRuleIndex() { return RULE_exprUn; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).enterUnExpr(this);
+			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprUn(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).exitUnExpr(this);
-		}
-	}
-	public static class ExprBaseContext extends EunContext {
-		public EbaseContext ebase() {
-			return getRuleContext(EbaseContext.class,0);
-		}
-		public ExprBaseContext(EunContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprBase(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprBase(this);
+			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprUn(this);
 		}
 	}
 
-	public final EunContext eun() throws RecognitionException {
-		EunContext _localctx = new EunContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_eun);
+	public final ExprUnContext exprUn() throws RecognitionException {
+		ExprUnContext _localctx = new ExprUnContext(_ctx, getState());
+		enterRule(_localctx, 16, RULE_exprUn);
 		try {
 			setState(131);
 			switch (_input.LA(1)) {
 			case UNOP:
-				_localctx = new UnExprContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(128);
-				((UnExprContext)_localctx).op = match(UNOP);
+				((ExprUnContext)_localctx).op = match(UNOP);
 				setState(129);
-				((UnExprContext)_localctx).expression = eun();
+				((ExprUnContext)_localctx).expression = exprUn();
 				}
 				break;
 			case T__0:
@@ -940,11 +920,10 @@ public class LJParser extends Parser {
 			case BOOL:
 			case STR:
 			case ID:
-				_localctx = new ExprBaseContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(130);
-				ebase();
+				exprBase();
 				}
 				break;
 			default:
@@ -962,22 +941,22 @@ public class LJParser extends Parser {
 		return _localctx;
 	}
 
-	public static class EbaseContext extends ParserRuleContext {
-		public EbaseContext(ParserRuleContext parent, int invokingState) {
+	public static class ExprBaseContext extends ParserRuleContext {
+		public ExprBaseContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_ebase; }
+		@Override public int getRuleIndex() { return RULE_exprBase; }
 	 
-		public EbaseContext() { }
-		public void copyFrom(EbaseContext ctx) {
+		public ExprBaseContext() { }
+		public void copyFrom(ExprBaseContext ctx) {
 			super.copyFrom(ctx);
 		}
 	}
-	public static class ExprLocationContext extends EbaseContext {
+	public static class ExprLocationContext extends ExprBaseContext {
 		public LocContext loc() {
 			return getRuleContext(LocContext.class,0);
 		}
-		public ExprLocationContext(EbaseContext ctx) { copyFrom(ctx); }
+		public ExprLocationContext(ExprBaseContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
 			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprLocation(this);
@@ -987,11 +966,11 @@ public class LJParser extends Parser {
 			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprLocation(this);
 		}
 	}
-	public static class ExprFunctionCallContext extends EbaseContext {
+	public static class ExprFunctionCallContext extends ExprBaseContext {
 		public FuncCallContext funcCall() {
 			return getRuleContext(FuncCallContext.class,0);
 		}
-		public ExprFunctionCallContext(EbaseContext ctx) { copyFrom(ctx); }
+		public ExprFunctionCallContext(ExprBaseContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
 			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprFunctionCall(this);
@@ -1001,11 +980,11 @@ public class LJParser extends Parser {
 			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprFunctionCall(this);
 		}
 	}
-	public static class ExprParenContext extends EbaseContext {
+	public static class ExprParenContext extends ExprBaseContext {
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
-		public ExprParenContext(EbaseContext ctx) { copyFrom(ctx); }
+		public ExprParenContext(ExprBaseContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
 			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprParen(this);
@@ -1015,11 +994,11 @@ public class LJParser extends Parser {
 			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprParen(this);
 		}
 	}
-	public static class ExprLiteralContext extends EbaseContext {
+	public static class ExprLiteralContext extends ExprBaseContext {
 		public LitContext lit() {
 			return getRuleContext(LitContext.class,0);
 		}
-		public ExprLiteralContext(EbaseContext ctx) { copyFrom(ctx); }
+		public ExprLiteralContext(ExprBaseContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
 			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprLiteral(this);
@@ -1030,9 +1009,9 @@ public class LJParser extends Parser {
 		}
 	}
 
-	public final EbaseContext ebase() throws RecognitionException {
-		EbaseContext _localctx = new EbaseContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_ebase);
+	public final ExprBaseContext exprBase() throws RecognitionException {
+		ExprBaseContext _localctx = new ExprBaseContext(_ctx, getState());
+		enterRule(_localctx, 18, RULE_exprBase);
 		try {
 			setState(140);
 			_errHandler.sync(this);
@@ -1217,11 +1196,11 @@ public class LJParser extends Parser {
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		case 7:
-			return ebin_sempred((EbinContext)_localctx, predIndex);
+			return exprBin_sempred((ExprBinContext)_localctx, predIndex);
 		}
 		return true;
 	}
-	private boolean ebin_sempred(EbinContext _localctx, int predIndex) {
+	private boolean exprBin_sempred(ExprBinContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
 			return precpred(_ctx, 4);

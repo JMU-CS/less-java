@@ -195,37 +195,25 @@ public class LJBaseListener implements LJListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEbin(LJParser.EbinContext ctx) { }
+	@Override public void enterExprBin(LJParser.ExprBinContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEbin(LJParser.EbinContext ctx) { }
+	@Override public void exitExprBin(LJParser.ExprBinContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterUnExpr(LJParser.UnExprContext ctx) { }
+	@Override public void enterExprUn(LJParser.ExprUnContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitUnExpr(LJParser.UnExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterExprBase(LJParser.ExprBaseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitExprBase(LJParser.ExprBaseContext ctx) { }
+	@Override public void exitExprUn(LJParser.ExprUnContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -20,20 +20,20 @@ statement:      loc '=' expr EOL                        #Assignment
                 | EOL                                   #Terminator
                 ;
 
-expr:           ebin
+expr:           exprBin
                 ;
 
-ebin:           left=ebin op=PREC1 right=ebin
-                | left=ebin op=PREC2 right=ebin
-                | left=ebin op=PREC3 right=ebin
-                | eun
+exprBin:        left=exprBin op=PREC1 right=exprBin
+                | left=exprBin op=PREC2 right=exprBin
+                | left=exprBin op=PREC3 right=exprBin
+                | exprUn
                 ;
 
-eun:            op=UNOP expression=eun                             #UnExpr
-                | ebase                                 #ExprBase
+exprUn:         op=UNOP expression=exprUn
+                | exprBase
                 ;
 
-ebase:          funcCall                                #ExprFunctionCall
+exprBase:       funcCall                                #ExprFunctionCall
                 | loc                                   #ExprLocation
                 | lit                                   #ExprLiteral
                 | '(' expr ')'                          #ExprParen
