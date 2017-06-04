@@ -276,6 +276,10 @@ public class LJASTConverter extends LJBaseListener {
 
         funcCall = new ASTFunctionCall(ctx.funcCall().ID().getText());
 
+        for (LJParser.ExprContext expr: ctx.funcCall().argList().expr()) {
+            funcCall.arguments.add((ASTExpression)map.get(expr));
+        }
+
         funcCall.setDepth(ctx.depth());
 
         map.put(ctx, funcCall);
@@ -322,6 +326,10 @@ public class LJASTConverter extends LJBaseListener {
         ASTFunctionCall funcCall;
 
         funcCall = new ASTFunctionCall(ctx.ID().getText());
+
+        for (LJParser.ExprContext expr: ctx.argList().expr()) {
+            funcCall.arguments.add((ASTExpression)map.get(expr));
+        }
 
         funcCall.setDepth(ctx.depth());
 

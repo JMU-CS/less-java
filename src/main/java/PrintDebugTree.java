@@ -152,6 +152,13 @@ class PrintDebugTree extends DefaultASTVisitor
     }
 
     @Override
+    public void preVisit(ASTTest node) {
+        indent(node);
+        output.print("Test");
+        newline(node);
+    }
+
+    @Override
     public void preVisit(ASTBinaryExpr node)
     {
         indent(node);
