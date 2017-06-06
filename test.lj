@@ -1,8 +1,1 @@
-a = 1 + 2
-b = "hi"
-
-add(a, b) {
-    return a * (a + b)
-}
-
-test add(1, 2) = 3
+a = 1 + 2 * 3 / 4

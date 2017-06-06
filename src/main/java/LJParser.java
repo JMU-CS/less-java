@@ -942,70 +942,29 @@ public class LJParser extends Parser {
 	}
 
 	public static class ExprBaseContext extends ParserRuleContext {
+		public FuncCallContext funcCall() {
+			return getRuleContext(FuncCallContext.class,0);
+		}
+		public LocContext loc() {
+			return getRuleContext(LocContext.class,0);
+		}
+		public LitContext lit() {
+			return getRuleContext(LitContext.class,0);
+		}
+		public ExprContext expr() {
+			return getRuleContext(ExprContext.class,0);
+		}
 		public ExprBaseContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_exprBase; }
-	 
-		public ExprBaseContext() { }
-		public void copyFrom(ExprBaseContext ctx) {
-			super.copyFrom(ctx);
-		}
-	}
-	public static class ExprLocationContext extends ExprBaseContext {
-		public LocContext loc() {
-			return getRuleContext(LocContext.class,0);
-		}
-		public ExprLocationContext(ExprBaseContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprLocation(this);
+			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprBase(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprLocation(this);
-		}
-	}
-	public static class ExprFunctionCallContext extends ExprBaseContext {
-		public FuncCallContext funcCall() {
-			return getRuleContext(FuncCallContext.class,0);
-		}
-		public ExprFunctionCallContext(ExprBaseContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprFunctionCall(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprFunctionCall(this);
-		}
-	}
-	public static class ExprParenContext extends ExprBaseContext {
-		public ExprContext expr() {
-			return getRuleContext(ExprContext.class,0);
-		}
-		public ExprParenContext(ExprBaseContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprParen(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprParen(this);
-		}
-	}
-	public static class ExprLiteralContext extends ExprBaseContext {
-		public LitContext lit() {
-			return getRuleContext(LitContext.class,0);
-		}
-		public ExprLiteralContext(ExprBaseContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).enterExprLiteral(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprLiteral(this);
+			if ( listener instanceof LJListener ) ((LJListener)listener).exitExprBase(this);
 		}
 	}
 
@@ -1017,7 +976,6 @@ public class LJParser extends Parser {
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,13,_ctx) ) {
 			case 1:
-				_localctx = new ExprFunctionCallContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(133);
@@ -1025,7 +983,6 @@ public class LJParser extends Parser {
 				}
 				break;
 			case 2:
-				_localctx = new ExprLocationContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(134);
@@ -1033,7 +990,6 @@ public class LJParser extends Parser {
 				}
 				break;
 			case 3:
-				_localctx = new ExprLiteralContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(135);
@@ -1041,7 +997,6 @@ public class LJParser extends Parser {
 				}
 				break;
 			case 4:
-				_localctx = new ExprParenContext(_localctx);
 				enterOuterAlt(_localctx, 4);
 				{
 				setState(136);

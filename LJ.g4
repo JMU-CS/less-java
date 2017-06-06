@@ -33,10 +33,10 @@ exprUn:         op=UNOP expression=exprUn
                 | exprBase
                 ;
 
-exprBase:       funcCall                                #ExprFunctionCall
-                | loc                                   #ExprLocation
-                | lit                                   #ExprLiteral
-                | '(' expr ')'                          #ExprParen
+exprBase:       funcCall
+                | loc
+                | lit
+                | '(' expr ')'
                 ;
 
 
