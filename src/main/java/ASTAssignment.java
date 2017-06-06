@@ -4,21 +4,12 @@
  */
 public class ASTAssignment extends ASTStatement
 {
-    public ASTVariable variable;
     public ASTLocation location;
     public ASTExpression value;
 
     public ASTAssignment(ASTLocation location, ASTExpression value)
     {
-        this.variable = null;
         this.location = location;
-        this.value = value;
-    }
-
-    public ASTAssignment(ASTVariable variable, ASTExpression value)
-    {
-        this.variable = variable;
-        this.location = variable.loc;
         this.value = value;
     }
 
@@ -26,11 +17,7 @@ public class ASTAssignment extends ASTStatement
     public void traverse(ASTVisitor visitor)
     {
         visitor.preVisit(this);
-        if (variable == null) {
-            location.traverse(visitor);
-        } else {
-            variable.traverse(visitor);
-        }
+        location.traverse(visitor);
         value.traverse(visitor);
         visitor.postVisit(this);
     }

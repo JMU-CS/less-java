@@ -20,15 +20,25 @@ statement:      loc '=' expr EOL                        #Assignment
                 | EOL                                   #Terminator
                 ;
 
-expr:           left=expr op=PREC1 right=expr           #BinExprPrec1
-                | left=expr op=PREC2 right=expr         #BinExprPrec2
-                | left=expr op=PREC3 right=expr         #BinExprPrec3
-                | op=UNOP expr                          #UnExpr
-                | funcCall                              #ExprFunctionCall
-                | loc                                   #ExprLocation
-                | lit                                   #ExprLiteral
-                | '(' expr ')'                          #ExprParen
+expr:           exprBin
                 ;
+
+exprBin:        left=exprBin op=PREC1 right=exprBin
+                | left=exprBin op=PREC2 right=exprBin
+                | left=exprBin op=PREC3 right=exprBin
+                | exprUn
+                ;
+
+exprUn:         op=UNOP expression=exprUn
+                | exprBase
+                ;
+
+exprBase:       funcCall
+                | loc
+                | lit
+                | '(' expr ')'
+                ;
+
 
 funcCall:       ID '('argList')';
 

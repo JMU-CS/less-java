@@ -8,7 +8,7 @@ public class LJASTConverter extends LJBaseListener {
     private ASTProgram ast;
     private LinkedHashMap<ParserRuleContext, ASTNode> map;
 
-    //private ASTFunction currentFunction;
+    // private ASTFunction currentFunction;
     private Stack<ASTBlock> blocks;
 
     public LJASTConverter() {
@@ -20,13 +20,13 @@ public class LJASTConverter extends LJBaseListener {
     public void exitProgram(LJParser.ProgramContext ctx) {
         ast = new ASTProgram();
 
-        for (LJParser.StatementContext s: ctx.statement()) {
+        for (LJParser.StatementContext s : ctx.statement()) {
             if (!s.getText().equals("\n")) {
                 ast.statements.add((ASTStatement) map.get(s));
             }
         }
 
-        for (LJParser.FunctionContext f: ctx.function()) {
+        for (LJParser.FunctionContext f : ctx.function()) {
             ast.functions.add((ASTFunction) map.get(f));
         }
 
@@ -37,15 +37,14 @@ public class LJASTConverter extends LJBaseListener {
 
     @Override
     public void exitFunction(LJParser.FunctionContext ctx) {
-        ASTFunction             function;
-        ASTFunction.Parameter   parameter;
+        ASTFunction function;
+        ASTFunction.Parameter parameter;
 
         function = new ASTFunction(ctx.ID().getText(), (ASTBlock) map.get(ctx.block()));
         if (ctx.paramList() != null) {
             if (ctx.paramList().ID().size() > 0) {
-                for (TerminalNode tn: ctx.paramList().ID()) {
-                    parameter = new ASTFunction.Parameter(tn.getText(),
-                            ASTNode.DataType.UNKNOWN);
+                for (TerminalNode tn : ctx.paramList().ID()) {
+                    parameter = new ASTFunction.Parameter(tn.getText(), ASTNode.DataType.UNKNOWN);
                     function.parameters.add(parameter);
                 }
             }
@@ -209,118 +208,71 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitBinExprPrec1(LJParser.BinExprPrec1Context ctx) {
-        ASTBinaryExpr binExpr;
-        ASTExpression left;
-        ASTExpression right;
+    public void exitExpr(LJParser.ExprContext ctx) {
+        ASTExpression expr;
 
-        left = (ASTExpression) map.get(ctx.left);
-        right = (ASTExpression) map.get(ctx.right);
+        expr = (ASTExpression) map.get(ctx.exprBin());
 
-        binExpr = new ASTBinaryExpr(findBinOp(ctx.op.getText()), left, right);
-
-        binExpr.setDepth(ctx.depth());
-
-        map.put(ctx, binExpr);
+        map.put(ctx, expr);
     }
 
     @Override
-    public void exitBinExprPrec2(LJParser.BinExprPrec2Context ctx) {
+    public void exitExprBin(LJParser.ExprBinContext ctx) {
+        ASTExpression expr;
         ASTBinaryExpr binExpr;
-        ASTExpression left;
-        ASTExpression right;
+        ASTExpression left, right;
+        ASTBinaryExpr.BinOp binOp;
 
-        left = (ASTExpression) map.get(ctx.left);
-        right = (ASTExpression) map.get(ctx.right);
+        // If unary expression
+        if (ctx.op == null) {
+            expr = (ASTExpression) map.get(ctx.exprUn());
+            map.put(ctx, expr);
+        } else {
+            left = (ASTExpression) map.get(ctx.left);
+            right = (ASTExpression) map.get(ctx.right);
+            binOp = findBinOp(ctx.op.getText());
 
-        binExpr = new ASTBinaryExpr(findBinOp(ctx.op.getText()), left, right);
+            binExpr = new ASTBinaryExpr(binOp, left, right);
 
-        binExpr.setDepth(ctx.depth());
-
-        map.put(ctx, binExpr);
+            map.put(ctx, binExpr);
+        }
     }
 
     @Override
-    public void exitBinExprPrec3(LJParser.BinExprPrec3Context ctx) {
-        ASTBinaryExpr binExpr;
-        ASTExpression left;
-        ASTExpression right;
-
-        left = (ASTExpression) map.get(ctx.left);
-        right = (ASTExpression) map.get(ctx.right);
-
-        binExpr = new ASTBinaryExpr(findBinOp(ctx.op.getText()), left, right);
-
-        binExpr.setDepth(ctx.depth());
-
-        map.put(ctx, binExpr);
-    }
-
-    @Override
-    public void exitUnExpr(LJParser.UnExprContext ctx) {
+    public void exitExprUn(LJParser.ExprUnContext ctx) {
         ASTUnaryExpr unExpr;
         ASTUnaryExpr.UnaryOp op;
         ASTExpression expr;
 
-        op = findUnaryOp(ctx.op.getText());
-        expr = (ASTExpression) map.get(ctx.expr());
-
-        unExpr = new ASTUnaryExpr(op, expr);
-
-        map.put(ctx, unExpr);
-    }
-
-    @Override
-    public void exitExprFunctionCall(LJParser.ExprFunctionCallContext ctx) {
-        ASTFunctionCall funcCall;
-
-        LJParser.FuncCallContext fcc = ctx.funcCall();
-
-        funcCall = new ASTFunctionCall(fcc.ID().getText());
-
-        for (LJParser.ExprContext expr: fcc.argList().expr()) {
-            funcCall.arguments.add((ASTExpression)map.get(expr));
-        }
-
-        funcCall.setDepth(ctx.depth());
-
-        map.put(ctx, funcCall);
-    }
-
-    @Override
-    public void exitExprLocation(LJParser.ExprLocationContext ctx) {
-        ASTLocation loc;
-
-        loc = new ASTLocation(ctx.loc().ID().getText());
-
-        loc.setDepth(ctx.depth());
-
-        map.put(ctx, loc);
-    }
-
-    @Override
-    public void exitExprLiteral(LJParser.ExprLiteralContext ctx) {
-        ASTLiteral lit;
-
-        if (ctx.lit().BOOL() != null) {
-            lit = new ASTLiteral(ASTNode.DataType.BOOL,
-                    Boolean.parseBoolean(ctx.lit().BOOL().getText()));
-        } else if (ctx.lit().DEC() != null) {
-            lit = new ASTLiteral(ASTNode.DataType.INT,
-                    Integer.parseInt(ctx.lit().DEC().getText()));
+        // If base expression
+        if (ctx.op == null) {
+            expr = (ASTExpression) map.get(ctx.exprBase());
+            map.put(ctx, expr);
         } else {
-            assert(map.get(ctx.lit().STR()) != null);
-            lit = new ASTLiteral(ASTNode.DataType.STR, ctx.lit().STR().getText());
+            op = findUnaryOp(ctx.op.getText());
+            expr = (ASTExpression) map.get(ctx.expression);
+
+            unExpr = new ASTUnaryExpr(op, expr);
+
+            map.put(ctx, unExpr);
         }
-
-        lit.setDepth(ctx.depth());
-
-        map.put(ctx, lit);
     }
 
     @Override
-    public void exitExprParen(LJParser.ExprParenContext ctx) {
-        map.put(ctx, map.get(ctx.expr()));
+    public void exitExprBase(LJParser.ExprBaseContext ctx) {
+        ASTExpression expr;
+
+        if (ctx.funcCall() != null) {
+            expr = (ASTFunctionCall) map.get(ctx.funcCall());
+        } else if (ctx.lit() != null) {
+            expr = (ASTLiteral) map.get(ctx.lit());
+        } else if (ctx.loc() != null) {
+            expr = (ASTLocation) map.get(ctx.loc());
+        } else {
+            expr = (ASTExpression) map.get(ctx.expr());
+        }
+
+        map.put(ctx, expr);
     }
 
     @Override
@@ -354,13 +306,11 @@ public class LJASTConverter extends LJBaseListener {
         ASTLiteral lit;
 
         if (ctx.BOOL() != null) {
-            lit = new ASTLiteral(ASTNode.DataType.BOOL,
-                    Boolean.parseBoolean(ctx.BOOL().getText()));
+            lit = new ASTLiteral(ASTNode.DataType.BOOL, Boolean.parseBoolean(ctx.BOOL().getText()));
         } else if (ctx.DEC() != null) {
-            lit = new ASTLiteral(ASTNode.DataType.INT,
-                    Integer.parseInt(ctx.DEC().getText()));
+            lit = new ASTLiteral(ASTNode.DataType.INT, Integer.parseInt(ctx.DEC().getText()));
         } else {
-            assert(map.get(ctx.STR()) != null);
+            assert (map.get(ctx.STR()) != null);
             lit = new ASTLiteral(ASTNode.DataType.STR, ctx.STR().getText());
         }
 
@@ -386,56 +336,56 @@ public class LJASTConverter extends LJBaseListener {
         ASTBinaryExpr.BinOp op;
 
         switch (s) {
-            case "+":
-                op = ASTBinaryExpr.BinOp.ADD;
-                break;
+        case "+":
+            op = ASTBinaryExpr.BinOp.ADD;
+            break;
 
-            case "*":
-                op = ASTBinaryExpr.BinOp.MUL;
-                break;
+        case "*":
+            op = ASTBinaryExpr.BinOp.MUL;
+            break;
 
-            case "/":
-                op = ASTBinaryExpr.BinOp.DIV;
-                break;
+        case "/":
+            op = ASTBinaryExpr.BinOp.DIV;
+            break;
 
-            case "-":
-                op = ASTBinaryExpr.BinOp.SUB;
-                break;
+        case "-":
+            op = ASTBinaryExpr.BinOp.SUB;
+            break;
 
-            case ">":
-                op = ASTBinaryExpr.BinOp.GT;
-                break;
+        case ">":
+            op = ASTBinaryExpr.BinOp.GT;
+            break;
 
-            case ">=":
-                op = ASTBinaryExpr.BinOp.GE;
-                break;
+        case ">=":
+            op = ASTBinaryExpr.BinOp.GE;
+            break;
 
-            case  "<":
-                op = ASTBinaryExpr.BinOp.LT;
-                break;
+        case "<":
+            op = ASTBinaryExpr.BinOp.LT;
+            break;
 
-            case "<=":
-                op = ASTBinaryExpr.BinOp.LE;
-                break;
+        case "<=":
+            op = ASTBinaryExpr.BinOp.LE;
+            break;
 
-            case "==":
-                op = ASTBinaryExpr.BinOp.EQ;
-                break;
+        case "==":
+            op = ASTBinaryExpr.BinOp.EQ;
+            break;
 
-            case "!=":
-                op = ASTBinaryExpr.BinOp.NE;
-                break;
+        case "!=":
+            op = ASTBinaryExpr.BinOp.NE;
+            break;
 
-            case "||":
-                op = ASTBinaryExpr.BinOp.OR;
-                break;
+        case "||":
+            op = ASTBinaryExpr.BinOp.OR;
+            break;
 
-            case "&&":
-                op = ASTBinaryExpr.BinOp.AND;
-                break;
+        case "&&":
+            op = ASTBinaryExpr.BinOp.AND;
+            break;
 
-            default:
-                op = null;
+        default:
+            op = null;
         }
 
         return op;
