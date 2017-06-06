@@ -274,9 +274,11 @@ public class LJASTConverter extends LJBaseListener {
     public void exitExprFunctionCall(LJParser.ExprFunctionCallContext ctx) {
         ASTFunctionCall funcCall;
 
-        funcCall = new ASTFunctionCall(ctx.funcCall().ID().getText());
+        LJParser.FuncCallContext fcc = ctx.funcCall();
 
-        for (LJParser.ExprContext expr: ctx.funcCall().argList().expr()) {
+        funcCall = new ASTFunctionCall(fcc.ID().getText());
+
+        for (LJParser.ExprContext expr: fcc.argList().expr()) {
             funcCall.arguments.add((ASTExpression)map.get(expr));
         }
 
