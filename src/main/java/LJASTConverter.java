@@ -8,7 +8,6 @@ public class LJASTConverter extends LJBaseListener {
     private ASTProgram ast;
     private LinkedHashMap<ParserRuleContext, ASTNode> map;
 
-    // private ASTFunction currentFunction;
     private Stack<ASTBlock> blocks;
 
     public LJASTConverter() {
