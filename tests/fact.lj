@@ -1,0 +1,17 @@
+fact (n) {
+    if (n <= 1) {
+        return 1
+    }
+    return n * fact(n-1)
+}
+
+test fact(0) = 1
+test fact(1) = 1
+test fact(2) = 2
+test fact(5) = 120
+test fact(10) = 3628800
+
+main {
+    return fact(5)
+}
+
