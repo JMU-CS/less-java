@@ -33,7 +33,7 @@ dependencies {
 task run(type: JavaExec) {
     main = "LJCompiler"
     classpath = sourceSets.main.runtimeClasspath
-    args = ["test.lj"]
+    args = ["$testfile"]
 
     doFirst {
         standardOutput = new FileOutputStream('compiler.out')
