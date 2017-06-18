@@ -212,6 +212,8 @@ public class LJASTConverter extends LJBaseListener {
 
         expr = (ASTExpression) map.get(ctx.exprBin());
 
+        expr.setDepth(ctx.depth());
+
         map.put(ctx, expr);
     }
 
@@ -225,6 +227,9 @@ public class LJASTConverter extends LJBaseListener {
         // If unary expression
         if (ctx.op == null) {
             expr = (ASTExpression) map.get(ctx.exprUn());
+
+            expr.setDepth(ctx.depth());
+
             map.put(ctx, expr);
         } else {
             left = (ASTExpression) map.get(ctx.left);
@@ -232,6 +237,8 @@ public class LJASTConverter extends LJBaseListener {
             binOp = findBinOp(ctx.op.getText());
 
             binExpr = new ASTBinaryExpr(binOp, left, right);
+
+            binExpr.setDepth(ctx.depth());
 
             map.put(ctx, binExpr);
         }
@@ -246,12 +253,17 @@ public class LJASTConverter extends LJBaseListener {
         // If base expression
         if (ctx.op == null) {
             expr = (ASTExpression) map.get(ctx.exprBase());
+
+            expr.setDepth(ctx.depth());
+
             map.put(ctx, expr);
         } else {
             op = findUnaryOp(ctx.op.getText());
             expr = (ASTExpression) map.get(ctx.expression);
 
             unExpr = new ASTUnaryExpr(op, expr);
+
+            unExpr.setDepth(ctx.depth());
 
             map.put(ctx, unExpr);
         }
@@ -270,6 +282,8 @@ public class LJASTConverter extends LJBaseListener {
         } else {
             expr = (ASTExpression) map.get(ctx.expr());
         }
+
+        expr.setDepth(ctx.depth());
 
         map.put(ctx, expr);
     }
