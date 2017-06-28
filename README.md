@@ -9,7 +9,7 @@
         `gradlew build`     #windows
 
 2. How to run:
-    * `gradle run`
+    * `./lj.sh <file-name>`
     * Output is written to compiler.out
 
 This runs with the test file "test.lj"

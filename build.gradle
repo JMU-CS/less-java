@@ -16,16 +16,13 @@ apply plugin: 'antlr'
 repositories {
     // Use 'jcenter' for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
-    //jcenter()
     mavenCentral()
 }
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    // The production code uses the SLF4J logging API at compile time
-    //compile 'org.slf4j:slf4j-api:1.7.21'
 
-    //compile files("libs/classes")
+    // Compile external jars
     compile fileTree(dir: "libs", include: "*.jar")
 
     // JUnit
@@ -36,20 +33,14 @@ dependencies {
 }
 
 task run(type: JavaExec) {
-    main = "LJCompiler"
-    classpath = sourceSets.main.runtimeClasspath
-    args = ["$testfile"]
-
     doFirst {
         standardOutput = new FileOutputStream('compiler.out')
     }
-}
 
-/*
-task antlr(type: Exec) {
-    commandLine 'java', '-jar', 'libs/antlr-4.5.3-complete.jar', 'LJ.g4', '-o',
-        'src/main/java'
-}
-*/
+    doLast {
+        main = "LJCompiler"
+        classpath = sourceSets.main.runtimeClasspath
+        args = ["$testfile"]
 
-//build.dependsOn(antlr)
+    }
+}
