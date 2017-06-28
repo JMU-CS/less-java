@@ -10,12 +10,14 @@
 
 // Add Java support
 apply plugin: 'java'
+apply plugin: 'antlr'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'jcenter' for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+    //jcenter()
+    mavenCentral()
 }
 
 // In this section you declare the dependencies for your production and test code
@@ -23,11 +25,14 @@ dependencies {
     // The production code uses the SLF4J logging API at compile time
     //compile 'org.slf4j:slf4j-api:1.7.21'
 
-    compile files("libs/classes")
+    //compile files("libs/classes")
     compile fileTree(dir: "libs", include: "*.jar")
 
     // JUnit
     testCompile 'junit:junit:4.12'
+
+    // ANTLR v4
+    antlr 'org.antlr:antlr4:4.5.3'
 }
 
 task run(type: JavaExec) {
@@ -40,9 +45,11 @@ task run(type: JavaExec) {
     }
 }
 
+/*
 task antlr(type: Exec) {
     commandLine 'java', '-jar', 'libs/antlr-4.5.3-complete.jar', 'LJ.g4', '-o',
         'src/main/java'
 }
+*/
 
-build.dependsOn(antlr)
+//build.dependsOn(antlr)
