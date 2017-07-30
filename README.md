@@ -1,6 +1,8 @@
 # A language to introduce students to programming
 ---
 
+Get convenient gradle aliases from my .dotfiles repo: [Gradle Aliases](https://github.com/Zamua/.dotfiles/blob/master/gradle-aliases.sh)
+
 1. How to build:
     * If you have gradle installed:
         `gradle build`
@@ -11,6 +13,5 @@
 2. How to run:
     * `./lj.sh <file-name>`
     * Output is written to compiler.out
+    * With gradle aliases: gr <file-name>
 
-This runs with the test file "test.lj"
-Replace that file in build.gradle with your desired file.
