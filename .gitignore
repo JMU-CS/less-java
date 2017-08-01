@@ -5,3 +5,9 @@ decaf-compiler-reference/
 compiler.out
 test.lj
 src/main/java/.*.swp
+/bin/
+.classpath
+.project
+.settings/
+workbench.xmi
+

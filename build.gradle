@@ -1,4 +1,4 @@
-
+// Plugins
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'eclipse'
@@ -24,9 +24,9 @@ dependencies {
     antlr 'org.antlr:antlr4:4.5.3'
 }
 
+// Tasks
 run {
-    standardOutput = new FileOutputStream('compiler.out')
-    mainClassName = "LJCompiler"
+    mainClassName = "com.github.lessjava.LJCompiler"
 
     def defaultTestfile = "tests/fact.lj"
 
@@ -37,3 +37,16 @@ run {
     }
 }
 
+generateGrammarSource {
+    arguments += ["-package", "com.github.lessjava.generated"]
+
+    doLast {
+      copy {
+        from 'build/generated-src/antlr/main/'
+        include '*.*'
+        into 'build/generated-src/antlr/main/com/github/lessjava/generated'
+      }
+
+      project.delete fileTree('build/generated-src/antlr/main').include('*.*')
+    }
+}

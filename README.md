@@ -15,3 +15,4 @@ Get convenient gradle aliases from my .dotfiles repo: [Gradle Aliases](https://g
     * Output is written to compiler.out
     * With gradle aliases: gr <file-name>
 
+3. If you would like to use eclipse, then run `gradle eclipse` to generate project files.
