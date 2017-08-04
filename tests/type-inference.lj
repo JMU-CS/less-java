@@ -1,0 +1,31 @@
+add (a, b) {
+    return a + b
+}
+
+c = add(1, 2)
+
+addTen (d) {
+    e = 10
+    return add(d, e)
+}
+
+f = addTen(11)
+
+addIfGreater (g, h) {
+    return add(g, h)
+}
+
+i = addIfGreater(f, 10)
+
+j = true
+
+addTenIfTrue(k, l) {
+    if (k) {
+        return add(l, 10)
+    }
+
+    return l
+}
+
+m = addTenIfTrue(j, f)
+
