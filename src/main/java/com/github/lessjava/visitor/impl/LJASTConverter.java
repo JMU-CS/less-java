@@ -15,13 +15,13 @@ import com.github.lessjava.ast.ASTExpression;
 import com.github.lessjava.ast.ASTFunction;
 import com.github.lessjava.ast.ASTFunctionCall;
 import com.github.lessjava.ast.ASTLiteral;
-import com.github.lessjava.ast.ASTLocation;
 import com.github.lessjava.ast.ASTNode;
 import com.github.lessjava.ast.ASTProgram;
 import com.github.lessjava.ast.ASTReturn;
 import com.github.lessjava.ast.ASTStatement;
 import com.github.lessjava.ast.ASTTest;
 import com.github.lessjava.ast.ASTUnaryExpr;
+import com.github.lessjava.ast.ASTVariable;
 import com.github.lessjava.ast.ASTWhileLoop;
 import com.github.lessjava.generated.LJBaseListener;
 import com.github.lessjava.generated.LJParser;
@@ -60,15 +60,13 @@ public class LJASTConverter extends LJBaseListener {
     public void exitFunction(LJParser.FunctionContext ctx) {
         ASTFunction function;
         ASTFunction.Parameter parameter;
-
+        
         function = new ASTFunction(ctx.ID().getText(), (ASTBlock) map.get(ctx.block()));
-        if (ctx.paramList() != null) {
-            if (ctx.paramList().ID().size() > 0) {
-                for (TerminalNode tn : ctx.paramList().ID()) {
-                    parameter = new ASTFunction.Parameter(tn.getText(), ASTNode.DataType.UNKNOWN);
-                    function.parameters.add(parameter);
-                }
-            }
+        if (ctx.paramList() != null && ctx.paramList().ID().size() > 0) {
+			for (TerminalNode tn : ctx.paramList().ID()) {
+				parameter = new ASTFunction.Parameter(tn.getText(), ASTNode.DataType.UNKNOWN);
+				function.parameters.add(parameter);
+			}
         }
 
         function.setDepth(ctx.depth());
@@ -97,13 +95,13 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitAssignment(LJParser.AssignmentContext ctx) {
         ASTAssignment assignment;
-        ASTLocation location;
+        ASTVariable variable;
         ASTExpression expression;
 
-        location = (ASTLocation) map.get(ctx.loc());
+        variable = (ASTVariable) map.get(ctx.var());
         expression = (ASTExpression) map.get(ctx.expr());
 
-        assignment = new ASTAssignment(location, expression);
+        assignment = new ASTAssignment(variable, expression);
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(assignment);
@@ -299,8 +297,8 @@ public class LJASTConverter extends LJBaseListener {
             expr = (ASTFunctionCall) map.get(ctx.funcCall());
         } else if (ctx.lit() != null) {
             expr = (ASTLiteral) map.get(ctx.lit());
-        } else if (ctx.loc() != null) {
-            expr = (ASTLocation) map.get(ctx.loc());
+        } else if (ctx.var() != null) {
+            expr = (ASTVariable) map.get(ctx.var());
         } else {
             expr = (ASTExpression) map.get(ctx.expr());
         }
@@ -326,14 +324,14 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitLoc(LJParser.LocContext ctx) {
-        ASTLocation loc;
+    public void exitVar(LJParser.VarContext ctx) {
+        ASTVariable var;
 
-        loc = new ASTLocation(ctx.ID().getText());
+        var = new ASTVariable(ctx.ID().getText());
 
-        loc.setDepth(ctx.depth());
+        var.setDepth(ctx.depth());
 
-        map.put(ctx, loc);
+        map.put(ctx, var);
     }
 
     @Override
@@ -345,7 +343,7 @@ public class LJASTConverter extends LJBaseListener {
         } else if (ctx.DEC() != null) {
             lit = new ASTLiteral(ASTNode.DataType.INT, Integer.parseInt(ctx.DEC().getText()));
         } else {
-            assert (map.get(ctx.STR()) != null);
+            assert (ctx.STR() != null);
             lit = new ASTLiteral(ASTNode.DataType.STR, ctx.STR().getText());
         }
 

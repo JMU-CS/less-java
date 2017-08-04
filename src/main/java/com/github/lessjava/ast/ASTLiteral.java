@@ -39,12 +39,11 @@ public class ASTLiteral extends ASTExpression
         return str.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n").replaceAll("\t", "\\\\t").replaceAll("\r", "");
     }
 
-    public ASTNode.DataType type;
     public Object value;
 
     public ASTLiteral(ASTNode.DataType type, Object value)
     {
-        this.type = type;
+        super.type = type;
         this.value = value;
     }
 

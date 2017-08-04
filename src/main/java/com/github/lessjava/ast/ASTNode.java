@@ -36,6 +36,9 @@ public abstract class ASTNode
 
     public static String typeToString(DataType t)
     {
+        if (t == null) {
+            return null;
+        }
         switch (t) {
             case INT:       return "int";
             case BOOL:      return "bool";

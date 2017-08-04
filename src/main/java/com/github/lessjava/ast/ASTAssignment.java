@@ -5,12 +5,12 @@ package com.github.lessjava.ast;
  */
 public class ASTAssignment extends ASTStatement
 {
-    public ASTLocation location;
+    public ASTVariable variable;
     public ASTExpression value;
 
-    public ASTAssignment(ASTLocation location, ASTExpression value)
+    public ASTAssignment(ASTVariable variable, ASTExpression value)
     {
-        this.location = location;
+        this.variable = variable;
         this.value = value;
     }
 
@@ -18,7 +18,7 @@ public class ASTAssignment extends ASTStatement
     public void traverse(ASTVisitor visitor)
     {
         visitor.preVisit(this);
-        location.traverse(visitor);
+        variable.traverse(visitor);
         value.traverse(visitor);
         visitor.postVisit(this);
     }

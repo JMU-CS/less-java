@@ -4,26 +4,26 @@ package com.github.lessjava.ast;
  * Decaf variable declaration. Contains a name, a data type, and an array
  * flag. If the flag is set, the arrayLength field contains the size.
  */
-public class ASTVariable extends ASTNode
+public class ASTVariable extends ASTExpression
 {
-    public ASTLocation loc;
-    public ASTNode.DataType type;
+    public String name;
     public boolean isArray;
     public int arrayLength;
-
-    public ASTVariable(ASTLocation loc, ASTNode.DataType type)
-    {
-        this.loc = loc;
-        this.type = type;
-        this.isArray = false;
-        this.arrayLength = 1;
+    
+    public ASTVariable(String name) {
+    		this.name = name;
     }
 
-    public ASTVariable(ASTLocation loc, ASTNode.DataType type, int arrayLength)
+    public ASTVariable(String name, int arrayLength)
     {
-        this (loc, type);
+        this (name);
         this.isArray = true;
         this.arrayLength = arrayLength;
+    }
+    
+    @Override
+    public String toString() {
+    		return name;
     }
 
     @Override

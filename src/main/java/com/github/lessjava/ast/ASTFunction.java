@@ -1,5 +1,7 @@
 package com.github.lessjava.ast;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Decaf function declaration. Contains a name, a return type, a list of formal
@@ -12,7 +14,7 @@ public class ASTFunction extends ASTNode
      */
     public static class Parameter
     {
-        public String name;
+        public String           name;
         public ASTNode.DataType type;
 
         public Parameter(String name, ASTNode.DataType type)
@@ -21,14 +23,15 @@ public class ASTFunction extends ASTNode
             this.type = type;
         }
 
-        public Parameter(String name) {
+        public Parameter(String name)
+        {
             this(name, null);
         }
     }
 
-    public String name;
+    public String           name;
     public ASTNode.DataType returnType;
-    public ASTBlock body;
+    public ASTBlock         body;
 
     public List<Parameter> parameters;
 
@@ -40,7 +43,8 @@ public class ASTFunction extends ASTNode
         this.parameters = new ArrayList<Parameter>();
     }
 
-    public ASTFunction(String name, ASTBlock body) {
+    public ASTFunction(String name, ASTBlock body)
+    {
         this(name, ASTNode.DataType.UNKNOWN, body);
     }
 
@@ -66,4 +70,3 @@ public class ASTFunction extends ASTNode
         visitor.postVisit(this);
     }
 }
-

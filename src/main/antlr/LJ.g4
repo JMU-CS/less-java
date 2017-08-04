@@ -9,7 +9,7 @@ paramList:      ID((','ID)+)?;
 argList:        expr((','expr)+)?;
 block:          '{'statement*'}';
 
-statement:      loc '=' expr EOL                        #Assignment
+statement:      var '=' expr EOL                        #Assignment
                 | IF '(' expr ')' block (ELSE block)?   #Conditional
                 | WHILE '(' expr ')' block              #While
                 | RETURN expr EOL                       #Return
@@ -20,8 +20,7 @@ statement:      loc '=' expr EOL                        #Assignment
                 | EOL                                   #Terminator
                 ;
 
-expr:           exprBin
-                ;
+expr:           exprBin;
 
 exprBin:        left=exprBin op=PREC1 right=exprBin
                 | left=exprBin op=PREC2 right=exprBin
@@ -34,7 +33,7 @@ exprUn:         op=UNOP expression=exprUn
                 ;
 
 exprBase:       funcCall
-                | loc
+                | var
                 | lit
                 | '(' expr ')'
                 ;
@@ -42,7 +41,7 @@ exprBase:       funcCall
 
 funcCall:       ID '('argList')';
 
-loc:            ID;
+var:            ID;
 lit:            DEC | BOOL | STR;
 
 

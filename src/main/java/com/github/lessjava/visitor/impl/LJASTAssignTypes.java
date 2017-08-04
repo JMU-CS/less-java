@@ -1,58 +1,84 @@
 package com.github.lessjava.visitor.impl;
 
+import java.util.Iterator;
+
+import com.github.lessjava.ast.ASTAssignment;
 import com.github.lessjava.ast.ASTBinaryExpr;
 import com.github.lessjava.ast.ASTExpression;
 import com.github.lessjava.ast.ASTFunction;
-import com.github.lessjava.ast.ASTLiteral;
-import com.github.lessjava.ast.ASTLocation;
-import com.github.lessjava.ast.ASTNode;
+import com.github.lessjava.ast.ASTFunction.Parameter;
+import com.github.lessjava.ast.ASTFunctionCall;
+import com.github.lessjava.ast.ASTNode.DataType;
 import com.github.lessjava.ast.ASTReturn;
+import com.github.lessjava.ast.ASTUnaryExpr;
+import com.github.lessjava.ast.ASTVariable;
+import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
-public class LJASTAssignTypes extends LJBaseASTVisitor {
-
-    private ASTNode.DataType functionReturnType;
+public class LJASTAssignTypes extends LJAbstractAssignTypes
+{
     private ASTFunction currentFunction;
 
-    public LJASTAssignTypes() {
-    }
-
     @Override
-    public void preVisit(ASTFunction node) {
+    public void preVisit(ASTFunction node)
+    {
         currentFunction = node;
     }
 
     @Override
-    public void postVisit(ASTReturn node) {
+    public void postVisit(ASTFunction node)
+    {
+        currentFunction = null;
+    }
+
+    @Override
+    public void preVisit(ASTReturn node)
+    {
         currentFunction.returnType = evalExprType(node.value);
     }
 
-    public ASTNode.DataType evalExprType(ASTExpression expr) {
-        ASTNode.DataType type;
+    @Override
+    public void preVisit(ASTFunctionCall node)
+    {
+        ASTFunction function = nameFunctionMap.get(node.name);
+        Iterator<ASTExpression> functionCallArgIterator = node.arguments.iterator();
+        
+        // Assign types of parameters of associated function
+        for (Parameter p : function.parameters) {
+            ASTExpression arg = functionCallArgIterator.next();
+            DataType argType = evalExprType(arg);
 
-        if (expr instanceof ASTBinaryExpr) {
-           type = evalExprType(expr);
-        } else if(expr instanceof ASTLocation) {
-           type = evalExprType(expr);
-        } else if(expr instanceof ASTLiteral) {
-           type = evalExprType(expr);
-        } else {
-           type = null;
+            if (!typeIsKnown(p.type) && typeIsKnown(argType)) {
+                p.type = argType;
+            }
         }
-
-        return type;
+        
+        if (!typeIsKnown(node.type) && typeIsKnown(function.returnType)) {
+            node.type = function.returnType;
+        }
     }
 
-    public ASTNode.DataType evalExprType(ASTBinaryExpr expr) {
-        return null;
+    @Override
+    public void postVisit(ASTAssignment node)
+    {
+        node.variable.type = evalExprType(node.value);
     }
 
-    public ASTNode.DataType evalExprType(ASTLocation expr) {
-        //look up value in symboltable
-        return null;
+    @Override
+    public void postVisit(ASTBinaryExpr node)
+    {
+        node.type = node.leftChild.type;
     }
 
-    public ASTNode.DataType evalExprType(ASTLiteral expr) {
-        return expr.type;
+    @Override
+    public void postVisit(ASTUnaryExpr node)
+    {
+        node.type = node.child.type;
     }
+
+    @Override
+    public void postVisit(ASTVariable node)
+    {
+        node.type = evalExprType(node);
+    }
+
 }
-

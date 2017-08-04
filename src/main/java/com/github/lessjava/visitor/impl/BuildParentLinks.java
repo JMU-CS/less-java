@@ -22,7 +22,7 @@ import com.github.lessjava.visitor.DefaultASTVisitor;
  * analyses.
  *
  */
-class BuildParentLinks extends DefaultASTVisitor
+public class BuildParentLinks extends DefaultASTVisitor
 {
     @Override
     public void preVisit(ASTProgram node)
@@ -55,7 +55,7 @@ class BuildParentLinks extends DefaultASTVisitor
     @Override
     public void preVisit(ASTAssignment node)
     {
-        node.location.setParent(node);
+        node.variable.setParent(node);
         node.value.setParent(node);
     }
 

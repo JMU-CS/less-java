@@ -17,5 +17,6 @@ package com.github.lessjava.ast;
  */
 public abstract class ASTExpression extends ASTNode
 {
+	public ASTNode.DataType type;
 }
 

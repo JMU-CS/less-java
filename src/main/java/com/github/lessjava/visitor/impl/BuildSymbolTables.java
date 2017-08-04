@@ -1,4 +1,5 @@
 package com.github.lessjava.visitor.impl;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -6,6 +7,7 @@ import java.util.List;
 
 import com.github.lessjava.ast.ASTBlock;
 import com.github.lessjava.ast.ASTFunction;
+import com.github.lessjava.ast.ASTFunction.Parameter;
 import com.github.lessjava.ast.ASTNode;
 import com.github.lessjava.ast.ASTProgram;
 import com.github.lessjava.ast.ASTVariable;
@@ -14,8 +16,8 @@ import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.SymbolTable;
 
 /**
- * Static analysis pass to construct symbol tables. Visits an AST, maintaining
- * a stack of active symbol tables and annotating various AST nodes with the
+ * Static analysis pass to construct symbol tables. Visits an AST, maintaining a
+ * stack of active symbol tables and annotating various AST nodes with the
  * appropriate symbol tables.
  */
 public class BuildSymbolTables extends StaticAnalysis
@@ -35,7 +37,7 @@ public class BuildSymbolTables extends StaticAnalysis
      */
     protected SymbolTable getCurrentTable()
     {
-        assert(tableStack.size() > 0);
+        assert (tableStack.size() > 0);
         return tableStack.peek();
     }
 
@@ -59,7 +61,7 @@ public class BuildSymbolTables extends StaticAnalysis
      */
     protected void finalizeScope()
     {
-        assert(tableStack.size() > 0);
+        assert (tableStack.size() > 0);
         tableStack.pop();
     }
 
@@ -83,15 +85,16 @@ public class BuildSymbolTables extends StaticAnalysis
     protected void insertVariableSymbol(ASTVariable node)
     {
         try {
-            Symbol symbol = new Symbol(node.loc.name, node.type, node.isArray, node.arrayLength);
-            getCurrentTable().insert(node.loc.name, symbol);
+            Symbol symbol = new Symbol(node.name, node.type, node.isArray, node.arrayLength);
+            getCurrentTable().insert(node.name, symbol);
         } catch (InvalidProgramException ex) {
             addError(ex);
         }
     }
 
     /**
-     * Add a symbol for the given function parameter to the current (innermost) scope.
+     * Add a symbol for the given function parameter to the current (innermost)
+     * scope.
      */
     protected void insertParamSymbol(ASTFunction.Parameter p)
     {
@@ -104,20 +107,19 @@ public class BuildSymbolTables extends StaticAnalysis
     }
 
     /**
-     * Add a symbol for a hard-coded function to the current (innermost) scope.
-     * Uses the given function name; the function will take one parameter of the
-     * given type and return void.
+     * Add a symbol for a hard-coded function to the current (innermost) scope. Uses
+     * the given function name; the function will take one parameter of the given
+     * type and return void.
      */
     private void insertPrintFunctionSymbol(String name, ASTNode.DataType type)
     {
         List<ASTNode.DataType> ptypes;
         ptypes = new ArrayList<ASTNode.DataType>();
-        ptypes.add(type);                               // one param
+        ptypes.add(type); // one param
         try {
-            getCurrentTable().insert(name,
-                    new Symbol(name,                    // name
-                            ASTNode.DataType.VOID,      // return
-                            ptypes));                   // parameters
+            getCurrentTable().insert(name, new Symbol(name, // name
+                    ASTNode.DataType.VOID, // return
+                    ptypes)); // parameters
         } catch (InvalidProgramException ex) {
             addError(ex);
         }
@@ -127,9 +129,6 @@ public class BuildSymbolTables extends StaticAnalysis
     public void preVisit(ASTProgram node)
     {
         node.attributes.put("symbolTable", initializeScope());
-        insertPrintFunctionSymbol("print_int",  ASTNode.DataType.INT);
-        insertPrintFunctionSymbol("print_bool", ASTNode.DataType.BOOL);
-        insertPrintFunctionSymbol("print_str",  ASTNode.DataType.STR);
     }
 
     @Override
@@ -144,7 +143,7 @@ public class BuildSymbolTables extends StaticAnalysis
         insertFunctionSymbol(node);
         node.attributes.put("symbolTable", initializeScope());
 
-        for (ASTFunction.Parameter p: node.parameters) {
+        for (ASTFunction.Parameter p : node.parameters) {
             insertParamSymbol(p);
         }
     }
@@ -159,6 +158,16 @@ public class BuildSymbolTables extends StaticAnalysis
     public void preVisit(ASTBlock node)
     {
         node.attributes.put("symbolTable", initializeScope());
+
+        // TODO: check if necessary
+        // Add the parameters from the parent function
+        if (node.getParent() instanceof ASTFunction) {
+            ASTFunction parent = (ASTFunction) node.getParent();
+
+            for (Parameter p : parent.parameters) {
+                insertParamSymbol(p);
+            }
+        }
     }
 
     @Override
@@ -168,9 +177,8 @@ public class BuildSymbolTables extends StaticAnalysis
     }
 
     @Override
-    public void preVisit(ASTVariable node)
+    public void postVisit(ASTVariable node)
     {
         insertVariableSymbol(node);
     }
 }
-

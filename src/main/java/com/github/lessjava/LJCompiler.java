@@ -1,4 +1,5 @@
 package com.github.lessjava;
+
 import java.io.IOException;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -9,19 +10,24 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import com.github.lessjava.ast.ASTProgram;
 import com.github.lessjava.generated.LJLexer;
 import com.github.lessjava.generated.LJParser;
+import com.github.lessjava.visitor.impl.BuildParentLinks;
 import com.github.lessjava.visitor.impl.BuildSymbolTables;
+import com.github.lessjava.visitor.impl.LJASTAssignTypes;
+import com.github.lessjava.visitor.impl.LJASTCheckUnknownTypes;
 import com.github.lessjava.visitor.impl.LJASTConverter;
 import com.github.lessjava.visitor.impl.LJStaticAnalysis;
 import com.github.lessjava.visitor.impl.PrintDebugTree;
 
-public class LJCompiler {
-    public static void main(String[] args) {
+public class LJCompiler
+{
+    public static void main(String[] args)
+    {
         if (args.length == 0) {
             System.err.println("usage: LJCompiler <Files>");
             System.exit(0);
         }
 
-        for (String s: args) {
+        for (String s : args) {
             if (!s.endsWith("lj")) {
                 System.err.println("Only accepts .lj files");
                 System.exit(0);
@@ -36,10 +42,12 @@ public class LJCompiler {
         LJStaticAnalysis staticAnalyzer = null;
         ASTProgram program = null;
         PrintDebugTree printTree = null;
+        BuildParentLinks buildParentLinks = null;
         BuildSymbolTables bst = null;
+        LJASTAssignTypes assignTypes = null;
 
         try {
-            for (String s: args) {
+            for (String s : args) {
                 lexer = new LJLexer(new ANTLRFileStream(s));
             }
         } catch (IOException ioe) {
@@ -53,14 +61,39 @@ public class LJCompiler {
         staticAnalyzer = new LJStaticAnalysis();
 
         parseTree = parser.program();
-        //walker.walk(staticAnalyzer, parseTree);
+        // walker.walk(staticAnalyzer, parseTree);
         walker.walk(converter, parseTree);
 
         program = converter.getAST();
         printTree = new PrintDebugTree();
+        buildParentLinks = new BuildParentLinks();
         bst = new BuildSymbolTables();
+        assignTypes = new LJASTAssignTypes();
 
-        program.traverse(bst);
+        program.traverse(buildParentLinks);
+
+        boolean loop = false;
+
+        if (loop) {
+            // While unknown types remain
+            while (true) {
+                program.traverse(assignTypes);
+                program.traverse(bst);
+
+                LJASTCheckUnknownTypes checkUnknownTypes = new LJASTCheckUnknownTypes();
+                program.traverse(checkUnknownTypes);
+
+                if (checkUnknownTypes.allTypesKnown) {
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < 1000; i++) {
+                program.traverse(bst);
+                program.traverse(assignTypes);
+            }
+        }
+
         program.traverse(printTree);
     }
 }

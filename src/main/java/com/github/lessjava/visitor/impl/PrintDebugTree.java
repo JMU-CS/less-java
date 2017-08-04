@@ -1,5 +1,6 @@
 package com.github.lessjava.visitor.impl;
-import java.io.*;
+
+import java.io.PrintStream;
 
 import com.github.lessjava.ast.ASTAssignment;
 import com.github.lessjava.ast.ASTBinaryExpr;
@@ -23,9 +24,8 @@ import com.github.lessjava.ast.ASTWhileLoop;
 import com.github.lessjava.visitor.DefaultASTVisitor;
 
 /**
- * AST pre-order visitor; prints each node to standard output.
- * For best output, should be run AFTER {@link BuildParentLinks} and {@link
- * CalculateNodeDepths}.
+ * AST pre-order visitor; prints each node to standard output. For best output,
+ * should be run AFTER {@link BuildParentLinks} and {@link CalculateNodeDepths}.
  *
  */
 public class PrintDebugTree extends DefaultASTVisitor
@@ -45,7 +45,7 @@ public class PrintDebugTree extends DefaultASTVisitor
     public void indent(ASTNode node)
     {
         if (node.attributes.containsKey("depth")) {
-            int level = ((Integer)node.attributes.get("depth")).intValue();
+            int level = ((Integer) node.attributes.get("depth")).intValue();
             while (level > 1) {
                 output.print("  ");
                 level--;
@@ -55,13 +55,13 @@ public class PrintDebugTree extends DefaultASTVisitor
 
     public void newline(ASTNode node)
     {
-        newline(node, true);    // change to "false" to omit source info
+        newline(node, true); // change to "false" to omit source info
     }
 
     public void newline(ASTNode node, boolean printSource)
     {
         if (printSource) {
-            //output.println("  [" + node.getSourceInfo().toString() + "]");
+            // output.println(" [" + node.getSourceInfo().toString() + "]");
             output.println();
         } else {
             output.println();
@@ -80,9 +80,8 @@ public class PrintDebugTree extends DefaultASTVisitor
     public void preVisit(ASTFunction node)
     {
         indent(node);
-        output.print("Function: " + node.name +
-                " : " + ASTNode.typeToString(node.returnType) +
-                " " + node.getParameterStr());
+        output.print("Function: " + node.name + " : " + ASTNode.typeToString(node.returnType) + " "
+                + node.getParameterStr());
         newline(node, true);
     }
 
@@ -90,9 +89,8 @@ public class PrintDebugTree extends DefaultASTVisitor
     public void preVisit(ASTVariable node)
     {
         indent(node);
-        output.print("Variable: " + node.loc.name +
-                " : " + ASTNode.typeToString(node.type) +
-                (node.isArray ? "[" + node.arrayLength + "]" : ""));
+        output.print("Variable: " + node.name + " : " + ASTNode.typeToString(node.type)
+                + (node.isArray ? "[" + node.arrayLength + "]" : ""));
         newline(node, true);
     }
 
@@ -108,8 +106,7 @@ public class PrintDebugTree extends DefaultASTVisitor
     public void preVisit(ASTAssignment node)
     {
         indent(node);
-        output.print("Assignment: " + node.location.toString() +
-                " = " + node.value.toString());
+        output.print("Assignment: " + node.variable.toString() + " = " + node.value.toString());
         newline(node, true);
     }
 
@@ -127,8 +124,7 @@ public class PrintDebugTree extends DefaultASTVisitor
         args.append(")");
 
         indent(node);
-        output.print("VoidFunctionCall: " + node.name +
-                " " + args.toString());
+        output.print("VoidFunctionCall: " + node.name + " " + args.toString());
         newline(node);
     }
 
@@ -136,8 +132,7 @@ public class PrintDebugTree extends DefaultASTVisitor
     public void preVisit(ASTConditional node)
     {
         indent(node);
-        output.print("Conditional: condition=" +
-                node.condition.toString());
+        output.print("Conditional: condition=" + node.condition.toString());
         newline(node, true);
     }
 
@@ -174,7 +169,8 @@ public class PrintDebugTree extends DefaultASTVisitor
     }
 
     @Override
-    public void preVisit(ASTTest node) {
+    public void preVisit(ASTTest node)
+    {
         indent(node);
         output.print("Test");
         newline(node);
@@ -184,8 +180,7 @@ public class PrintDebugTree extends DefaultASTVisitor
     public void preVisit(ASTBinaryExpr node)
     {
         indent(node);
-        output.print("BinaryExpr: " +
-                ASTBinaryExpr.opToString(node.operator));
+        output.print("BinaryExpr: " + ASTBinaryExpr.opToString(node.operator));
         newline(node);
     }
 
@@ -193,8 +188,7 @@ public class PrintDebugTree extends DefaultASTVisitor
     public void preVisit(ASTUnaryExpr node)
     {
         indent(node);
-        output.print("UnaryExpr: " +
-                ASTUnaryExpr.opToString(node.operator));
+        output.print("UnaryExpr: " + ASTUnaryExpr.opToString(node.operator));
         newline(node);
     }
 
@@ -212,8 +206,7 @@ public class PrintDebugTree extends DefaultASTVisitor
         args.append(")");
 
         indent(node);
-        output.print("FunctionCall: " + node.name +
-                " " + args.toString());
+        output.print("FunctionCall: " + node.name + " : " + node.type + " " + args.toString());
         newline(node);
     }
 
@@ -229,8 +222,7 @@ public class PrintDebugTree extends DefaultASTVisitor
     public void preVisit(ASTLiteral node)
     {
         indent(node);
-        output.print("Literal: " + node.toString() +
-                " : " + ASTNode.typeToString(node.type));
+        output.print("Literal: " + node.toString() + " : " + ASTNode.typeToString(node.type));
         newline(node);
     }
 }
