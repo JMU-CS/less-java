@@ -29,3 +29,11 @@ addTenIfTrue(k, l) {
 
 m = addTenIfTrue(j, f)
 
+eq (a, b) {
+    return a == b
+}
+
+n = eq(2, 3)
+o = eq(true, false)
+p = eq(2, true)
+
