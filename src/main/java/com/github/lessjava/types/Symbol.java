@@ -1,7 +1,7 @@
 package com.github.lessjava.types;
 import java.util.*;
 
-import com.github.lessjava.ast.ASTNode;
+import com.github.lessjava.types.ast.ASTNode;
 
 /**
  * Single Decaf symbol. Might represent a scalar variable, an array, or a

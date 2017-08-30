@@ -1,4 +1,4 @@
-package com.github.lessjava.ast;
+package com.github.lessjava.types.ast;
 /**
  * Decaf assignment statement. When executed, the program should fully evaluate
  * the value expression and store the result in the given memory location.

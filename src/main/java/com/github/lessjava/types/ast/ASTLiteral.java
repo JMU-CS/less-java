@@ -1,4 +1,4 @@
-package com.github.lessjava.ast;
+package com.github.lessjava.types.ast;
 
 /**
  * Decaf literal value.

@@ -1,4 +1,4 @@
-package com.github.lessjava.ast;
+package com.github.lessjava.types.ast;
 
 /**
  * Any Decaf statement that can be executed at runtime.

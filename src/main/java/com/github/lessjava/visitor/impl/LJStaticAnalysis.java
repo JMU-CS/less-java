@@ -1,61 +1,268 @@
 package com.github.lessjava.visitor.impl;
 
-import com.github.lessjava.ast.ASTNode;
-import com.github.lessjava.generated.LJBaseListener;
-import com.github.lessjava.generated.LJParser;
+import com.github.lessjava.exceptions.InvalidProgramException;
+import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTBinaryExpr;
+import com.github.lessjava.types.ast.ASTBlock;
+import com.github.lessjava.types.ast.ASTBreak;
+import com.github.lessjava.types.ast.ASTConditional;
+import com.github.lessjava.types.ast.ASTContinue;
+import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTLiteral;
+import com.github.lessjava.types.ast.ASTLocation;
+import com.github.lessjava.types.ast.ASTProgram;
+import com.github.lessjava.types.ast.ASTReturn;
+import com.github.lessjava.types.ast.ASTTest;
+import com.github.lessjava.types.ast.ASTUnaryExpr;
+import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTVoidFunctionCall;
+import com.github.lessjava.types.ast.ASTWhileLoop;
 
-public class LJStaticAnalysis extends LJBaseListener {
+public class LJStaticAnalysis extends StaticAnalysis
+{
+    private boolean hasReturn;
 
-    private ASTNode.DataType functionReturnType;
-
-    public LJStaticAnalysis() {
+    @Override
+    public void preVisit(ASTProgram node)
+    {
     }
 
     @Override
-    public void exitProgram(LJParser.ProgramContext ctx) {
+    public void postVisit(ASTProgram node)
+    {
     }
 
     @Override
-    public void exitFunction(LJParser.FunctionContext ctx) {
+    public void preVisit(ASTFunction node)
+    {
     }
 
     @Override
-    public void enterBlock(LJParser.BlockContext ctx) {
+    public void postVisit(ASTFunction node)
+    {
+        if (!hasReturn) {
+            String message = String.format("Function \"%s\" is missing a return statement", node.name);
+            addError(new InvalidProgramException(message));
+        }
+        
+        hasReturn = false;
     }
 
     @Override
-    public void exitBlock(LJParser.BlockContext ctx) {
+    public void preVisit(ASTVariable node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
     }
 
     @Override
-    public void exitAssignment(LJParser.AssignmentContext ctx) {
+    public void postVisit(ASTVariable node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
     }
 
     @Override
-    public void exitConditional(LJParser.ConditionalContext ctx) {
+    public void preVisit(ASTBlock node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
     }
 
     @Override
-    public void exitWhile(LJParser.WhileContext ctx) {
+    public void postVisit(ASTBlock node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
     }
 
     @Override
-    public void exitReturn(LJParser.ReturnContext ctx) {
+    public void preVisit(ASTAssignment node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
     }
 
     @Override
-    public void exitBreak(LJParser.BreakContext ctx) {
+    public void postVisit(ASTAssignment node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
     }
 
     @Override
-    public void exitContinue(LJParser.ContinueContext ctx) {
+    public void preVisit(ASTVoidFunctionCall node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
     }
 
     @Override
-    public void exitTest(LJParser.TestContext ctx) {
+    public void postVisit(ASTVoidFunctionCall node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
     }
 
     @Override
-    public void exitLit(LJParser.LitContext ctx) {
+    public void preVisit(ASTConditional node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
     }
+
+    @Override
+    public void postVisit(ASTConditional node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTWhileLoop node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTWhileLoop node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTReturn node)
+    {
+        hasReturn = true;
+    }
+
+    @Override
+    public void postVisit(ASTReturn node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTBreak node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTBreak node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTContinue node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTContinue node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTTest node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTTest node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTBinaryExpr node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
+    }
+
+    @Override
+    public void inVisit(ASTBinaryExpr node)
+    {
+        // TODO Auto-generated method stub
+        super.inVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTBinaryExpr node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTUnaryExpr node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTUnaryExpr node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTFunctionCall node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTFunctionCall node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTLocation node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTLocation node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTLiteral node)
+    {
+        // TODO Auto-generated method stub
+        super.preVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTLiteral node)
+    {
+        // TODO Auto-generated method stub
+        super.postVisit(node);
+    }
+
 }

@@ -2,16 +2,16 @@ package com.github.lessjava.visitor.impl;
 
 import java.util.Iterator;
 
-import com.github.lessjava.ast.ASTAssignment;
-import com.github.lessjava.ast.ASTBinaryExpr;
-import com.github.lessjava.ast.ASTExpression;
-import com.github.lessjava.ast.ASTFunction;
-import com.github.lessjava.ast.ASTFunction.Parameter;
-import com.github.lessjava.ast.ASTFunctionCall;
-import com.github.lessjava.ast.ASTNode.DataType;
-import com.github.lessjava.ast.ASTReturn;
-import com.github.lessjava.ast.ASTUnaryExpr;
-import com.github.lessjava.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTBinaryExpr;
+import com.github.lessjava.types.ast.ASTExpression;
+import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTReturn;
+import com.github.lessjava.types.ast.ASTUnaryExpr;
+import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTFunction.Parameter;
+import com.github.lessjava.types.ast.ASTNode.DataType;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 public class LJASTAssignTypes extends LJAbstractAssignTypes
@@ -41,7 +41,7 @@ public class LJASTAssignTypes extends LJAbstractAssignTypes
     {
         ASTFunction function = nameFunctionMap.get(node.name);
         Iterator<ASTExpression> functionCallArgIterator = node.arguments.iterator();
-        
+
         // Assign types of parameters of associated function
         for (Parameter p : function.parameters) {
             ASTExpression arg = functionCallArgIterator.next();
@@ -51,7 +51,7 @@ public class LJASTAssignTypes extends LJAbstractAssignTypes
                 p.type = argType;
             }
         }
-        
+
         if (!typeIsKnown(node.type) && typeIsKnown(function.returnType)) {
             node.type = function.returnType;
         }

@@ -1,4 +1,4 @@
-package com.github.lessjava.ast;
+package com.github.lessjava.types.ast;
 
 /**
  * Unary operation with an operation tag and a child sub-expression. When

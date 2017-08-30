@@ -1,4 +1,4 @@
-package com.github.lessjava.ast;
+package com.github.lessjava.types.ast;
 
 import java.util.ArrayList;
 import java.util.List;

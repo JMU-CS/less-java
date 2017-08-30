@@ -5,15 +5,15 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import com.github.lessjava.ast.ASTBlock;
-import com.github.lessjava.ast.ASTFunction;
-import com.github.lessjava.ast.ASTFunction.Parameter;
-import com.github.lessjava.ast.ASTNode;
-import com.github.lessjava.ast.ASTProgram;
-import com.github.lessjava.ast.ASTVariable;
 import com.github.lessjava.exceptions.InvalidProgramException;
 import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.SymbolTable;
+import com.github.lessjava.types.ast.ASTBlock;
+import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTNode;
+import com.github.lessjava.types.ast.ASTProgram;
+import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTFunction.Parameter;
 
 /**
  * Static analysis pass to construct symbol tables. Visits an AST, maintaining a

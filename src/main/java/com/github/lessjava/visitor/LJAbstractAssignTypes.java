@@ -6,17 +6,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.github.lessjava.ast.ASTBinaryExpr;
-import com.github.lessjava.ast.ASTBlock;
-import com.github.lessjava.ast.ASTExpression;
-import com.github.lessjava.ast.ASTFunction;
-import com.github.lessjava.ast.ASTFunctionCall;
-import com.github.lessjava.ast.ASTNode.DataType;
-import com.github.lessjava.ast.ASTProgram;
-import com.github.lessjava.ast.ASTUnaryExpr;
-import com.github.lessjava.ast.ASTVariable;
 import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.SymbolTable;
+import com.github.lessjava.types.ast.ASTBinaryExpr;
+import com.github.lessjava.types.ast.ASTBlock;
+import com.github.lessjava.types.ast.ASTExpression;
+import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTProgram;
+import com.github.lessjava.types.ast.ASTUnaryExpr;
+import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTNode.DataType;
 import com.github.lessjava.visitor.impl.LJBaseASTVisitor;
 
 public abstract class LJAbstractAssignTypes extends LJBaseASTVisitor implements LJAssignTypes
@@ -39,14 +39,16 @@ public abstract class LJAbstractAssignTypes extends LJBaseASTVisitor implements 
     {
         scopes.pop();
     }
-    
+
     @Override
-    public void preVisit(ASTFunction node) {
+    public void preVisit(ASTFunction node)
+    {
         scopes.push((SymbolTable) node.attributes.get("symbolTable"));
     }
 
     @Override
-    public void postVisit(ASTFunction node) {
+    public void postVisit(ASTFunction node)
+    {
         scopes.pop();
     }
 
@@ -101,9 +103,9 @@ public abstract class LJAbstractAssignTypes extends LJBaseASTVisitor implements 
     public DataType evalExprType(ASTVariable expr)
     {
         try {
-            
+
             Iterator<SymbolTable> scopeIterator = scopes.iterator();
-            
+
             // Iterate over the current active scopes for the symbol
             while (scopeIterator.hasNext()) {
                 SymbolTable scope = scopeIterator.next();

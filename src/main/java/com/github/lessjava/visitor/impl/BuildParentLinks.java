@@ -1,20 +1,20 @@
 package com.github.lessjava.visitor.impl;
 
-import com.github.lessjava.ast.ASTAssignment;
-import com.github.lessjava.ast.ASTBinaryExpr;
-import com.github.lessjava.ast.ASTBlock;
-import com.github.lessjava.ast.ASTConditional;
-import com.github.lessjava.ast.ASTExpression;
-import com.github.lessjava.ast.ASTFunction;
-import com.github.lessjava.ast.ASTFunctionCall;
-import com.github.lessjava.ast.ASTProgram;
-import com.github.lessjava.ast.ASTReturn;
-import com.github.lessjava.ast.ASTStatement;
-import com.github.lessjava.ast.ASTTest;
-import com.github.lessjava.ast.ASTUnaryExpr;
-import com.github.lessjava.ast.ASTVariable;
-import com.github.lessjava.ast.ASTVoidFunctionCall;
-import com.github.lessjava.ast.ASTWhileLoop;
+import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTBinaryExpr;
+import com.github.lessjava.types.ast.ASTBlock;
+import com.github.lessjava.types.ast.ASTConditional;
+import com.github.lessjava.types.ast.ASTExpression;
+import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTProgram;
+import com.github.lessjava.types.ast.ASTReturn;
+import com.github.lessjava.types.ast.ASTStatement;
+import com.github.lessjava.types.ast.ASTTest;
+import com.github.lessjava.types.ast.ASTUnaryExpr;
+import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTVoidFunctionCall;
+import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.visitor.DefaultASTVisitor;
 
 /**

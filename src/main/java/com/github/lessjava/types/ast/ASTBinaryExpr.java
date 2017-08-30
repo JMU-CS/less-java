@@ -1,4 +1,4 @@
-package com.github.lessjava.ast;
+package com.github.lessjava.types.ast;
 
 /**
  * Decaf binary operation with an operation tag and two child sub-expressions.

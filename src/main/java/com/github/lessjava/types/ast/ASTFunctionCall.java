@@ -1,4 +1,4 @@
-package com.github.lessjava.ast;
+package com.github.lessjava.types.ast;
 import java.util.*;
 
 /**
@@ -40,4 +40,3 @@ public class ASTFunctionCall extends ASTExpression
         return name + argString;
     }
 }
-
