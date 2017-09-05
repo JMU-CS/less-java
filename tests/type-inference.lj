@@ -2,38 +2,18 @@ add (a, b) {
     return a + b
 }
 
-c = add(1, 2)
-
-addTen (d) {
-    e = 10
-    return add(d, e)
+addTen (a) {
+    return a + 10
 }
 
-f = addTen(11)
-
-addIfGreater (g, h) {
-    return add(g, h)
+gt (a, b) {
+    b = 10
+    return a > true
 }
-
-i = addIfGreater(f, 10)
-
-j = true
-
-addTenIfTrue(k, l) {
-    if (k) {
-        return add(l, 10)
-    }
-
-    return l
-}
-
-m = addTenIfTrue(j, f)
 
 eq (a, b) {
     return a == b
 }
 
-n = eq(2, 3)
-o = eq(true, false)
-p = eq(2, true)
-
+c = add(1, 2)
+d = addTen(c)

@@ -1,4 +1,4 @@
-package com.github.lessjava.visitor.impl;
+package com.github.lessjava.visitor;
 
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
@@ -30,7 +30,7 @@ import com.github.lessjava.types.ast.ASTWhileLoop;
  * interface, and optionally to define default behavior for any unimplemented
  * parts of the interface.
  */
-public class LJBaseASTVisitor implements ASTVisitor
+public class LJDefaultASTVisitor implements ASTVisitor
 {
     public void defaultPreVisit(ASTNode node)  { }
     public void defaultInVisit(ASTNode node)   { }

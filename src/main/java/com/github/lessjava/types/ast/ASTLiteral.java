@@ -1,5 +1,7 @@
 package com.github.lessjava.types.ast;
 
+import com.github.lessjava.types.inference.HMType;
+
 /**
  * Decaf literal value.
  *
@@ -40,6 +42,7 @@ public class ASTLiteral extends ASTExpression
     }
 
     public Object value;
+    public HMType hmType;
 
     public ASTLiteral(ASTNode.DataType type, Object value)
     {

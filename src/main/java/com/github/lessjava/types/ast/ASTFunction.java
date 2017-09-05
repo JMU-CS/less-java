@@ -3,6 +3,8 @@ package com.github.lessjava.types.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.lessjava.types.inference.HMType;
+
 /**
  * Decaf function declaration. Contains a name, a return type, a list of formal
  * parameters, and a function body (block).
@@ -34,6 +36,8 @@ public class ASTFunction extends ASTNode
     public ASTBlock         body;
 
     public List<Parameter> parameters;
+    
+    public HMType hmType;
 
     public ASTFunction(String name, ASTNode.DataType returnType, ASTBlock body)
     {

@@ -15,19 +15,19 @@ import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
-import com.github.lessjava.visitor.DefaultASTVisitor;
+import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 /**
  * AST pre-order visitor; initializes parent links for use in later AST
  * analyses.
  *
  */
-public class BuildParentLinks extends DefaultASTVisitor
+public class BuildParentLinks extends LJDefaultASTVisitor
 {
     @Override
     public void preVisit(ASTProgram node)
     {
-        for (ASTStatement statement: node.statements) {
+        for (ASTStatement statement : node.statements) {
             statement.setParent(node);
         }
         for (ASTFunction func : node.functions) {
@@ -93,7 +93,8 @@ public class BuildParentLinks extends DefaultASTVisitor
     }
 
     @Override
-    public void preVisit(ASTTest node) {
+    public void preVisit(ASTTest node)
+    {
         node.function.setParent(node);
         node.expectedValue.setParent(node);
     }
@@ -125,4 +126,3 @@ public class BuildParentLinks extends DefaultASTVisitor
 
     // no need for ASTLiteral handler (no children)
 }
-

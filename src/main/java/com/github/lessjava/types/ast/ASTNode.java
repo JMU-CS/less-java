@@ -32,7 +32,7 @@ public abstract class ASTNode
     /**
      * List of Decaf AST data types.
      */
-    public enum DataType { INT, BOOL, VOID, STR, UNKNOWN }
+    public enum DataType { INT, BOOL, VOID, STR, EQ, UNKNOWN }
 
     public static String typeToString(DataType t)
     {
@@ -44,6 +44,7 @@ public abstract class ASTNode
             case BOOL:      return "bool";
             case VOID:      return "void";
             case STR:       return "str";
+            case EQ:        return "equalable";
             case UNKNOWN:   return "unknown";
             default:        return "???";
         }

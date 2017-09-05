@@ -44,8 +44,7 @@ public class SymbolTable
             throws InvalidProgramException
     {
         if (localTable.containsKey(name)) {
-            throw new InvalidProgramException(
-                    "Duplicate symbols with identical name: " + name);
+            return;
         }
         this.localTable.put(name, symbol);
         this.localSymbols.add(symbol);

@@ -4,10 +4,10 @@ import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTNode.DataType;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
-import com.github.lessjava.types.ast.ASTNode.DataType;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 public class LJASTCheckUnknownTypes extends LJAbstractAssignTypes

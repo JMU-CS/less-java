@@ -16,10 +16,10 @@ import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.visitor.impl.StaticAnalysis;
 import com.github.lessjava.types.ast.ASTNode.DataType;
-import com.github.lessjava.visitor.impl.LJBaseASTVisitor;
 
-public abstract class LJAbstractAssignTypes extends LJBaseASTVisitor implements LJAssignTypes
+public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJAssignTypes
 {
     protected Map<String, ASTFunction> nameFunctionMap = new HashMap<>();
     protected Deque<SymbolTable>       scopes          = new ArrayDeque<>();
@@ -63,6 +63,16 @@ public abstract class LJAbstractAssignTypes extends LJBaseASTVisitor implements 
     {
         scopes.pop();
     }
+    
+    @Override
+    public void preVisit(ASTFunctionCall node) {
+        node.type = nameFunctionMap.get(node.name).returnType;
+    }
+
+    @Override
+    public void postVisit(ASTFunctionCall node) {
+    }
+        
 
     public DataType evalExprType(ASTExpression expr)
     {

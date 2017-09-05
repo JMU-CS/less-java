@@ -21,14 +21,14 @@ import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
-import com.github.lessjava.visitor.DefaultASTVisitor;
+import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 /**
  * AST pre-order visitor; prints each node to standard output. For best output,
  * should be run AFTER {@link BuildParentLinks} and {@link CalculateNodeDepths}.
  *
  */
-public class PrintDebugTree extends DefaultASTVisitor
+public class PrintDebugTree extends LJDefaultASTVisitor
 {
     private PrintStream output;
 
@@ -206,7 +206,7 @@ public class PrintDebugTree extends DefaultASTVisitor
         args.append(")");
 
         indent(node);
-        output.print("FunctionCall: " + node.name + " : " + node.type + " " + args.toString());
+        output.print("FunctionCall: " + node.name + " : " + ASTNode.typeToString(node.type) + " " + args.toString());
         newline(node);
     }
 
