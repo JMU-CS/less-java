@@ -11,9 +11,10 @@ import com.github.lessjava.types.SymbolTable;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
-import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.inference.HMType;
+import com.github.lessjava.types.inference.impl.HMTypeBase;
 
 /**
  * Static analysis pass to construct symbol tables. Visits an AST, maintaining a
@@ -71,7 +72,7 @@ public class BuildSymbolTables extends StaticAnalysis
     protected void insertFunctionSymbol(ASTFunction node)
     {
         try {
-            List<ASTNode.DataType> ptypes = new ArrayList<ASTNode.DataType>();
+            List<HMType> ptypes = new ArrayList<>();
             for (ASTFunction.Parameter p : node.parameters) {
                 ptypes.add(p.type);
             }
@@ -111,14 +112,14 @@ public class BuildSymbolTables extends StaticAnalysis
      * the given function name; the function will take one parameter of the given
      * type and return void.
      */
-    private void insertPrintFunctionSymbol(String name, ASTNode.DataType type)
+    private void insertPrintFunctionSymbol(String name, HMType type)
     {
-        List<ASTNode.DataType> ptypes;
-        ptypes = new ArrayList<ASTNode.DataType>();
+        List<HMType> ptypes;
+        ptypes = new ArrayList<HMType>();
         ptypes.add(type); // one param
         try {
             getCurrentTable().insert(name, new Symbol(name, // name
-                    ASTNode.DataType.VOID, // return
+                    new HMTypeBase(HMType.BaseDataType.VOID), // return
                     ptypes)); // parameters
         } catch (InvalidProgramException ex) {
             addError(ex);

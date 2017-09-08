@@ -2,18 +2,21 @@ add (a, b) {
     return a + b
 }
 
-addTen (a) {
-    return a + 10
-}
-
-gt (a, b) {
-    b = 10
-    return a > true
-}
-
 eq (a, b) {
     return a == b
 }
 
-c = add(1, 2)
-d = addTen(c)
+compareToInt(c) {
+    return c == 10
+}
+
+compareIntAndBool {
+    a = 10
+    b = true
+
+    return a == b
+}
+
+add (1, 2)
+eq (1, 2)
+

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.lessjava.types.inference.HMType;
+import com.github.lessjava.types.inference.HMType.BaseDataType;
+import com.github.lessjava.types.inference.impl.HMTypeBase;
 
 /**
  * Decaf function declaration. Contains a name, a return type, a list of formal
@@ -16,10 +18,10 @@ public class ASTFunction extends ASTNode
      */
     public static class Parameter
     {
-        public String           name;
-        public ASTNode.DataType type;
+        public String name;
+        public HMType type;
 
-        public Parameter(String name, ASTNode.DataType type)
+        public Parameter(String name, HMType type)
         {
             this.name = name;
             this.type = type;
@@ -31,15 +33,15 @@ public class ASTFunction extends ASTNode
         }
     }
 
-    public String           name;
-    public ASTNode.DataType returnType;
-    public ASTBlock         body;
+    public String   name;
+    public HMType   returnType;
+    public ASTBlock body;
 
     public List<Parameter> parameters;
-    
+
     public HMType hmType;
 
-    public ASTFunction(String name, ASTNode.DataType returnType, ASTBlock body)
+    public ASTFunction(String name, HMType returnType, ASTBlock body)
     {
         this.name = name;
         this.returnType = returnType;
@@ -49,7 +51,7 @@ public class ASTFunction extends ASTNode
 
     public ASTFunction(String name, ASTBlock body)
     {
-        this(name, ASTNode.DataType.UNKNOWN, body);
+        this(name, new HMTypeBase(BaseDataType.UNKNOWN), body);
     }
 
     public String getParameterStr()
@@ -60,7 +62,7 @@ public class ASTFunction extends ASTNode
             if (params.length() > 1) {
                 params.append(", ");
             }
-            params.append(p.name + ":" + ASTNode.typeToString(p.type));
+            params.append(p.name + ":" + HMType.typeToString(p.type));
         }
         params.append(")");
         return params.toString();

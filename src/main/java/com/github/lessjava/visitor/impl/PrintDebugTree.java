@@ -21,6 +21,7 @@ import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
+import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 /**
@@ -80,7 +81,7 @@ public class PrintDebugTree extends LJDefaultASTVisitor
     public void preVisit(ASTFunction node)
     {
         indent(node);
-        output.print("Function: " + node.name + " : " + ASTNode.typeToString(node.returnType) + " "
+        output.print("Function: " + node.name + " : " + HMType.typeToString(node.returnType) + " "
                 + node.getParameterStr());
         newline(node, true);
     }
@@ -89,7 +90,7 @@ public class PrintDebugTree extends LJDefaultASTVisitor
     public void preVisit(ASTVariable node)
     {
         indent(node);
-        output.print("Variable: " + node.name + " : " + ASTNode.typeToString(node.type)
+        output.print("Variable: " + node.name + " : " + HMType.typeToString(node.type)
                 + (node.isArray ? "[" + node.arrayLength + "]" : ""));
         newline(node, true);
     }
@@ -206,7 +207,7 @@ public class PrintDebugTree extends LJDefaultASTVisitor
         args.append(")");
 
         indent(node);
-        output.print("FunctionCall: " + node.name + " : " + ASTNode.typeToString(node.type) + " " + args.toString());
+        output.print("FunctionCall: " + node.name + " : " + HMType.typeToString(node.type) + " " + args.toString());
         newline(node);
     }
 
@@ -222,7 +223,7 @@ public class PrintDebugTree extends LJDefaultASTVisitor
     public void preVisit(ASTLiteral node)
     {
         indent(node);
-        output.print("Literal: " + node.toString() + " : " + ASTNode.typeToString(node.type));
+        output.print("Literal: " + node.toString() + " : " + HMType.typeToString(node.type));
         newline(node);
     }
 }

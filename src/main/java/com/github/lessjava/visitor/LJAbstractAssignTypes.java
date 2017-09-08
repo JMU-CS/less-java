@@ -16,8 +16,9 @@ import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.inference.HMType;
+import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
-import com.github.lessjava.types.ast.ASTNode.DataType;
 
 public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJAssignTypes
 {
@@ -63,24 +64,23 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     {
         scopes.pop();
     }
-    
+
     @Override
-    public void preVisit(ASTFunctionCall node) {
+    public void preVisit(ASTFunctionCall node)
+    {
         node.type = nameFunctionMap.get(node.name).returnType;
     }
 
     @Override
-    public void postVisit(ASTFunctionCall node) {
-    }
-        
-
-    public DataType evalExprType(ASTExpression expr)
+    public void postVisit(ASTFunctionCall node)
     {
-        DataType type;
+    }
 
-        if (typeIsKnown(expr.type)) {
-            type = expr.type;
-        } else if (expr instanceof ASTBinaryExpr) {
+    public HMType evalExprType(ASTExpression expr)
+    {
+        HMType type;
+
+        if (expr instanceof ASTBinaryExpr) {
             type = evalExprType((ASTBinaryExpr) expr);
         } else if (expr instanceof ASTUnaryExpr) {
             type = evalExprType((ASTUnaryExpr) expr);
@@ -95,25 +95,24 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
         return type;
     }
 
-    public DataType evalExprType(ASTBinaryExpr expr)
+    public HMType evalExprType(ASTBinaryExpr expr)
     {
         return evalExprType(expr.leftChild);
     }
 
-    public DataType evalExprType(ASTUnaryExpr expr)
+    public HMType evalExprType(ASTUnaryExpr expr)
     {
         return evalExprType(expr.child);
     }
 
-    public DataType evalExprType(ASTFunctionCall expr)
+    public HMType evalExprType(ASTFunctionCall expr)
     {
         return nameFunctionMap.get(expr.name).returnType;
     }
 
-    public DataType evalExprType(ASTVariable expr)
+    public HMType evalExprType(ASTVariable expr)
     {
         try {
-
             Iterator<SymbolTable> scopeIterator = scopes.iterator();
 
             // Iterate over the current active scopes for the symbol
@@ -121,7 +120,7 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
                 SymbolTable scope = scopeIterator.next();
 
                 Symbol symbol = scope.lookup(expr.name);
-                if (symbol != null && typeIsKnown(symbol.type)) {
+                if (symbol != null && symbol.type != null) {
                     return symbol.type;
                 }
             }
@@ -129,12 +128,12 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
         } catch (Exception e) {
         }
 
-        return DataType.UNKNOWN;
+        return new HMTypeVar();
     }
 
-    public boolean typeIsKnown(DataType type)
+    public boolean typeIsKnown(HMType type)
     {
-        return type != null && !type.equals(DataType.UNKNOWN);
+        return type != null && !(type instanceof HMTypeVar);
     }
 
 }

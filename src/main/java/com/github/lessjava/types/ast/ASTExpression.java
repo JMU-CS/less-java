@@ -1,5 +1,8 @@
 package com.github.lessjava.types.ast;
 
+import com.github.lessjava.types.inference.HMType;
+import com.github.lessjava.types.inference.impl.HMTypeVar;
+
 /**
  * Any Decaf expression that can be evaluated to a value at runtime.
  * 
@@ -16,5 +19,5 @@ package com.github.lessjava.types.ast;
  */
 public abstract class ASTExpression extends ASTNode
 {
-    public ASTNode.DataType type = ASTNode.DataType.UNKNOWN;
+    public HMType type = new HMTypeVar();
 }

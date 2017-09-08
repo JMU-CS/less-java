@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.github.lessjava.types.inference.HMType;
+import com.github.lessjava.types.inference.HMType.BaseDataType;
+
 /**
  * Decaf binary operation with an operation tag and two child sub-expressions.
  * When executed, the program should evaluate the left-hand side and the
@@ -78,7 +81,7 @@ public class ASTBinaryExpr extends ASTExpression
         }
     }
 
-    public static ASTNode.DataType opToReturnType(BinOp op)
+    public static BaseDataType opToReturnType(BinOp op)
     {
         switch (op) {
             case OR:
@@ -89,15 +92,15 @@ public class ASTBinaryExpr extends ASTExpression
             case GT:
             case LE:
             case GE:
-                return ASTNode.DataType.BOOL;
+                return HMType.BaseDataType.BOOL;
             case ADD:
             case SUB:
             case MUL:
             case DIV:
             case MOD:
-                return ASTNode.DataType.INT;
+                return HMType.BaseDataType.INT;
             default:
-                return ASTNode.DataType.UNKNOWN;
+                return HMType.BaseDataType.UNKNOWN;
         }
     }
 

@@ -22,7 +22,10 @@ public class ASTProgram extends ASTNode
     {
         visitor.preVisit(this);
         for (ASTStatement s : statements) {
-            s.traverse(visitor);
+            // TODO: Why null?????
+            if (s != null) {
+                s.traverse(visitor);
+            }
         }
         for (ASTFunction f : functions) {
             f.traverse(visitor);

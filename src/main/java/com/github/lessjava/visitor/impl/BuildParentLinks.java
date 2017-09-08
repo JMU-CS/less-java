@@ -28,7 +28,10 @@ public class BuildParentLinks extends LJDefaultASTVisitor
     public void preVisit(ASTProgram node)
     {
         for (ASTStatement statement : node.statements) {
-            statement.setParent(node);
+            // TODO: why is it null???
+            if (statement != null) {
+                statement.setParent(node);
+            }
         }
         for (ASTFunction func : node.functions) {
             func.setParent(node);
