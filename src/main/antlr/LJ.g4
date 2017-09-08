@@ -25,6 +25,9 @@ expr:           exprBin;
 exprBin:        left=exprBin op=PREC1 right=exprBin
                 | left=exprBin op=PREC2 right=exprBin
                 | left=exprBin op=PREC3 right=exprBin
+                | left=exprBin op=PREC4 right=exprBin
+                | left=exprBin op=PREC5 right=exprBin
+                | left=exprBin op=PREC6 right=exprBin
                 | exprUn
                 ;
 
@@ -65,15 +68,20 @@ PREC2:      ADD
             | SUB
             ;
 
-PREC3:      | GT
+PREC3:      GT
             | GTE
             | LT
             | LTE
-            | ET
-            | NET
-            | OR
-            | AND
             ;
+
+PREC4:      ET
+            | NET
+            ;
+
+
+PREC5:      AND;
+
+PREC6:      OR;
 
 UNOP:       NOT;
 

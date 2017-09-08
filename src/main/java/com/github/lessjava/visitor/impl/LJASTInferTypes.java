@@ -11,7 +11,6 @@ import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
-import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
@@ -22,8 +21,6 @@ import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 public class LJASTInferTypes extends LJAbstractAssignTypes
 {
-    // Map to bind nodes to their types
-    private Map<ASTNode, HMType> nodeToHMType = new HashMap<>();
 
     // Map variables in a functions scope to function parameters
     private Map<Parameter, ASTVariable> parameterToVar = new HashMap<>();
@@ -56,9 +53,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
     public void preVisit(ASTBinaryExpr node)
     {
         node.type = new HMTypeBase(ASTBinaryExpr.opToReturnType(node.operator));
-
-        nodeToHMType.put(node.leftChild, new HMTypeVar());
-        nodeToHMType.put(node.rightChild, new HMTypeVar());
     }
 
     @Override

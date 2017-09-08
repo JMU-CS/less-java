@@ -7,11 +7,11 @@ eq (a, b) {
 }
 
 eqBroken (a, b, c, d) {
-    return (a == b) && (c == d) && (b == true) && (b == c)
+    return a == b && c == d && b == true && b == c
 }
 
 eqWorks (a, b, c, d) {
-    return (a == b) && (c == d) && (b == c) && (b == true)
+    return a == b && c == d && b == c && b == true
 }
 
 compareToInt(c) {
