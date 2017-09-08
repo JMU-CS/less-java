@@ -4,7 +4,7 @@ decaf-compiler-reference/
 .gradle/
 compiler.out
 test.lj
-src/main/java/.*.swp
+*.swp
 /bin/
 .classpath
 .project
