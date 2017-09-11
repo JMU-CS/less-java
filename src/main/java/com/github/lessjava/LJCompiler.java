@@ -13,7 +13,7 @@ import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.visitor.impl.BuildParentLinks;
 import com.github.lessjava.visitor.impl.BuildSymbolTables;
 import com.github.lessjava.visitor.impl.LJASTAssignPrimitiveTypes;
-import com.github.lessjava.visitor.impl.LJASTCheckUnknownTypes;
+import com.github.lessjava.visitor.impl.LJASTCheckTypesHaveChanged;
 import com.github.lessjava.visitor.impl.LJASTConverter;
 import com.github.lessjava.visitor.impl.LJASTInferTypes;
 import com.github.lessjava.visitor.impl.LJStaticAnalysis;
@@ -73,31 +73,31 @@ public class LJCompiler
         // Apply visitors to AST
         program.traverse(buildParentLinks);
         program.traverse(staticAnalysis);
-        
-        boolean allTypesKnown = false;
+
+        boolean typesHaveChanged = true;
+
+        LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
 
         int i = 0;
-        while (!allTypesKnown) {
-            LJASTCheckUnknownTypes checkUnknownTypes = new LJASTCheckUnknownTypes();
-            
+        while (typesHaveChanged) {
             program.traverse(buildSymbolTables);
             program.traverse(assignPrimitiveTypes);
             program.traverse(inferTypes);
 
-            program.traverse(checkUnknownTypes);
-            
-            allTypesKnown = checkUnknownTypes.allTypesKnown;
-            
-            if (i++ == 10) {
+            program.traverse(checkTypesHaveChanged);
+
+            typesHaveChanged = checkTypesHaveChanged.typesChanged;
+
+            // TODO: Fix termination
+            if (i++ == 100) {
                 break;
             }
         }
 
         program.traverse(printTree);
-        
+
         if (!StaticAnalysis.getErrors().isEmpty()) {
-            System.err.println();
-            System.err.println(StaticAnalysis.getErrorString());
+            System.out.printf("%n%s%n", StaticAnalysis.getErrorString());
         }
     }
 }
