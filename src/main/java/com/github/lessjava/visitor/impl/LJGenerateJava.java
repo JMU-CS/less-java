@@ -15,6 +15,7 @@ import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTTest;
@@ -24,22 +25,34 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJGenerateJava extends LJDefaultASTVisitor
 {
-    Path         file  = Paths.get("Main.java");
-    List<String> lines = new ArrayList<>();
+    private Path         file      = Paths.get("Main.java");
+    private List<String> lines     = new ArrayList<>();
+    private List<String> mainLines = new ArrayList<>();
+    private int          indent    = 1;
 
-    int indent = 1;
+    private ASTProgram programNode;
 
     @Override
     public void preVisit(ASTProgram node)
     {
+        this.programNode = node;
         lines.add("public class Main");
         lines.add("{");
+
+        String spaces = String.format("%" + (indent * 4) + "s", "");
+        mainLines.add(String.format("%spublic static void main(String[] args)", spaces));
+        mainLines.add(String.format("%s{", spaces));
     }
 
     @Override
     public void postVisit(ASTProgram node)
     {
+        String line = String.format("}"); 
+        addLine(node, line);
+
         lines.add("}");
+        lines.addAll(2, mainLines);
+        
         try {
             Files.write(file, lines, Charset.forName("UTF-8"));
         } catch (IOException ioe) {
@@ -50,19 +63,17 @@ public class LJGenerateJava extends LJDefaultASTVisitor
     @Override
     public void preVisit(ASTFunction node)
     {
-        String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        indent++;
         String paramaterString = node.parameters.toString().substring(1, node.parameters.toString().length() - 1);
-        lines.add(String.format("%spublic static %s %s(%s)", spaces, HMType.typeToString(node.returnType), node.name,
-                paramaterString));
-        indent--;
+        String line = String.format("public static %s %s(%s)", HMType.typeToString(node.returnType), node.name,
+                paramaterString);
+        addLine(node, line);
     }
 
     @Override
     public void preVisit(ASTBlock node)
     {
-        String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        lines.add(String.format("%s{", spaces));
+        String line = String.format("{");
+        addLine(node, line);
         indent++;
     }
 
@@ -70,51 +81,51 @@ public class LJGenerateJava extends LJDefaultASTVisitor
     public void postVisit(ASTBlock node)
     {
         indent--;
-        String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        lines.add(String.format("%s}", spaces));
+        String line = String.format("}");
+        addLine(node, line);
     }
 
     @Override
     public void preVisit(ASTAssignment node)
     {
-        String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        lines.add(String.format("%s%s %s = %s;", spaces, HMType.typeToString(node.variable.type), node.variable.name,
-                node.value));
+        String line = String.format("%s %s = %s;", HMType.typeToString(node.variable.type), node.variable.name,
+                node.value);
+        addLine(node, line);
     }
 
     @Override
     public void preVisit(ASTConditional node)
     {
-        String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        lines.add(String.format("%sif (%s)", spaces, node.condition));
+        String line = String.format("if (%s)", node.condition);
+        addLine(node, line);
     }
 
     @Override
     public void preVisit(ASTWhileLoop node)
     {
-        String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        lines.add(String.format("%swhile (%s)", spaces, node.guard));
+        String line = String.format("while (%s)", node.guard);
+        addLine(node, line);
     }
 
     @Override
     public void preVisit(ASTReturn node)
     {
-        String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        lines.add(String.format("%sreturn %s;", spaces, node.value));
+        String line = String.format("return %s;", node.value);
+        addLine(node, line);
     }
 
     @Override
     public void preVisit(ASTBreak node)
     {
-        String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        lines.add(String.format("%sbreak;%n", spaces));
+        String line = String.format("break;", node);
+        addLine(node, line);
     }
 
     @Override
     public void preVisit(ASTContinue node)
     {
-        String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        lines.add(String.format("%scontinue;%n", spaces));
+        String line = String.format("continue;", node);
+        addLine(node, line);
     }
 
     @Override
@@ -126,8 +137,20 @@ public class LJGenerateJava extends LJDefaultASTVisitor
     @Override
     public void preVisit(ASTFunctionCall node)
     {
+        String line = String.format("%s", node);
+        addLine(node, line);
+        
+        System.out.println(node);
+    }
+
+    private void addLine(ASTNode node, String line)
+    {
         String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-        lines.add(String.format("%s%s", spaces, node));
+        if (node.equals(programNode) || !(node instanceof ASTFunction) && node.getParent().equals(programNode)) {
+            mainLines.add(String.format("%s%s%s", spaces, spaces, line));
+        } else {
+            lines.add(String.format("%s%s", spaces, line));
+        }
     }
 
 }

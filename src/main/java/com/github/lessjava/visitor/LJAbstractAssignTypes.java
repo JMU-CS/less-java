@@ -13,6 +13,7 @@ import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
@@ -30,6 +31,7 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     {
         for (ASTFunction function : node.functions) {
             nameFunctionMap.put(function.name, function);
+            System.out.println("function: " + function.name);
         }
 
         scopes.push((SymbolTable) node.attributes.get("symbolTable"));
@@ -68,12 +70,11 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     @Override
     public void preVisit(ASTFunctionCall node)
     {
+        System.out.println("call: " + node.name);
+        HMType t = node.type;
+        ASTFunction f = nameFunctionMap.get(node.name);
+        HMType t2 = f.returnType;
         node.type = nameFunctionMap.get(node.name).returnType;
-    }
-
-    @Override
-    public void postVisit(ASTFunctionCall node)
-    {
     }
 
     public HMType evalExprType(ASTExpression expr)
