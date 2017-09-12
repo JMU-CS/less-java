@@ -23,11 +23,11 @@ public interface HMType
                 case INT:
                     return "int";
                 case BOOL:
-                    return "bool";
+                    return "boolean";
                 case VOID:
                     return "void";
                 case STR:
-                    return "str";
+                    return "String";
                 case UNKNOWN:
                     return "unknown";
                 default:

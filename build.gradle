@@ -33,6 +33,11 @@ run {
     args = (project.hasProperty("testfile")) ? [testfile] : [defaultTestfile]
 
     doLast {
+        copy {
+            from '.'
+            include 'Main.java'
+            into 'build/generated-src/java/main/com/github/lessjava/generated'
+        }
         println "output written to compiler.out"
     }
 }

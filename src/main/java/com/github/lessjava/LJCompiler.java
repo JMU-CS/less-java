@@ -16,6 +16,7 @@ import com.github.lessjava.visitor.impl.LJASTAssignPrimitiveTypes;
 import com.github.lessjava.visitor.impl.LJASTCheckTypesHaveChanged;
 import com.github.lessjava.visitor.impl.LJASTConverter;
 import com.github.lessjava.visitor.impl.LJASTInferTypes;
+import com.github.lessjava.visitor.impl.LJGenerateJava;
 import com.github.lessjava.visitor.impl.LJStaticAnalysis;
 import com.github.lessjava.visitor.impl.PrintDebugTree;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
@@ -62,6 +63,7 @@ public class LJCompiler
         LJASTAssignPrimitiveTypes assignPrimitiveTypes = new LJASTAssignPrimitiveTypes();
         LJASTInferTypes inferTypes = new LJASTInferTypes();
         PrintDebugTree printTree = new PrintDebugTree();
+        LJGenerateJava  generateJava = new LJGenerateJava();
 
         // ANTLR Parsing
         ParseTree parseTree = parser.program();
@@ -95,6 +97,7 @@ public class LJCompiler
         }
 
         program.traverse(printTree);
+        program.traverse(generateJava);
 
         if (!StaticAnalysis.getErrors().isEmpty()) {
             System.out.printf("%n%s%n", StaticAnalysis.getErrorString());

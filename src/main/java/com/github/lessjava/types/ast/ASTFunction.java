@@ -31,6 +31,11 @@ public class ASTFunction extends ASTNode
         {
             this(name, null);
         }
+        
+        @Override
+        public String toString() {
+            return String.format("%s %s", HMType.typeToString(type), name);
+        }
     }
 
     public String   name;
