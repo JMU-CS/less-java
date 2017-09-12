@@ -15,4 +15,14 @@ public class HMTypeBase implements HMType
     {
         return baseType;
     }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (other instanceof HMType) {
+            return HMType.typeToString(this) == HMType.typeToString((HMType)other);
+        } else {
+            return false;
+        }
+    }
 }
