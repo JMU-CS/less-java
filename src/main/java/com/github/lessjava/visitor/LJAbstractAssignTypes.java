@@ -31,7 +31,6 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     {
         for (ASTFunction function : node.functions) {
             nameFunctionMap.put(function.name, function);
-            System.out.println("function: " + function.name);
         }
 
         scopes.push((SymbolTable) node.attributes.get("symbolTable"));
@@ -70,7 +69,6 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     @Override
     public void preVisit(ASTFunctionCall node)
     {
-        System.out.println("call: " + node.name);
         HMType t = node.type;
         ASTFunction f = nameFunctionMap.get(node.name);
         HMType t2 = f.returnType;
