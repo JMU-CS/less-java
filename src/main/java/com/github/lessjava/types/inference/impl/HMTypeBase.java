@@ -2,7 +2,7 @@ package com.github.lessjava.types.inference.impl;
 
 import com.github.lessjava.types.inference.HMType;
 
-public class HMTypeBase implements HMType
+public class HMTypeBase extends HMType
 {
     private BaseDataType baseType;
 
@@ -17,12 +17,23 @@ public class HMTypeBase implements HMType
     }
 
     @Override
-    public boolean equals(Object other)
+    public String toString()
     {
-        if (other instanceof HMType) {
-            return HMType.typeToString(this) == HMType.typeToString((HMType)other);
-        } else {
-            return false;
+        switch (this.baseType) {
+            case INT:
+                return "int";
+            case BOOL:
+                return "boolean";
+            case VOID:
+                return "void";
+            case STR:
+                return "String";
+            case UNKNOWN:
+                return "unknown";
+            default:
+                return "???";
         }
+
     }
+
 }

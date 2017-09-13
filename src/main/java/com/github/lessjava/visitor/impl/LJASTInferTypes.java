@@ -153,7 +153,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
         if (left.getBaseType() != right.getBaseType()) {
             successfullyUnified = false;
             addError(new InvalidProgramException(String.format("Type Unification Error:\t%s, %s",
-                    HMType.typeToString(left), HMType.typeToString(right))));
+                    left.toString(), right.toString())));
         }
 
         return successfullyUnified;

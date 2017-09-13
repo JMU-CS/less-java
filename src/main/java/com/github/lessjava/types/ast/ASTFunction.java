@@ -34,7 +34,7 @@ public class ASTFunction extends ASTNode
         
         @Override
         public String toString() {
-            return String.format("%s %s", HMType.typeToString(type), name);
+            return String.format("%s %s", type.toString(), name);
         }
     }
 
@@ -67,7 +67,7 @@ public class ASTFunction extends ASTNode
             if (params.length() > 1) {
                 params.append(", ");
             }
-            params.append(p.name + ":" + HMType.typeToString(p.type));
+            params.append(p.name + ":" + p.type.toString());
         }
         params.append(")");
         return params.toString();

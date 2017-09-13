@@ -148,7 +148,7 @@ public class Symbol
             str.append("[" + length + "]");
         }
         str.append(" : ");
-        str.append(HMType.typeToString(type));
+        str.append(type.toString());
         switch (location) {
             case STATIC_VAR:
                 str.append(" (0x" + Long.toHexString(offset) + ")");
@@ -160,7 +160,7 @@ public class Symbol
                     if (comma) {
                         str.append(",");
                     }
-                    str.append(HMType.typeToString(t));
+                    str.append(t.toString());
                     comma = true;
                 }
                 str.append(")");

@@ -2,7 +2,7 @@ package com.github.lessjava.types.inference.impl;
 
 import com.github.lessjava.types.inference.HMType;
 
-public class HMTypeVar implements HMType
+public class HMTypeVar extends HMType
 {
     private static Integer globalUniqueId = 0;
 
@@ -17,8 +17,9 @@ public class HMTypeVar implements HMType
         return uniqueVarId;
     }
 
-    public void setUniqueId(Integer uniqueId)
-    {
-        this.uniqueVarId = uniqueId;
+    @Override
+    public String toString() {
+        return String.format("T%s", this.uniqueVarId);
+        
     }
 }

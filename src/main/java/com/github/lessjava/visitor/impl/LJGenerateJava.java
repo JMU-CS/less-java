@@ -64,7 +64,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor
     public void preVisit(ASTFunction node)
     {
         String paramaterString = node.parameters.toString().substring(1, node.parameters.toString().length() - 1);
-        String line = String.format("public static %s %s(%s)", HMType.typeToString(node.returnType), node.name,
+        String line = String.format("public static %s %s(%s)", node.returnType.toString(), node.name,
                 paramaterString);
         addLine(node, line);
     }
@@ -88,7 +88,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor
     @Override
     public void preVisit(ASTAssignment node)
     {
-        String line = String.format("%s %s = %s;", HMType.typeToString(node.variable.type), node.variable.name,
+        String line = String.format("%s %s = %s;", node.variable.type.toString(), node.variable.name,
                 node.value);
         addLine(node, line);
     }

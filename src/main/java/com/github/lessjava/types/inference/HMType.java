@@ -1,42 +1,15 @@
 package com.github.lessjava.types.inference;
 
-import com.github.lessjava.types.inference.impl.HMTypeBase;
-import com.github.lessjava.types.inference.impl.HMTypeVar;
-
-public interface HMType
+public abstract class HMType
 {
     public static enum BaseDataType
     {
         INT, BOOL, VOID, STR, UNKNOWN
     }
 
-    public static String typeToString(HMType t)
+    @Override
+    public boolean equals(Object other)
     {
-        if (t == null) {
-            return null;
-        }
-
-        if (t instanceof HMTypeBase) {
-            BaseDataType baseType = ((HMTypeBase) t).getBaseType();
-
-            switch (baseType) {
-                case INT:
-                    return "int";
-                case BOOL:
-                    return "boolean";
-                case VOID:
-                    return "void";
-                case STR:
-                    return "String";
-                case UNKNOWN:
-                    return "unknown";
-                default:
-                    return "???";
-            }
-        } else {
-            Integer id = ((HMTypeVar) t).getUniqueId();
-
-            return String.format("T%s", id);
-        }
+        return other instanceof HMType && (this.toString()).equals(((HMType) other).toString());
     }
 }

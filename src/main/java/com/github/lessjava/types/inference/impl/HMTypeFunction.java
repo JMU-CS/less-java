@@ -4,7 +4,7 @@ import com.github.lessjava.types.inference.HMType;
 
 // TODO
 
-public class HMTypeFunction implements HMType
+public class HMTypeFunction extends HMType
 {
     private HMType[] left, right;
 
