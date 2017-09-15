@@ -12,9 +12,8 @@ import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
-import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
-public class LJASTCheckTypesHaveChanged extends LJAbstractAssignTypes
+public class LJASTCheckTypesHaveChanged extends StaticAnalysis
 {
     private Map<ASTNode, HMType> exprTypeMap;
 

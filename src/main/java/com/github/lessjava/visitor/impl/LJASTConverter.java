@@ -8,6 +8,23 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.github.lessjava.generated.LJBaseListener;
 import com.github.lessjava.generated.LJParser;
+import com.github.lessjava.generated.LJParser.AssignmentContext;
+import com.github.lessjava.generated.LJParser.BlockContext;
+import com.github.lessjava.generated.LJParser.BreakContext;
+import com.github.lessjava.generated.LJParser.ConditionalContext;
+import com.github.lessjava.generated.LJParser.ContinueContext;
+import com.github.lessjava.generated.LJParser.ExprBaseContext;
+import com.github.lessjava.generated.LJParser.ExprBinContext;
+import com.github.lessjava.generated.LJParser.ExprContext;
+import com.github.lessjava.generated.LJParser.ExprUnContext;
+import com.github.lessjava.generated.LJParser.FuncCallContext;
+import com.github.lessjava.generated.LJParser.FunctionContext;
+import com.github.lessjava.generated.LJParser.ProgramContext;
+import com.github.lessjava.generated.LJParser.ReturnContext;
+import com.github.lessjava.generated.LJParser.StatementContext;
+import com.github.lessjava.generated.LJParser.TestContext;
+import com.github.lessjava.generated.LJParser.VoidFunctionCallContext;
+import com.github.lessjava.generated.LJParser.WhileContext;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
@@ -25,6 +42,7 @@ import com.github.lessjava.types.ast.ASTStatement;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
@@ -43,17 +61,17 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitProgram(LJParser.ProgramContext ctx)
+    public void exitProgram(ProgramContext ctx)
     {
         ast = new ASTProgram();
 
-        for (LJParser.StatementContext s : ctx.statement()) {
+        for (StatementContext s : ctx.statement()) {
             if (!s.getText().equals("\n")) {
                 ast.statements.add((ASTStatement) map.get(s));
             }
         }
 
-        for (LJParser.FunctionContext f : ctx.function()) {
+        for (FunctionContext f : ctx.function()) {
             ast.functions.add((ASTFunction) map.get(f));
         }
 
@@ -63,7 +81,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitFunction(LJParser.FunctionContext ctx)
+    public void exitFunction(FunctionContext ctx)
     {
         ASTFunction function;
         ASTFunction.Parameter parameter;
@@ -82,7 +100,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void enterBlock(LJParser.BlockContext ctx)
+    public void enterBlock(BlockContext ctx)
     {
         ASTBlock block;
 
@@ -96,13 +114,13 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitBlock(LJParser.BlockContext ctx)
+    public void exitBlock(BlockContext ctx)
     {
         blocks.pop();
     }
 
     @Override
-    public void exitAssignment(LJParser.AssignmentContext ctx)
+    public void exitAssignment(AssignmentContext ctx)
     {
         ASTAssignment assignment;
         ASTVariable variable;
@@ -123,7 +141,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitConditional(LJParser.ConditionalContext ctx)
+    public void exitConditional(ConditionalContext ctx)
     {
         ASTConditional conditional;
         ASTExpression condition;
@@ -150,7 +168,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitWhile(LJParser.WhileContext ctx)
+    public void exitWhile(WhileContext ctx)
     {
         ASTWhileLoop whileLoop;
         ASTExpression guard;
@@ -171,7 +189,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitReturn(LJParser.ReturnContext ctx)
+    public void exitReturn(ReturnContext ctx)
     {
         ASTReturn ret;
         ASTExpression expression;
@@ -190,7 +208,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitBreak(LJParser.BreakContext ctx)
+    public void exitBreak(BreakContext ctx)
     {
         ASTBreak br;
 
@@ -206,7 +224,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitContinue(LJParser.ContinueContext ctx)
+    public void exitContinue(ContinueContext ctx)
     {
         ASTContinue cont;
 
@@ -222,7 +240,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitTest(LJParser.TestContext ctx)
+    public void exitTest(TestContext ctx)
     {
         ASTTest test;
         ASTFunctionCall function;
@@ -243,7 +261,23 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitExpr(LJParser.ExprContext ctx)
+    public void exitVoidFunctionCall(VoidFunctionCallContext ctx)
+    {
+        ASTVoidFunctionCall voidFuncCall;
+
+        voidFuncCall = new ASTVoidFunctionCall(ctx.funcCall().ID().getText());
+
+        for (ExprContext expr : ctx.funcCall().argList().expr()) {
+            voidFuncCall.arguments.add((ASTExpression) map.get(expr));
+        }
+
+        voidFuncCall.setDepth(ctx.depth());
+
+        map.put(ctx, voidFuncCall);
+    }
+
+    @Override
+    public void exitExpr(ExprContext ctx)
     {
         ASTExpression expr;
 
@@ -255,7 +289,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitExprBin(LJParser.ExprBinContext ctx)
+    public void exitExprBin(ExprBinContext ctx)
     {
         ASTExpression expr;
         ASTBinaryExpr binExpr;
@@ -283,7 +317,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitExprUn(LJParser.ExprUnContext ctx)
+    public void exitExprUn(ExprUnContext ctx)
     {
         ASTUnaryExpr unExpr;
         ASTUnaryExpr.UnaryOp op;
@@ -309,7 +343,7 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitExprBase(LJParser.ExprBaseContext ctx)
+    public void exitExprBase(ExprBaseContext ctx)
     {
         ASTExpression expr;
 
@@ -329,13 +363,13 @@ public class LJASTConverter extends LJBaseListener
     }
 
     @Override
-    public void exitFuncCall(LJParser.FuncCallContext ctx)
+    public void exitFuncCall(FuncCallContext ctx)
     {
         ASTFunctionCall funcCall;
 
         funcCall = new ASTFunctionCall(ctx.ID().getText());
 
-        for (LJParser.ExprContext expr : ctx.argList().expr()) {
+        for (ExprContext expr : ctx.argList().expr()) {
             funcCall.arguments.add((ASTExpression) map.get(expr));
         }
 

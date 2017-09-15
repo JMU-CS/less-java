@@ -13,7 +13,6 @@ import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
-import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
@@ -23,8 +22,9 @@ import com.github.lessjava.visitor.impl.StaticAnalysis;
 
 public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJAssignTypes
 {
-    protected Map<String, ASTFunction> nameFunctionMap = new HashMap<>();
-    protected Deque<SymbolTable>       scopes          = new ArrayDeque<>();
+    protected static Map<String, ASTFunction> nameFunctionMap = new HashMap<>();
+
+    protected Deque<SymbolTable> scopes = new ArrayDeque<>();
 
     @Override
     public void preVisit(ASTProgram node)
@@ -69,9 +69,6 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     @Override
     public void preVisit(ASTFunctionCall node)
     {
-        HMType t = node.type;
-        ASTFunction f = nameFunctionMap.get(node.name);
-        HMType t2 = f.returnType;
         node.type = nameFunctionMap.get(node.name).returnType;
     }
 

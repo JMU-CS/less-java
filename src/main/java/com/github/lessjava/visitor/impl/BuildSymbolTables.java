@@ -3,18 +3,22 @@ package com.github.lessjava.visitor.impl;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.lessjava.exceptions.InvalidProgramException;
 import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.SymbolTable;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTFunction;
-import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 /**
  * Static analysis pass to construct symbol tables. Visits an AST, maintaining a
@@ -26,11 +30,13 @@ public class BuildSymbolTables extends StaticAnalysis
     /**
      * Stack of symbol tables, representing all active nested scopes.
      */
-    protected Deque<SymbolTable> tableStack;
+    protected Deque<SymbolTable>       tableStack;
+    protected Map<String, ASTVariable> nameVarMap;
 
     public BuildSymbolTables()
     {
         tableStack = new ArrayDeque<SymbolTable>();
+        nameVarMap = new HashMap<>();
     }
 
     /**
@@ -40,6 +46,25 @@ public class BuildSymbolTables extends StaticAnalysis
     {
         assert (tableStack.size() > 0);
         return tableStack.peek();
+    }
+
+    /**
+     * Return the previous active symbol table.
+     */
+    protected SymbolTable getPreviousTable()
+    {
+        assert (tableStack.size() > 0);
+        
+        SymbolTable current = tableStack.pop();
+        SymbolTable previous = (tableStack.size() > 0) ? tableStack.pop() : current;
+        
+        tableStack.push(previous);
+        
+        if (previous != current) {
+            tableStack.push(current);
+        }
+        
+        return previous;
     }
 
     /**
@@ -86,6 +111,16 @@ public class BuildSymbolTables extends StaticAnalysis
     protected void insertVariableSymbol(ASTVariable node)
     {
         try {
+            SymbolTable st = getPreviousTable();
+
+            // Get names of parent symbols
+            Set<String> varNames = st.getAllSymbols().stream().map(Symbol::getName).collect(Collectors.toSet());
+
+            // Don't add the symbol if we've already encountered it
+            if (varNames.contains(node.name)) {
+                return;
+            }
+
             Symbol symbol = new Symbol(node.name, node.type, node.isArray, node.arrayLength);
             getCurrentTable().insert(node.name, symbol);
         } catch (InvalidProgramException ex) {
@@ -130,6 +165,7 @@ public class BuildSymbolTables extends StaticAnalysis
     public void preVisit(ASTProgram node)
     {
         node.attributes.put("symbolTable", initializeScope());
+        insertPrintFunctionSymbol("print", new HMTypeVar());
     }
 
     @Override
@@ -159,16 +195,6 @@ public class BuildSymbolTables extends StaticAnalysis
     public void preVisit(ASTBlock node)
     {
         node.attributes.put("symbolTable", initializeScope());
-
-        // TODO: check if necessary
-        // Add the parameters from the parent function
-        if (node.getParent() instanceof ASTFunction) {
-            ASTFunction parent = (ASTFunction) node.getParent();
-
-            for (Parameter p : parent.parameters) {
-                insertParamSymbol(p);
-            }
-        }
     }
 
     @Override

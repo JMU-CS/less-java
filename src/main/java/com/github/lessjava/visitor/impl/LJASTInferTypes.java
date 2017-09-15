@@ -8,6 +8,7 @@ import com.github.lessjava.exceptions.InvalidProgramException;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
+import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
@@ -87,6 +88,27 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
         node.variable.type = node.value.type;
     }
 
+    @Override
+    public void preVisit(ASTConditional node)
+    {
+        unify(node.condition, BaseDataType.BOOL);
+    }
+
+    private boolean unify(ASTExpression left, BaseDataType right)
+    {
+        boolean successfullyUnified = true;
+        
+        HMTypeBase baseRight = new HMTypeBase(right);
+
+        if (left.type instanceof HMTypeVar) {
+            left.type = new HMTypeBase(right);
+        } else if(left.type instanceof HMTypeBase) {
+            successfullyUnified = unify((HMTypeBase) left.type, baseRight);
+        }
+        
+        return successfullyUnified;
+    }
+
     private boolean unify(ASTExpression left, ASTExpression right)
     {
         boolean successfullyUnified = true;
@@ -152,8 +174,8 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
 
         if (left.getBaseType() != right.getBaseType()) {
             successfullyUnified = false;
-            addError(new InvalidProgramException(String.format("Type Unification Error:\t%s, %s",
-                    left.toString(), right.toString())));
+            addError(new InvalidProgramException(
+                    String.format("Type Unification Error:\t%s, %s", left.toString(), right.toString())));
         }
 
         return successfullyUnified;

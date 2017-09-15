@@ -80,7 +80,6 @@ public class LJCompiler
 
         LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
 
-        int i = 0;
         while (typesHaveChanged) {
             program.traverse(buildSymbolTables);
             program.traverse(assignPrimitiveTypes);
@@ -89,11 +88,6 @@ public class LJCompiler
             program.traverse(checkTypesHaveChanged);
 
             typesHaveChanged = checkTypesHaveChanged.typesChanged;
-
-            // TODO: Fix termination
-            if (i++ == 100) {
-                break;
-            }
         }
 
         program.traverse(printTree);
