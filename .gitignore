@@ -6,6 +6,7 @@ compiler.out
 test.lj
 *.swp
 *.class
+libs/*.jar
 /bin/
 .classpath
 .project
