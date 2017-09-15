@@ -5,6 +5,7 @@ decaf-compiler-reference/
 compiler.out
 test.lj
 *.swp
+*.class
 /bin/
 .classpath
 .project

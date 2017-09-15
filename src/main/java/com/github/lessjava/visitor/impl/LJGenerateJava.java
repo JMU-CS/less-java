@@ -28,8 +28,9 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJGenerateJava extends LJDefaultASTVisitor
 {
+    public Path file = Paths.get("Main.java");
+
     private Set<Symbol>  declaredVariables    = new HashSet<>();
-    private Path         file                 = Paths.get("Main.java");
     private List<String> lines                = new ArrayList<>();
     private List<String> mainLines            = new ArrayList<>();
     private List<String> mainDeclarationLines = new ArrayList<>();

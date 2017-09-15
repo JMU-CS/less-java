@@ -1,8 +1,14 @@
+plugins {
+  id 'com.github.johnrengelman.shadow' version '2.0.1'
+  id 'java'
+}
+
 // Plugins
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'eclipse'
 apply plugin: 'antlr'
+
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -38,7 +44,12 @@ run {
             include 'Main.java'
             into 'build/generated-src/java/main/com/github/lessjava/generated'
         }
-        println "output written to compiler.out"
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.github.lessjava.LJCompiler'
     }
 }
 

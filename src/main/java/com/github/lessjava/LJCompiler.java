@@ -2,6 +2,9 @@ package com.github.lessjava;
 
 import java.io.IOException;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -63,7 +66,7 @@ public class LJCompiler
         LJASTAssignPrimitiveTypes assignPrimitiveTypes = new LJASTAssignPrimitiveTypes();
         LJASTInferTypes inferTypes = new LJASTInferTypes();
         PrintDebugTree printTree = new PrintDebugTree();
-        LJGenerateJava  generateJava = new LJGenerateJava();
+        LJGenerateJava generateJava = new LJGenerateJava();
 
         // ANTLR Parsing
         ParseTree parseTree = parser.program();
@@ -80,6 +83,7 @@ public class LJCompiler
 
         LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
 
+        int i = 0;
         while (typesHaveChanged) {
             program.traverse(buildSymbolTables);
             program.traverse(assignPrimitiveTypes);
@@ -88,13 +92,21 @@ public class LJCompiler
             program.traverse(checkTypesHaveChanged);
 
             typesHaveChanged = checkTypesHaveChanged.typesChanged;
+
+            if (i++ == 100) {
+                break;
+            }
         }
 
-        program.traverse(printTree);
+        // program.traverse(printTree);
         program.traverse(generateJava);
 
         if (!StaticAnalysis.getErrors().isEmpty()) {
             System.out.printf("%n%s%n", StaticAnalysis.getErrorString());
         }
+
+        // Compile java source file
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        compiler.run(null, null, null, generateJava.file.toString());
     }
 }
