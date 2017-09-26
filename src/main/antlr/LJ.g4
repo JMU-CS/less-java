@@ -106,7 +106,10 @@ DEC:        [0-9]+;
 BOOL:       'true'|'false';
 STR:        '\"'.*?'\"';
 
-ID:         [a-zA-Z]+;
-
-WS:         [ \t]+ -> skip;
+ID:         [a-zA-Z][a-zA-Z0-9_]*;
 EOL:        '\r'? '\n';
+
+// Ignore
+WHITESPACE:    	[ \t]+ -> skip;
+BLOCK_COMMENT: 	'/*' .*? '*/' -> skip;
+LINE_COMMENT:  	'//' ~[\r\n]* -> skip;
