@@ -6,7 +6,7 @@ program:        (statement | function)*;
 
 function:       ID ('('paramList')')? block;
 paramList:      ID((','ID)+)?;
-argList:        expr((','expr)+)?;
+argList:        (expr((','expr)+)?)?;
 block:          '{'statement*'}';
 
 statement:      var '=' expr EOL                        #Assignment

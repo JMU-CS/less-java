@@ -273,6 +273,10 @@ public class LJASTConverter extends LJBaseListener
 
         voidFuncCall.setDepth(ctx.depth());
 
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(voidFuncCall);
+        }
+
         map.put(ctx, voidFuncCall);
     }
 

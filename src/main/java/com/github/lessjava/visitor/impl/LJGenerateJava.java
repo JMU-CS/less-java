@@ -18,6 +18,7 @@ import com.github.lessjava.types.ast.ASTBreak;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -73,9 +74,12 @@ public class LJGenerateJava extends LJDefaultASTVisitor
     public void preVisit(ASTFunction node)
     {
         this.currentFunction = node;
-
+        
         String paramaterString = node.parameters.toString().substring(1, node.parameters.toString().length() - 1);
-        String line = String.format("public static %s %s(%s)", node.returnType.toString(), node.name, paramaterString);
+        String functionHeader = node.returnType == null ? String.format("public static void %s(%s)", node.name, paramaterString):
+                                                          String.format("public static %s %s(%s)", node.returnType.toString(), node.name, paramaterString);
+
+        String line = String.format("%s", functionHeader);
         addLine(node, line);
     }
 
@@ -96,10 +100,6 @@ public class LJGenerateJava extends LJDefaultASTVisitor
         if (node.getParent() instanceof ASTFunction) {
             SymbolTable symbolTable = (SymbolTable) node.attributes.get("symbolTable");
             List<Symbol> symbols = symbolTable.getSymbols();
-
-            System.out.println("ALL: \n" + symbolTable.getAllSymbols());
-            System.out.println("Inherited: \n" + symbolTable.getInheritedSymbols());
-            System.out.println("Local: \n" + symbolTable.getSymbols());
 
             for (Symbol s : symbols) {
                 if (!declaredVariables.contains(s)) {
@@ -180,13 +180,17 @@ public class LJGenerateJava extends LJDefaultASTVisitor
     {
         // TODO: ugh...
     }
+    
+    @Override
+    public void preVisit(ASTFunctionCall node) {
+    }
 
     @Override
     public void preVisit(ASTVoidFunctionCall node)
     {
         if (node.name.equals("print")) {
-            String arguments = node.arguments.toString().substring(1, node.arguments.toString().length() - 1);
-            String line = String.format("System.out.println(%s);", arguments);
+            String arguments = node.arguments.toString().substring(1, node.arguments.toString().length() - 1).replaceAll("\\\\\"", "");
+            String line = String.format("System.out.printf(%s);", arguments);
             addLine(node, line);
         }
     }

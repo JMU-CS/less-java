@@ -82,6 +82,11 @@ public class LJASTCheckTypesHaveChanged extends StaticAnalysis
     private boolean typeChanged(ASTNode node, HMType type)
     {
         boolean typeChanged = false;
+        
+        if (type == null) {
+            exprTypeMap.put(node, null);
+            return false;
+        }
 
         if (!exprTypeMap.containsKey(node) || !exprTypeMap.get(node).equals(type)) {
             typeChanged = true;

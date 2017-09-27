@@ -1,6 +1,5 @@
 package com.github.lessjava.visitor.impl;
 
-import com.github.lessjava.exceptions.InvalidProgramException;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
@@ -21,8 +20,6 @@ import com.github.lessjava.types.ast.ASTWhileLoop;
 
 public class LJStaticAnalysis extends StaticAnalysis
 {
-    private boolean hasReturn;
-
     @Override
     public void preVisit(ASTProgram node)
     {
@@ -41,12 +38,6 @@ public class LJStaticAnalysis extends StaticAnalysis
     @Override
     public void postVisit(ASTFunction node)
     {
-        if (!hasReturn) {
-            String message = String.format("Function \"%s\" is missing a return statement", node.name);
-            addError(new InvalidProgramException(message));
-        }
-        
-        hasReturn = false;
     }
 
     @Override
@@ -136,7 +127,6 @@ public class LJStaticAnalysis extends StaticAnalysis
     @Override
     public void preVisit(ASTReturn node)
     {
-        hasReturn = true;
     }
 
     @Override
