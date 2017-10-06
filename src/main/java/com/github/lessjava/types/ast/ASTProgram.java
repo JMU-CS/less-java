@@ -21,14 +21,11 @@ public class ASTProgram extends ASTNode
     public void traverse(ASTVisitor visitor)
     {
         visitor.preVisit(this);
-        for (ASTStatement s : statements) {
-            // TODO: Why null?????
-            if (s != null) {
-                s.traverse(visitor);
-            }
-        }
         for (ASTFunction f : functions) {
             f.traverse(visitor);
+        }
+        for (ASTStatement s : statements) {
+            s.traverse(visitor);
         }
         visitor.postVisit(this);
     }

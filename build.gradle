@@ -1,14 +1,10 @@
 plugins {
-  id 'com.github.johnrengelman.shadow' version '2.0.1'
-  id 'java'
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id 'java'
+    id 'application'
+    id 'eclipse'
+    id 'antlr'
 }
-
-// Plugins
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'eclipse'
-apply plugin: 'antlr'
-
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -19,7 +15,6 @@ repositories {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
-
     // Compile external jars
     compile fileTree(dir: "libs", include: "*.jar")
 

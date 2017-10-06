@@ -25,6 +25,7 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     protected static Map<String, ASTFunction> nameFunctionMap = new HashMap<>();
 
     protected Deque<SymbolTable> scopes = new ArrayDeque<>();
+    protected Deque<ASTVariable> visitedVariables = new ArrayDeque<>();
 
     @Override
     public void preVisit(ASTProgram node)
@@ -64,6 +65,7 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     public void postVisit(ASTBlock node)
     {
         scopes.pop();
+        visitedVariables.clear();
     }
 
     @Override
@@ -115,7 +117,7 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
             while (scopeIterator.hasNext()) {
                 SymbolTable scope = scopeIterator.next();
 
-                Symbol symbol = scope.lookup(expr.name);
+                Symbol symbol = scope.lookup(expr.name).get(0);
                 if (symbol != null && symbol.type != null) {
                     return symbol.type;
                 }

@@ -21,7 +21,6 @@ import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
-import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 /**

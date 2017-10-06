@@ -14,11 +14,13 @@ import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.SymbolTable;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTFunction.Parameter;
+import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTVariable;
-import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.inference.HMType;
-import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 /**
  * Static analysis pass to construct symbol tables. Visits an AST, maintaining a
@@ -32,6 +34,33 @@ public class BuildSymbolTables extends StaticAnalysis
      */
     protected Deque<SymbolTable>       tableStack;
     protected Map<String, ASTVariable> nameVarMap;
+
+    public static Map<ASTNode, SymbolTable> nodeSymbolTableMap = new HashMap<>();
+
+    /**
+     * ¦* Retrieves symbol information for a given symbol name. Searches for ¦*
+     * symbol tables up the parent tree if there is no table at the given ¦*
+     * node. Adds a static analysis error and returns null if the symbol ¦*
+     * cannot be found. ¦* ¦* @param node {@link ASTNode} to search ¦* @param
+     * name Decaf symbol name ¦* @return Symbol information ¦
+     */
+    public static List<Symbol> searchScopesForSymbol(ASTNode node, String name)
+    {
+        List<Symbol> symbols = null;
+        try {
+            if (node.attributes.containsKey("symbolTable")) {
+                SymbolTable table = (SymbolTable) node.attributes.get("symbolTable");
+                symbols = table.lookup(name);
+            } else if (node.getParent() != null) {
+                symbols = searchScopesForSymbol(node.getParent(), name);
+            } else {
+                addError(new InvalidProgramException("Symbol not found: " + name));
+            }
+        } catch (InvalidProgramException ex) {
+            addError(new InvalidProgramException(ex.getMessage()));
+        }
+        return symbols;
+    }
 
     public BuildSymbolTables()
     {
@@ -98,15 +127,59 @@ public class BuildSymbolTables extends StaticAnalysis
     protected void insertFunctionSymbol(ASTFunction node)
     {
         try {
+            boolean isConcrete = true;
             List<HMType> ptypes = new ArrayList<>();
             for (ASTFunction.Parameter p : node.parameters) {
                 ptypes.add(p.type);
+
+                if (p.type instanceof HMTypeVar) {
+                    isConcrete = false;
+                }
             }
-            Symbol symbol = new Symbol(node.name, node.returnType, ptypes);
+            Symbol symbol = new Symbol(node, node.name, node.returnType, ptypes,
+                                       isConcrete);
+
             getCurrentTable().insert(node.name, symbol);
         } catch (InvalidProgramException ex) {
             addError(ex);
         }
+    }
+
+    protected void insertFunctionInstanceSymbol(ASTFunctionCall node)
+    {
+        // TODO
+        // try {
+        // SymbolTable table = (SymbolTable)
+        // node.getParent().getParent().attributes.get("symbolTable");
+        //
+        // System.err.println(node.getParent().getClass());
+        //
+        // if (table == null) {
+        // return;
+        // }
+        //
+        // Symbol function = ((SymbolTable)
+        // node.getParent().attributes.get("symbolTable")).lookup(node.name)
+        // .get(0);
+        //
+        // if (function != null && function.concrete) {
+        // return;
+        // }
+        //
+        // List<HMType> instanceTypes = new ArrayList<>();
+        //
+        // for (int i = 0; i < node.arguments.size(); i++) {
+        // instanceTypes.add(node.arguments.get(i).type);
+        // }
+        //
+        // Symbol symbol = new Symbol(function.name, function.type,
+        // instanceTypes, true);
+        // getCurrentTable().insert(node.name, symbol);
+        // System.err.printf("inserted %s", symbol);
+        // } catch (InvalidProgramException ex) {
+        // ex.printStackTrace();
+        // // TODO
+        // }
     }
 
     protected void insertVariableSymbol(ASTVariable node)
@@ -115,9 +188,9 @@ public class BuildSymbolTables extends StaticAnalysis
             SymbolTable st = getPreviousTable();
 
             // Get names of parent symbols
-            Set<String> varNames = st.getAllSymbols().stream()
-                                                     .map(Symbol::getName)
-                                                     .collect(Collectors.toSet());
+            Set<String> varNames = st.getAllSymbols().stream().map(
+                                                                   Symbol::getName)
+                                     .collect(Collectors.toSet());
 
             // Don't add the symbol if we've already encountered it
             if (varNames.contains(node.name)) {
@@ -136,30 +209,11 @@ public class BuildSymbolTables extends StaticAnalysis
      * Add a symbol for the given function parameter to the current (innermost)
      * scope.
      */
-    protected void insertParamSymbol(ASTFunction.Parameter p)
+    protected void insertParamSymbol(Parameter p)
     {
         try {
             Symbol symbol = new Symbol(p.name, p.type);
             getCurrentTable().insert(p.name, symbol);
-        } catch (InvalidProgramException ex) {
-            addError(ex);
-        }
-    }
-
-    /**
-     * Add a symbol for a hard-coded function to the current (innermost) scope.
-     * Uses the given function name; the function will take one parameter of the
-     * given type and return void.
-     */
-    private void insertPrintFunctionSymbol(String name, HMType type)
-    {
-        List<HMType> ptypes;
-        ptypes = new ArrayList<HMType>();
-        ptypes.add(type); // one param
-        try {
-            getCurrentTable().insert(name, new Symbol(name, // name
-                                                      new HMTypeBase(HMType.BaseDataType.VOID), // return
-                                                      ptypes)); // parameters
         } catch (InvalidProgramException ex) {
             addError(ex);
         }
@@ -174,6 +228,7 @@ public class BuildSymbolTables extends StaticAnalysis
     @Override
     public void postVisit(ASTProgram node)
     {
+        nodeSymbolTableMap.put(node, getCurrentTable());
         finalizeScope();
     }
 
@@ -191,7 +246,14 @@ public class BuildSymbolTables extends StaticAnalysis
     @Override
     public void postVisit(ASTFunction node)
     {
+        nodeSymbolTableMap.put(node, getCurrentTable());
         finalizeScope();
+    }
+
+    @Override
+    public void postVisit(ASTFunctionCall node)
+    {
+        insertFunctionInstanceSymbol(node);
     }
 
     @Override
@@ -203,6 +265,7 @@ public class BuildSymbolTables extends StaticAnalysis
     @Override
     public void postVisit(ASTBlock node)
     {
+        nodeSymbolTableMap.put(node, getCurrentTable());
         finalizeScope();
     }
 
@@ -212,11 +275,4 @@ public class BuildSymbolTables extends StaticAnalysis
         insertVariableSymbol(node);
     }
 
-    @Override
-    public void postVisit(ASTVoidFunctionCall node)
-    {
-//        if (node.name.equals("print")) {
-//            insertPrintFunctionSymbol("print", node.arguments.get(0).type);
-//        }
-    }
 }

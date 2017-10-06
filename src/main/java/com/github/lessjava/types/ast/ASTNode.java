@@ -58,6 +58,8 @@ import com.github.lessjava.types.SymbolTable;
 public abstract class ASTNode
 {
     public Map<String, Object> attributes;
+    
+    private ASTNode parentScope;
 
     public ASTNode()
     {
@@ -97,6 +99,14 @@ public abstract class ASTNode
             parent = (ASTNode) attributes.get("parent");
         }
         return parent;
+    }
+    
+    public void setParentScope(ASTNode parentScope) {
+        this.parentScope = parentScope;
+    }
+
+    public ASTNode getParentScope() {
+        return this.parentScope;
     }
 
     /**

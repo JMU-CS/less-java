@@ -3,6 +3,7 @@ package com.github.lessjava.types;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.inference.HMType;
 
@@ -33,6 +34,11 @@ public class Symbol
      * Name in source code
      */
     public String name;
+    
+    /**
+     * True if a concrete instance of a function
+     */
+    public boolean concrete;
 
     /**
      * Data type
@@ -74,6 +80,8 @@ public class Symbol
      * Memory offset (if needed)
      */
     public int offset;
+
+    public ASTFunction node;
 
     /**
      * Create a new scalar symbol
@@ -134,6 +142,30 @@ public class Symbol
         this.totalSize = 8;
         this.location = MemLoc.STATIC_FUNC;
         this.offset = 0;
+    }
+
+    /**
+     * Create a new function symbol
+     * 
+     * @param name
+     *            Name in source code
+     * @param returnType
+     *            Function return type ({@link ASTNode.DataType})
+     * @param paramTypes
+     *            List of formal parameter data types
+     */
+    public Symbol(ASTFunction node, String name, HMType returnType, List<HMType> paramTypes, boolean concrete)
+    {
+        this.node = node;
+        this.name = name;
+        this.type = returnType;
+        this.paramTypes = paramTypes;
+        this.length = 1;
+        this.elementSize = 8;
+        this.totalSize = 8;
+        this.location = MemLoc.STATIC_FUNC;
+        this.offset = 0;
+        this.concrete = concrete;
     }
 
     /**

@@ -10,6 +10,6 @@ public abstract class HMType
     @Override
     public boolean equals(Object other)
     {
-        return other instanceof HMType && (this.toString()).equals(((HMType) other).toString());
+        return other != null && other instanceof HMType && (this.toString()).equals(((HMType) other).toString());
     }
 }

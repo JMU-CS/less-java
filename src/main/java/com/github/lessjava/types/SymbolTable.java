@@ -1,5 +1,8 @@
 package com.github.lessjava.types;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.github.lessjava.exceptions.InvalidProgramException;
 
@@ -12,8 +15,9 @@ import com.github.lessjava.exceptions.InvalidProgramException;
 public class SymbolTable
 {
     private SymbolTable parent;
-    private Map<String, Symbol> localTable;
+    private Map<String, List<Symbol>> localTable;
     private List<Symbol> localSymbols;
+    
     
     /**
      * Create a new, empty symbol table with no parent table.
@@ -30,8 +34,8 @@ public class SymbolTable
     public SymbolTable(SymbolTable parent)
     {
         this.parent = parent;
-        this.localTable = new HashMap<String, Symbol>();
-        this.localSymbols = new ArrayList<Symbol>();
+        this.localTable = new HashMap<>();
+        this.localSymbols = new ArrayList<>();
     }
 
     /**
@@ -43,11 +47,8 @@ public class SymbolTable
     public void insert(String name, Symbol symbol)
             throws InvalidProgramException
     {
-        if (localTable.containsKey(name)) {
-            return;
-        }
-        this.localTable.put(name, symbol);
         this.localSymbols.add(symbol);
+        this.localTable.computeIfAbsent(name, unused -> new ArrayList<>()).add(symbol);
     }
     
     /**
@@ -56,7 +57,7 @@ public class SymbolTable
      * @return Symbol information from either this table or a parent table
      * @throws InvalidProgramException Thrown if the symbol is not found
      */
-    public Symbol lookup(String name) throws InvalidProgramException
+    public List<Symbol> lookup(String name) throws InvalidProgramException
     {
         if (localTable.containsKey(name)) {
             return localTable.get(name);

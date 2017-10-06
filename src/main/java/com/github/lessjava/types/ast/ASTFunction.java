@@ -16,7 +16,7 @@ public class ASTFunction extends ASTNode
     /**
      * Decaf formal parameter (name and data type).
      */
-    public static class Parameter
+    public static class Parameter implements Cloneable
     {
         public String name;
         public HMType type;
@@ -32,9 +32,41 @@ public class ASTFunction extends ASTNode
             this(name, null);
         }
         
+        /* (non-Javadoc)
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
         @Override
-        public String toString() {
-            return String.format("%s %s", type.toString(), name);
+        public boolean equals(Object obj)
+        {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Parameter other = (Parameter) obj;
+            if (name == null) {
+                if (other.name != null)
+                    return false;
+            } else if (!name.equals(other.name))
+                return false;
+            if (type == null) {
+                if (other.type != null)
+                    return false;
+            } else if (!type.equals(other.type))
+                return false;
+            return true;
+        }
+        
+        @Override
+        public Object clone() {
+            return new Parameter(this.name, this.type);
+        }
+        
+        @Override
+        public String toString()
+        {
+            return String.format("%s %s", (type != null) ? type.toString() : "unused", name);
         }
     }
 
@@ -45,6 +77,8 @@ public class ASTFunction extends ASTNode
     public List<Parameter> parameters;
 
     public HMType hmType;
+
+    public boolean concrete;
 
     public ASTFunction(String name, HMType returnType, ASTBlock body)
     {
@@ -67,10 +101,46 @@ public class ASTFunction extends ASTNode
             if (params.length() > 1) {
                 params.append(", ");
             }
-            params.append(p.name + ":" + p.type.toString());
+            String paramString = (p.type != null) ? String.format("%s:%s", p.name,
+                                                             p.type.toString())
+                                             : String.format("%s:unused",
+                                                             p.name);
+            params.append(paramString);
         }
         params.append(")");
         return params.toString();
+    }
+    
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ASTFunction other = (ASTFunction) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        if (parameters == null) {
+            if (other.parameters != null)
+                return false;
+        } else if (!parameters.equals(other.parameters))
+            return false;
+        if (returnType == null) {
+            if (other.returnType != null)
+                return false;
+        } else if (!returnType.equals(other.returnType))
+            return false;
+        return true;
     }
 
     @Override

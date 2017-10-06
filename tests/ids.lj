@@ -1,7 +1,9 @@
-z {
+z() {
     print("z")
 }
 
-z2 {
-    print("z2")
+z2() {
+    print("asda%s", "hi")
 }
+
+z2()

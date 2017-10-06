@@ -2,9 +2,6 @@ package com.github.lessjava;
 
 import java.io.IOException;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
-
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -19,6 +16,7 @@ import com.github.lessjava.visitor.impl.LJASTAssignPrimitiveTypes;
 import com.github.lessjava.visitor.impl.LJASTCheckTypesHaveChanged;
 import com.github.lessjava.visitor.impl.LJASTConverter;
 import com.github.lessjava.visitor.impl.LJASTInferTypes;
+import com.github.lessjava.visitor.impl.LJASTUnifyVariables;
 import com.github.lessjava.visitor.impl.LJGenerateJava;
 import com.github.lessjava.visitor.impl.LJStaticAnalysis;
 import com.github.lessjava.visitor.impl.PrintDebugTree;
@@ -63,6 +61,7 @@ public class LJCompiler
         BuildParentLinks buildParentLinks = new BuildParentLinks();
         LJStaticAnalysis staticAnalysis = new LJStaticAnalysis();
         BuildSymbolTables buildSymbolTables = new BuildSymbolTables();
+//        LJASTUnifyVariables unifyVariables = new LJASTUnifyVariables();
         LJASTAssignPrimitiveTypes assignPrimitiveTypes = new LJASTAssignPrimitiveTypes();
         LJASTInferTypes inferTypes = new LJASTInferTypes();
         PrintDebugTree printTree = new PrintDebugTree();
@@ -86,9 +85,9 @@ public class LJCompiler
         int i = 0;
         while (typesHaveChanged) {
             program.traverse(buildSymbolTables);
-            program.traverse(assignPrimitiveTypes);
+//            program.traverse(unifyVariables);
+//            program.traverse(assignPrimitiveTypes);
             program.traverse(inferTypes);
-
             program.traverse(checkTypesHaveChanged);
 
             typesHaveChanged = checkTypesHaveChanged.typesChanged;
@@ -98,7 +97,7 @@ public class LJCompiler
             }
         }
 
-        // program.traverse(printTree);
+        program.traverse(printTree);
         program.traverse(generateJava);
 
         if (!StaticAnalysis.getErrors().isEmpty()) {
@@ -106,7 +105,7 @@ public class LJCompiler
         }
 
         // Compile java source file
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        compiler.run(null, null, null, generateJava.file.toString());
+//        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+//        compiler.run(null, null, null, generateJava.file.toString());
     }
 }
