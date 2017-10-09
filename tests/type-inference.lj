@@ -33,16 +33,6 @@ compareToInt(c) {
     return c == 10
 }
 
-// compareIntAndBool : INVALID
-/*
-compareIntAndBool {
-    a = 10
-    b = true
-
-    return a == b
-}
-*/
-
 add (1, 2)      // ok
 eq (1, 2)       // ok; instantiate to (int, int) -> bool
 
@@ -52,9 +42,5 @@ eqComposite(1, 2, 3, 4)
 // ok; instantiate to (int, int, bool, bool) -> bool
 eqComposite(1, 2, true, false)
 
-// ok; instantiate to (int, int, int, int) -> bool
-eqCompositeConstrained(1, 2, 3, 4)
-
-// ERROR
-//eqCompositeConstrained(1, 2, true, false)
-
+// ok; instantiate to (int, int, int) -> bool
+eqCompositeConstrained(1, 2, 3)

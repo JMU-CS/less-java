@@ -16,8 +16,8 @@ import com.github.lessjava.visitor.impl.LJASTAssignPrimitiveTypes;
 import com.github.lessjava.visitor.impl.LJASTCheckTypesHaveChanged;
 import com.github.lessjava.visitor.impl.LJASTConverter;
 import com.github.lessjava.visitor.impl.LJASTInferTypes;
-import com.github.lessjava.visitor.impl.LJASTUnifyVariables;
 import com.github.lessjava.visitor.impl.LJGenerateJava;
+import com.github.lessjava.visitor.impl.LJInstantiateFunctions;
 import com.github.lessjava.visitor.impl.LJStaticAnalysis;
 import com.github.lessjava.visitor.impl.PrintDebugTree;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
@@ -96,6 +96,8 @@ public class LJCompiler
                 break;
             }
         }
+        
+        program.traverse(new LJInstantiateFunctions());
 
         program.traverse(printTree);
         program.traverse(generateJava);

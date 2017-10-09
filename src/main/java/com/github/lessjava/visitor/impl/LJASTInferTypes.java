@@ -1,11 +1,9 @@
 package com.github.lessjava.visitor.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.github.lessjava.exceptions.InvalidProgramException;
 import com.github.lessjava.types.Symbol;
@@ -16,11 +14,9 @@ import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
-import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTVariable;
-import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
@@ -38,6 +34,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
     private HMType          returnType;
 
     private static ASTProgram program;
+    
 
     @Override
     public void preVisit(ASTProgram node)
@@ -47,7 +44,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
             LJASTInferTypes.program = node;
         }
     }
-
+    
     @Override
     public void preVisit(ASTFunction node)
     {
@@ -66,64 +63,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
         node.returnType = returnType != null ? returnType : new HMTypeBase(BaseDataType.VOID);
 
         node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
-    }
-
-    @Override
-    public void postVisit(ASTFunctionCall node)
-    {
-        super.postVisit(node);
-        instantiateFunction(node.name, node.arguments);
-
-    }
-
-    @Override
-    public void postVisit(ASTVoidFunctionCall node)
-    {
-        super.postVisit(node);
-        instantiateFunction(node.name, node.arguments);
-    }
-
-    private void instantiateFunction(String name, List<ASTExpression> arguments)
-    {
-//        program.functions.stream().map(ASTFunction::getParameterStr).forEach(System.out::println);
-//        program.functions.stream().map(func -> func.concrete).forEach(System.out::println);
-        
-        List<ASTFunction> functions = program.functions.stream()
-                                                       .filter(func -> func.name.equals(name))
-                                                       .collect(Collectors.toList());
-
-        if (functions == null) {
-            return;
-        }
-
-        Optional<ASTFunction> prototype = functions.stream()
-                                                   .filter(func -> !func.concrete)
-                                                   .findFirst();
-
-        if (!prototype.isPresent()) {
-            return;
-        }
-        
-
-        ASTFunction functionInstance = new ASTFunction(prototype.get().name,
-                                                       prototype.get().returnType,
-                                                       prototype.get().body);
-
-        functionInstance.concrete = true;
-        functionInstance.parameters = new ArrayList<>();
-
-        for (int i = 0; i < arguments.size(); i++) {
-            String pname = prototype.get().parameters.get(i).name; 
-            HMType type = new HMTypeBase(((HMTypeBase) arguments.get(i).type).getBaseType());
-            Parameter parameter = new Parameter(pname, type);
-            functionInstance.parameters.add(parameter);
-        }
-
-        if (program.functions.stream().noneMatch(func -> func.equals(functionInstance))) {
-            functionInstance.setParent(program);
-            functionInstance.setDepth(2);
-            program.functions.add(functionInstance);
-        }
     }
 
     @Override
@@ -162,7 +101,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
                                                         .findFirst();
 
         if (visited.isPresent()) {
-            node.type = visited.get().type;
+            unify(node, visited.get());
         } else {
             visitedVariables.add(node);
         }
@@ -176,6 +115,11 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
                 parameterToVar.put(p, node);
             }
         }
+    }
+    
+    @Override
+    public void postVisit(ASTVariable node) {
+        super.postVisit(node);
     }
 
     @Override
@@ -232,9 +176,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
                                                                left, right)));
         }
 
-        updateSymbolTable(left);
-        updateSymbolTable(right);
-
         return successfullyUnified;
     }
 
@@ -268,9 +209,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
 
         left.type = right.type = unifiedType;
 
-        updateSymbolTable(left);
-        updateSymbolTable(right);
-
         return successfullyUnified;
     }
 
@@ -292,13 +230,17 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
     {
         if (node instanceof ASTVariable) {
             ASTVariable var = (ASTVariable) node;
+            
+            List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(var, var.name);
+            
+            System.err.printf("name: %s%nsymbols:%s%n", var.name, symbols);
 
             Optional<Symbol> oldSymbol = scopes.peek().getSymbols().stream()
-                                               .filter(s -> s.name.equals(var.name))
-                                               .findFirst();
+                                                                   .filter(s -> s.name.equals(var.name))
+                                                                   .findFirst();
 
             if (oldSymbol.isPresent()) {
-                oldSymbol.get().type = node.type;
+                //oldSymbol.get().type = node.type;
             }
         }
 
