@@ -12,7 +12,6 @@ import com.github.lessjava.generated.LJParser;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.visitor.impl.BuildParentLinks;
 import com.github.lessjava.visitor.impl.BuildSymbolTables;
-import com.github.lessjava.visitor.impl.LJASTAssignPrimitiveTypes;
 import com.github.lessjava.visitor.impl.LJASTCheckTypesHaveChanged;
 import com.github.lessjava.visitor.impl.LJASTConverter;
 import com.github.lessjava.visitor.impl.LJASTInferTypes;
@@ -61,8 +60,6 @@ public class LJCompiler
         BuildParentLinks buildParentLinks = new BuildParentLinks();
         LJStaticAnalysis staticAnalysis = new LJStaticAnalysis();
         BuildSymbolTables buildSymbolTables = new BuildSymbolTables();
-//        LJASTUnifyVariables unifyVariables = new LJASTUnifyVariables();
-        LJASTAssignPrimitiveTypes assignPrimitiveTypes = new LJASTAssignPrimitiveTypes();
         LJASTInferTypes inferTypes = new LJASTInferTypes();
         PrintDebugTree printTree = new PrintDebugTree();
         LJGenerateJava generateJava = new LJGenerateJava();
@@ -85,8 +82,6 @@ public class LJCompiler
         int i = 0;
         while (typesHaveChanged) {
             program.traverse(buildSymbolTables);
-//            program.traverse(unifyVariables);
-//            program.traverse(assignPrimitiveTypes);
             program.traverse(inferTypes);
             program.traverse(checkTypesHaveChanged);
 
