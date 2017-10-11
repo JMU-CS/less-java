@@ -7,7 +7,7 @@ program:        (statement | function)*;
 function:       ID ('('paramList')')? block;
 paramList:      ID((','ID)+)?;
 argList:        (expr((','expr)+)?)?;
-block:          '{'statement*'}';
+block:          (EOL)? '{' (EOL)? statement* '}' (EOL)?;
 
 statement:      var '=' expr EOL                        #Assignment
                 | IF '(' expr ')' block (ELSE block)?   #Conditional
@@ -15,8 +15,8 @@ statement:      var '=' expr EOL                        #Assignment
                 | RETURN expr EOL                       #Return
                 | BREAK EOL                             #Break
                 | CONTINUE EOL                          #Continue
-                | TEST funcCall '=' expr EOL            #Test
                 | funcCall EOL                          #VoidFunctionCall
+                | TEST expr EOL                         #Test
                 | EOL                                   #Terminator
                 ;
 

@@ -18,6 +18,7 @@ import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -28,13 +29,16 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJGenerateJava extends LJDefaultASTVisitor
 {
-    public Path file = Paths.get("Main.java");
+    public Path mainFile = Paths.get("Main.java");
+    public Path testFile = Paths.get("Test.java");
 
     private List<String> lines                = new ArrayList<>();
     private List<String> mainLines            = new ArrayList<>();
+    private List<String> testLines            = new ArrayList<>();
     private List<String> mainDeclarationLines = new ArrayList<>();
     private Set<String>  mainVariables        = new HashSet<>();
     private int          indent               = 1;
+    private int          testIndex            = 0;
 
     private ASTFunction currentFunction;
 
@@ -50,6 +54,10 @@ public class LJGenerateJava extends LJDefaultASTVisitor
         mainLines.add(String.format("%spublic static void main(String[] args)",
                                     spaces));
         mainLines.add(String.format("%s{", spaces));
+
+        testLines.add("import static org.junit.Assert.*;");
+        testLines.add("public class Test");
+        testLines.add("{");
     }
 
     @Override
@@ -61,9 +69,11 @@ public class LJGenerateJava extends LJDefaultASTVisitor
         mainLines.addAll(2, mainDeclarationLines);
         lines.add("}");
         lines.addAll(2, mainLines);
+        testLines.add("}");
 
         try {
-            Files.write(file, lines, Charset.forName("UTF-8"));
+            Files.write(mainFile, lines, Charset.forName("UTF-8"));
+            Files.write(testFile, testLines, Charset.forName("UTF-8"));
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -82,7 +92,8 @@ public class LJGenerateJava extends LJDefaultASTVisitor
         String parameterString = this.currentFunction.parameters.toString()
                                                                 .substring(1,
                                                                            this.currentFunction.parameters.toString()
-                                                                                                          .length() - 1);
+                                                                                                          .length()
+                                                                              - 1);
         String functionHeader = String.format("public static %s %s(%s)",
                                               this.currentFunction.returnType.toString(),
                                               this.currentFunction.name,
@@ -174,7 +185,17 @@ public class LJGenerateJava extends LJDefaultASTVisitor
     @Override
     public void preVisit(ASTTest node)
     {
-        // TODO: ugh...
+        String line = String.format("@Test");
+        addLine(node, line);
+        
+        line = String.format("public static void test%d() {", testIndex++, "", node.expr);
+        addLine(node, line);
+
+        line = String.format("%4sassertTrue(%s);", "", node.expr);
+        addLine(node, line);
+
+        line = String.format("}");
+        addLine(node, line);
     }
 
     @Override
@@ -182,8 +203,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor
     {
         String line;
 
-        String arguments = node.arguments.stream()
-                                         .map(ASTExpression::toString)
+        String arguments = node.arguments.stream().map(ASTExpression::toString)
                                          .collect(Collectors.joining(","))
                                          .replaceAll("\\\\\"", "");
 
@@ -204,7 +224,10 @@ public class LJGenerateJava extends LJDefaultASTVisitor
 
         String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4)
                                                            + "s", "");
-        if (currentFunction == null) {
+
+        if (node instanceof ASTTest) {
+            testLines.add(String.format("%s%s", spaces, line));
+        } else if (currentFunction == null) {
             mainLines.add(String.format("%s%s%s", spaces, spaces, line));
         } else {
             lines.add(String.format("%s%s", spaces, line));

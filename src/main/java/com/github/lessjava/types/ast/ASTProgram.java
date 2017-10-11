@@ -1,14 +1,16 @@
 package com.github.lessjava.types.ast;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Decaf program. Basically just a list of {@link ASTVariable} and {@link
- * ASTFunction} declarations.
+ * Decaf program. Basically just a list of {@link ASTVariable} and
+ * {@link ASTFunction} declarations.
  */
 public class ASTProgram extends ASTNode
 {
     public List<ASTStatement> statements;
-    public List<ASTFunction> functions;
+    public List<ASTFunction>  functions;
 
     public ASTProgram()
     {
@@ -30,4 +32,3 @@ public class ASTProgram extends ASTNode
         visitor.postVisit(this);
     }
 }
-

@@ -6,21 +6,19 @@ package com.github.lessjava.types.ast;
  */
 public class ASTTest extends ASTStatement
 {
-    public ASTFunctionCall function;
-    public ASTExpression expectedValue;
+    
+    public ASTExpression expr;
 
-    public ASTTest(ASTFunctionCall function, ASTExpression expectedValue)
+    public ASTTest(ASTExpression expr)
     {
-        this.function = function;
-        this.expectedValue = expectedValue;
+        this.expr = expr;
     }
 
     @Override
     public void traverse(ASTVisitor visitor)
     {
         visitor.preVisit(this);
-        function.traverse(visitor);
-        expectedValue.traverse(visitor);
+        expr.traverse(visitor);
         visitor.postVisit(this);
     }
 }

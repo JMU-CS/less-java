@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.github.lessjava.exceptions.InvalidProgramException;
-import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
@@ -224,26 +223,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes
         }
 
         return successfullyUnified;
-    }
-
-    private void updateSymbolTable(ASTExpression node)
-    {
-        if (node instanceof ASTVariable) {
-            ASTVariable var = (ASTVariable) node;
-            
-            List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(var, var.name);
-            
-            System.err.printf("name: %s%nsymbols:%s%n", var.name, symbols);
-
-            Optional<Symbol> oldSymbol = scopes.peek().getSymbols().stream()
-                                                                   .filter(s -> s.name.equals(var.name))
-                                                                   .findFirst();
-
-            if (oldSymbol.isPresent()) {
-                //oldSymbol.get().type = node.type;
-            }
-        }
-
     }
 
 }

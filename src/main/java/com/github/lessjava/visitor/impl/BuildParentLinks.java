@@ -98,10 +98,9 @@ public class BuildParentLinks extends LJDefaultASTVisitor
     @Override
     public void preVisit(ASTTest node)
     {
-        node.function.setParent(node);
-        node.expectedValue.setParent(node);
+        node.expr.setParent(node);
     }
-
+    
     // no need for ASTBreak or ASTContinue handlers (no children)
 
     @Override

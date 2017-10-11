@@ -23,8 +23,8 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes
 
     private static ASTProgram program;
 
-    private static Queue<ASTFunctionCall> functionInstancesToMake = new ArrayDeque<>();;
-    private static Queue<ASTVoidFunctionCall> voidFunctionInstancesToMake = new ArrayDeque<>();;
+    private static Queue<ASTFunctionCall> functionInstancesToMake = new ArrayDeque<>();
+    private static Queue<ASTVoidFunctionCall> voidFunctionInstancesToMake = new ArrayDeque<>();
 
     @Override
     public void preVisit(ASTProgram node)

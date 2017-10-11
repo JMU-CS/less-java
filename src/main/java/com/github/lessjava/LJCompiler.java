@@ -87,6 +87,7 @@ public class LJCompiler
 
             typesHaveChanged = checkTypesHaveChanged.typesChanged;
 
+            // TODO: Fix...........................
             if (i++ == 100) {
                 break;
             }
