@@ -86,8 +86,7 @@ public class LJASTConverter extends LJBaseListener
         ASTFunction function;
         ASTFunction.Parameter parameter;
 
-        function = new ASTFunction(ctx.ID().getText(), (ASTBlock) map.get(ctx
-                                                                             .block()));
+        function = new ASTFunction(ctx.ID().getText(), (ASTBlock) map.get(ctx.block()));
         if (ctx.paramList() != null && ctx.paramList().ID().size() > 0) {
             for (TerminalNode tn : ctx.paramList().ID()) {
                 parameter = new ASTFunction.Parameter(tn.getText(),
@@ -395,13 +394,9 @@ public class LJASTConverter extends LJBaseListener
         ASTLiteral lit;
 
         if (ctx.BOOL() != null) {
-            lit = new ASTLiteral(HMType.BaseDataType.BOOL, Boolean.parseBoolean(
-                                                                                ctx.BOOL()
-                                                                                   .getText()));
+            lit = new ASTLiteral(HMType.BaseDataType.BOOL, Boolean.parseBoolean(ctx.BOOL().getText()));
         } else if (ctx.DEC() != null) {
-            lit = new ASTLiteral(HMType.BaseDataType.INT, Integer.parseInt(ctx
-                                                                              .DEC()
-                                                                              .getText()));
+            lit = new ASTLiteral(HMType.BaseDataType.INT, Integer.parseInt(ctx.DEC().getText()));
         } else {
             assert (ctx.STR() != null);
             lit = new ASTLiteral(HMType.BaseDataType.STR, ctx.STR().getText());

@@ -18,7 +18,6 @@ import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
-import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -29,8 +28,8 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJGenerateJava extends LJDefaultASTVisitor
 {
-    public Path mainFile = Paths.get("Main.java");
-    public Path testFile = Paths.get("Test.java");
+    public Path mainFile = Paths.get("unittest/src/main/java/Main.java");
+    public Path testFile = Paths.get("unittest/src/test/java/JUnitTests.java");
 
     private List<String> lines                = new ArrayList<>();
     private List<String> mainLines            = new ArrayList<>();
@@ -55,8 +54,9 @@ public class LJGenerateJava extends LJDefaultASTVisitor
                                     spaces));
         mainLines.add(String.format("%s{", spaces));
 
+        testLines.add("import org.junit.Test;");
         testLines.add("import static org.junit.Assert.*;");
-        testLines.add("public class Test");
+        testLines.add("public class JUnitTests");
         testLines.add("{");
     }
 
@@ -188,7 +188,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor
         String line = String.format("@Test");
         addLine(node, line);
         
-        line = String.format("public static void test%d() {", testIndex++, "", node.expr);
+        line = String.format("public void test%d() {", testIndex++, "", node.expr);
         addLine(node, line);
 
         line = String.format("%4sassertTrue(%s);", "", node.expr);
@@ -197,7 +197,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor
         line = String.format("}");
         addLine(node, line);
     }
-
+    
     @Override
     public void preVisit(ASTVoidFunctionCall node)
     {
