@@ -1,15 +1,2 @@
-build/
-decaf-compiler-630.zip
 decaf-compiler-reference/
-.gradle/
 compiler.out
-test.lj
-*.swp
-*.class
-libs/*.jar
-/bin/
-.classpath
-.project
-.settings/
-workbench.xmi
-Main.java

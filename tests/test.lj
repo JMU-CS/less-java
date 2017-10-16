@@ -1,0 +1,4 @@
+// eqBroken : (bool, bool, bool, bool) -> bool
+eqBroken (a, b, c, d) {
+    return a == b && c == d && b == true && b == c
+}
