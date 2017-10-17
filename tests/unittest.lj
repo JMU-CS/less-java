@@ -2,7 +2,17 @@ add(a, b) {
     return a + b
 }
 
+eq(a, b) {
+    return a == b
+}
+
 test add(1,1) == 2
 test add(1,2) == 3
 test add(1,3) == 4
 test add(1,4) == 5
+
+test eq(2, 2) == true
+test eq(2, 1) == false
+test eq(true, true) == true
+test eq(true, false) == false
+
