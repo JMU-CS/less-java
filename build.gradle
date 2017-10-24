@@ -1,10 +1,11 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '2.0.1'
     id 'java'
-    id 'application'
     id 'eclipse'
     id 'antlr'
 }
+
+apply plugin: 'application'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -19,6 +20,7 @@ dependencies {
     // compile fileTree(dir: "libs", include: "*.jar")
 
     // JUnit
+    compile 'junit:junit:4.12'
     testCompile 'junit:junit:4.12'
 
     // ANTLR v4
@@ -32,14 +34,6 @@ run {
     def defaultTestfile = "tests/fact.lj"
 
     args = (project.hasProperty("testfile")) ? [testfile] : [defaultTestfile]
-
-    doLast {
-        copy {
-            from '.'
-            include 'Main.java'
-            into 'build/generated-src/java/main/com/github/lessjava/generated'
-        }
-    }
 }
 
 jar {

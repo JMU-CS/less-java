@@ -75,6 +75,10 @@ public class LJASTConverter extends LJBaseListener
             ast.functions.add((ASTFunction) map.get(f));
         }
 
+        for (TestContext t : ctx.test()) {
+            ast.tests.add((ASTTest) map.get(t));
+        }
+
         ast.setDepth(ctx.depth());
 
         map.put(ctx, ast);
@@ -98,6 +102,20 @@ public class LJASTConverter extends LJBaseListener
         function.setDepth(ctx.depth());
 
         map.put(ctx, function);
+    }
+
+    @Override
+    public void exitTest(TestContext ctx)
+    {
+        ASTTest test;
+        ASTExpression expr;
+
+        expr = (ASTExpression) map.get(ctx.expr());
+        test = new ASTTest(expr);
+
+        test.setDepth(ctx.depth());
+
+        map.put(ctx, test);
     }
 
     @Override
@@ -238,20 +256,6 @@ public class LJASTConverter extends LJBaseListener
         cont.setDepth(ctx.depth());
 
         map.put(ctx, cont);
-    }
-
-    @Override
-    public void exitTest(TestContext ctx)
-    {
-        ASTTest test;
-        ASTExpression expr;
-
-        expr = (ASTExpression) map.get(ctx.expr());
-        test = new ASTTest(expr);
-
-        test.setDepth(ctx.depth());
-
-        map.put(ctx, test);
     }
 
     @Override

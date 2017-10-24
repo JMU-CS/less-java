@@ -2,10 +2,16 @@ package com.github.lessjava;
 
 import java.io.IOException;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 
 import com.github.lessjava.generated.LJLexer;
 import com.github.lessjava.generated.LJParser;
@@ -21,10 +27,8 @@ import com.github.lessjava.visitor.impl.LJStaticAnalysis;
 import com.github.lessjava.visitor.impl.PrintDebugTree;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
 
-public class LJCompiler
-{
-    public static void main(String[] args)
-    {
+public class LJCompiler {
+    public static void main(String[] args) {
         if (args.length == 0) {
             System.err.println("usage: LJCompiler <Files>");
             System.exit(0);
@@ -92,7 +96,7 @@ public class LJCompiler
                 break;
             }
         }
-        
+
         program.traverse(new LJInstantiateFunctions());
 
         program.traverse(printTree);
@@ -103,7 +107,16 @@ public class LJCompiler
         }
 
         // Compile java source file
-//        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-//        compiler.run(null, null, null, generateJava.file.toString());
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        compiler.run(null, null, null, generateJava.mainFile.toString());
+
+        // TODO: exec junit
+    }
+
+    private static void runTests(Class test) {
+        Result result = JUnitCore.runClasses(test);
+        for (Failure failure : result.getFailures()) {
+            System.out.println(failure.toString());
+        }
     }
 }

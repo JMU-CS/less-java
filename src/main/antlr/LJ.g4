@@ -2,7 +2,7 @@ grammar LJ;
 
 /* Parser Grammar */
 
-program:        (statement | function)*;
+program:        (statement | function | test)*;
 
 function:       ID ('('paramList')')? block;
 paramList:      ID((','ID)+)?;
@@ -16,9 +16,10 @@ statement:      var '=' expr EOL                        #Assignment
                 | BREAK EOL                             #Break
                 | CONTINUE EOL                          #Continue
                 | funcCall EOL                          #VoidFunctionCall
-                | TEST expr EOL                         #Test
                 | EOL                                   #Terminator
                 ;
+
+test:           TEST expr EOL;
 
 expr:           exprBin;
 
