@@ -27,6 +27,16 @@ import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJGenerateJava extends LJDefaultASTVisitor {
+
+    // Create generated directory if it doesn't exist
+    static {
+        try {
+            Files.createDirectories(Paths.get("generated"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public Path mainFile = Paths.get("generated/Main.java");
 
     private List<String> lines = new ArrayList<>();
