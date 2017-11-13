@@ -4,7 +4,7 @@ public abstract class HMType
 {
     public static enum BaseDataType
     {
-        INT, BOOL, VOID, STR, UNKNOWN
+        INT, DOUBLE, BOOL, VOID, STR
     }
 
     @Override

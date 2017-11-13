@@ -1,0 +1,14 @@
+nest1(s) {
+    return s
+}
+
+nest2(s) {
+    return s
+}
+
+nest3(s) {
+    return s
+}
+
+print("Hello, world!")
+print(nest1(nest2(nest3(readLine()))))

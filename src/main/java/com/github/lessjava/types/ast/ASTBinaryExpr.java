@@ -100,7 +100,7 @@ public class ASTBinaryExpr extends ASTExpression
             case MOD:
                 return HMType.BaseDataType.INT;
             default:
-                return HMType.BaseDataType.UNKNOWN;
+                return null;
         }
     }
 

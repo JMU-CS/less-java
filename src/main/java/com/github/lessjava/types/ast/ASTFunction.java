@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.lessjava.types.inference.HMType;
-import com.github.lessjava.types.inference.HMType.BaseDataType;
-import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 /**
  * Decaf function declaration. Contains a name, a return type, a list of formal
@@ -76,8 +75,6 @@ public class ASTFunction extends ASTNode
 
     public List<Parameter> parameters;
 
-    public HMType hmType;
-
     public boolean concrete;
 
     public ASTFunction(String name, HMType returnType, ASTBlock body)
@@ -90,7 +87,7 @@ public class ASTFunction extends ASTNode
 
     public ASTFunction(String name, ASTBlock body)
     {
-        this(name, new HMTypeBase(BaseDataType.UNKNOWN), body);
+        this(name, new HMTypeVar(), body);
     }
 
     public String getParameterStr()
@@ -110,7 +107,6 @@ public class ASTFunction extends ASTNode
         params.append(")");
         return params.toString();
     }
-    
 
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
@@ -142,12 +138,20 @@ public class ASTFunction extends ASTNode
             return false;
         return true;
     }
+    
+    @Override
+    public String toString() {
+        return String.format("Function: %s, %s", this.name, this.returnType);
+    }
 
     @Override
     public void traverse(ASTVisitor visitor)
     {
         visitor.preVisit(this);
-        body.traverse(visitor);
+        // Library functions have null bodies
+        if (body != null) {
+            body.traverse(visitor);
+        }
         visitor.postVisit(this);
     }
 }

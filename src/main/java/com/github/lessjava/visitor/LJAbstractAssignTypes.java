@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import com.github.lessjava.types.Symbol;
@@ -18,6 +19,7 @@ import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
+import com.github.lessjava.visitor.impl.BuildSymbolTables;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
 
 public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJAssignTypes
@@ -25,7 +27,6 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     protected static Map<String, ASTFunction> nameFunctionMap = new HashMap<>();
 
     protected Deque<SymbolTable> scopes = new ArrayDeque<>();
-    protected Deque<ASTVariable> visitedVariables = new ArrayDeque<>();
 
     @Override
     public void preVisit(ASTProgram node)
@@ -65,15 +66,20 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     public void postVisit(ASTBlock node)
     {
         scopes.pop();
-        visitedVariables.clear();
     }
 
     @Override
     public void preVisit(ASTFunctionCall node)
     {
-        node.type = nameFunctionMap.get(node.name).returnType;
-    }
+        List<Symbol> s = BuildSymbolTables.searchScopesForSymbol(node, node.name);
 
+        if (s != null && !s.isEmpty() && s.get(0) != null) {
+            node.type = s.get(0).type;
+        } else {
+            node.type = nameFunctionMap.get(node.name).returnType;
+        }
+    }
+    
     public HMType evalExprType(ASTExpression expr)
     {
         HMType type;

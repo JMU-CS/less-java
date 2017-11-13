@@ -36,12 +36,18 @@ public class BuildParentLinks extends LJDefaultASTVisitor
         for (ASTFunction func : node.functions) {
             func.setParent(node);
         }
+        for (ASTTest test : node.tests) {
+            test.setParent(node);
+        }
     }
 
     @Override
     public void preVisit(ASTFunction node)
     {
-        node.body.setParent(node);
+	// Library functions have null bodies
+	if (node.body != null) {
+            node.body.setParent(node);
+	}
     }
 
     @Override

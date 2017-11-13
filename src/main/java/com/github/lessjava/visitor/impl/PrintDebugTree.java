@@ -1,5 +1,6 @@
 package com.github.lessjava.visitor.impl;
 
+
 import java.io.PrintStream;
 
 import com.github.lessjava.types.ast.ASTAssignment;

@@ -28,8 +28,6 @@ public class HMTypeBase extends HMType
                 return "void";
             case STR:
                 return "String";
-            case UNKNOWN:
-                return "unknown";
             default:
                 return "???";
         }
