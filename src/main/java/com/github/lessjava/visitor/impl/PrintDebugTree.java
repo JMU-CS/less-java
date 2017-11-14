@@ -90,7 +90,7 @@ public class PrintDebugTree extends LJDefaultASTVisitor
     {
         indent(node);
         output.print("Variable: " + node.name + " : " + node.type.toString()
-                + (node.isArray ? "[" + node.arrayLength + "]" : ""));
+                + (node.isCollection ? "[]" : ""));
         newline(node, true);
     }
 

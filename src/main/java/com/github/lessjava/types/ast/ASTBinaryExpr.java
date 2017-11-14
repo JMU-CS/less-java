@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
+import com.github.lessjava.types.inference.impl.HMTypeBase;
 
 /**
  * Decaf binary operation with an operation tag and two child sub-expressions.
@@ -128,6 +129,11 @@ public class ASTBinaryExpr extends ASTExpression
     @Override
     public String toString()
     {
-        return "(" + leftChild.toString() + opToString(operator) + rightChild.toString() + ")";
+	String right = opToString(operator) + rightChild.toString();
+        if (leftChild.type instanceof HMTypeBase && ((HMTypeBase) leftChild.type).getBaseType().equals(BaseDataType.STR)) {
+            right = ".equals(" + rightChild.toString() + ")";
+        }
+
+        return ("(" + leftChild.toString() + right + ")").replaceAll("\\\\\"", "");
     }
 }

@@ -39,6 +39,7 @@ exprUn:         op=UNOP expression=exprUn
 exprBase:       funcCall
                 | var
                 | lit
+                | '[' argList ']'
                 | '(' expr ')'
                 ;
 

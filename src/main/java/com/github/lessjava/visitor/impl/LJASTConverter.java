@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.github.lessjava.generated.LJBaseListener;
 import com.github.lessjava.generated.LJParser;
+import com.github.lessjava.generated.LJParser.ArgListContext;
 import com.github.lessjava.generated.LJParser.AssignmentContext;
 import com.github.lessjava.generated.LJParser.BlockContext;
 import com.github.lessjava.generated.LJParser.BreakContext;
@@ -27,6 +28,7 @@ import com.github.lessjava.generated.LJParser.StatementContext;
 import com.github.lessjava.generated.LJParser.TestContext;
 import com.github.lessjava.generated.LJParser.VoidFunctionCallContext;
 import com.github.lessjava.generated.LJParser.WhileContext;
+import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
@@ -135,7 +137,21 @@ public class LJASTConverter extends LJBaseListener {
     public void exitBlock(BlockContext ctx) {
 	blocks.pop();
     }
-
+    
+    @Override
+    public void exitArgList(ArgListContext ctx) {
+	ASTArgList argList;
+	
+	List<ASTExpression> args = new ArrayList<>();
+	for (ExprContext e: ctx.expr()) {
+	    args.add((ASTExpression)map.get(e));
+	}
+	
+	argList = new ASTArgList(args);
+	
+	map.put(ctx, argList);
+    }
+    
     @Override
     public void exitAssignment(AssignmentContext ctx) {
 	ASTAssignment assignment;
@@ -144,6 +160,10 @@ public class LJASTConverter extends LJBaseListener {
 
 	variable = (ASTVariable) map.get(ctx.var());
 	expression = (ASTExpression) map.get(ctx.expr());
+	
+	if (expression instanceof ASTArgList) {
+	    variable.isCollection = true;
+	}
 
 	assignment = new ASTAssignment(variable, expression);
 
@@ -340,8 +360,10 @@ public class LJASTConverter extends LJBaseListener {
 	    expr = (ASTFunctionCall) map.get(ctx.funcCall());
 	} else if (ctx.lit() != null) {
 	    expr = (ASTLiteral) map.get(ctx.lit());
-	} else if (ctx.var() != null) {
+	} else if (ctx.var() != null ) {
 	    expr = (ASTVariable) map.get(ctx.var());
+	} else if (ctx.argList() != null) {
+	    expr = (ASTArgList) map.get(ctx.argList());
 	} else {
 	    expr = (ASTExpression) map.get(ctx.expr());
 	}

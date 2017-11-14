@@ -16,6 +16,11 @@ public class HMTypeBase extends HMType
         return baseType;
     }
 
+    public void setBaseType(BaseDataType baseType)
+    {
+	this.baseType = baseType;
+    }
+
     @Override
     public String toString()
     {

@@ -164,7 +164,7 @@ public class BuildSymbolTables extends StaticAnalysis {
 		return;
 	    }
 
-	    Symbol symbol = new Symbol(node.name, node.type, node.isArray, node.arrayLength);
+	    Symbol symbol = new Symbol(node.name, node.type, node.isCollection);
 	    getCurrentTable().insert(node.name, symbol);
 	} catch (InvalidProgramException ex) {
 	    addError(ex);

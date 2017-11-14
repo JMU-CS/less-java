@@ -1,0 +1,2 @@
+a = [readWord(), readWord(), readWord()]
+print("%s\n", a)

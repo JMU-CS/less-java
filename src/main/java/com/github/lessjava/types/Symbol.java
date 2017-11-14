@@ -93,7 +93,7 @@ public class Symbol
      */
     public Symbol(String name, HMType type)
     {
-        this(name, type, false, 1);
+        this(name, type, false);
     }
 
     /**
@@ -108,18 +108,12 @@ public class Symbol
      * @param length
      *            Array length (should be 1 for scalar)
      */
-    public Symbol(String name, HMType type, boolean isArray, int length)
+    public Symbol(String name, HMType type, boolean isArray)
     {
         this.name = name;
         this.type = type;
         this.paramTypes = new ArrayList<HMType>();
         this.isArray = isArray;
-        this.length = length;
-        this.elementSize = 4; // may depend on 'type' if we ever add data
-                              // types with differing sizes
-        this.totalSize = this.elementSize * this.length;
-        this.location = MemLoc.UNKNOWN;
-        this.offset = 0;
     }
 
     /**

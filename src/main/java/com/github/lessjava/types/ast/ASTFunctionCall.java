@@ -1,7 +1,5 @@
 package com.github.lessjava.types.ast;
 
-import static com.github.lessjava.visitor.impl.LJGenerateJava.libraryFunctions;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,16 +28,10 @@ public class ASTFunctionCall extends ASTExpression {
 
     @Override
     public String toString() {
-        StringBuffer argString = new StringBuffer();
+        StringBuilder argString = new StringBuilder();
         argString.append("(");
         for (ASTExpression e : arguments) {
             String exprString = e.toString();
-            if (e instanceof ASTFunctionCall) {
-                ASTFunctionCall f = (ASTFunctionCall) e;
-                if (libraryFunctions.containsKey(f.name)) {
-                    exprString = libraryFunctions.get(f.name);
-                }
-            }
             if (argString.length() > 1) {
                 argString.append(", ");
             }

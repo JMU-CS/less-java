@@ -1,1 +1,3 @@
-print(readWord())
+if (readWord() == "hello") {
+    print("how are you?\n")
+}

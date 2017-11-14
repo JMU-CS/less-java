@@ -26,6 +26,8 @@ import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
+import com.github.lessjava.types.inference.HMType;
+import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJGenerateJava extends LJDefaultASTVisitor {
@@ -101,7 +103,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTFunction node) {
 	this.currentFunction = node;
-	
+
 	// Library function
 	if (node.body == null) {
 	    return;
@@ -146,6 +148,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 	if (this.currentFunction == null) {
 	    if (!mainVariables.contains(node.variable.name)) {
 		String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
+
 		String declaration = String.format("%s%s%s %s;", spaces, spaces, node.variable.type,
 			node.variable.name);
 		mainDeclarationLines.add(declaration);
@@ -209,10 +212,20 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
 	String arguments = node.arguments.stream().map(ASTExpression::toString).collect(Collectors.joining(","))
 		.replaceAll("\\\\\"", "");
-	
+
 	if (libraryFunctions.containsKey(node.name)) {
 	    switch (node.name) {
 	    case "print":
+
+		List<String> printArgs = new ArrayList<>();
+		for (ASTExpression e : node.arguments) {
+		    System.err.printf("editing argument %s\n", e);
+		    System.err.printf("type of e: %s\n", e.type.getClass());
+		    printArgs.add(e.type instanceof HMTypeCollection ? e.toString() + ".toString()" : e.toString());
+		}
+		arguments = String.join(",", printArgs).replaceAll("\\\\\"", "");
+
+		System.err.printf("new arguments %s", arguments);
 		line = String.format(libraryFunctions.get(node.name), arguments);
 		break;
 	    default:
