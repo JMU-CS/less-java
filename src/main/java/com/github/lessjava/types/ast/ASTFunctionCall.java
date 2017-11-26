@@ -16,6 +16,15 @@ public class ASTFunctionCall extends ASTExpression {
         this.name = name;
         this.arguments = new ArrayList<ASTExpression>();
     }
+    
+    public String getNameArgString() {
+	StringBuilder sb = new StringBuilder(name);
+	for (ASTExpression e: arguments) {
+	    sb.append(e.type.toString() + ",");
+	}
+	
+	return sb.toString();
+    }
 
     @Override
     public void traverse(ASTVisitor visitor) {

@@ -25,8 +25,9 @@ public class ASTProgram extends ASTNode
     public void traverse(ASTVisitor visitor)
     {
         visitor.preVisit(this);
-        for (ASTFunction f : functions) {
-            f.traverse(visitor);
+        // Avoid concurrent modification exception
+        for (int i = 0; i < functions.size(); i++) {
+            functions.get(i).traverse(visitor);
         }
         for (ASTStatement s : statements) {
             s.traverse(visitor);

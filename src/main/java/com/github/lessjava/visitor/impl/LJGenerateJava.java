@@ -26,7 +26,6 @@ import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
-import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
@@ -216,17 +215,18 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 	if (libraryFunctions.containsKey(node.name)) {
 	    switch (node.name) {
 	    case "print":
-
 		List<String> printArgs = new ArrayList<>();
+
 		for (ASTExpression e : node.arguments) {
-		    System.err.printf("editing argument %s\n", e);
-		    System.err.printf("type of e: %s\n", e.type.getClass());
 		    printArgs.add(e.type instanceof HMTypeCollection ? e.toString() + ".toString()" : e.toString());
 		}
 		arguments = String.join(",", printArgs).replaceAll("\\\\\"", "");
 
-		System.err.printf("new arguments %s", arguments);
-		line = String.format(libraryFunctions.get(node.name), arguments);
+		if (node.arguments.size() == 1) {
+		    line = String.format("System.out.println(%s);", arguments);
+		} else {
+                    line = String.format(libraryFunctions.get(node.name), arguments);
+		}
 		break;
 	    default:
 		line = String.format("%s;", libraryFunctions.get(node.name));

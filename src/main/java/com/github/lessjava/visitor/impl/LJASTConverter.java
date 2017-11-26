@@ -506,11 +506,10 @@ public class LJASTConverter extends LJBaseListener {
 	libraryFunctions.add(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));
 	
 	for (ASTFunction f: libraryFunctions) {
-	    f.setDepth(1);
+	    f.setDepth(2);
 	    f.setParent(ast);
 	}
 	
 	ast.functions.addAll(libraryFunctions);
-	
     }
 }

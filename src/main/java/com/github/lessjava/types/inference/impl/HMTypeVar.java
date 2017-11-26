@@ -9,6 +9,7 @@ public class HMTypeVar extends HMType
     private Integer uniqueVarId;
     
     public HMTypeVar() {
+	this.isConcrete = false;
         this.uniqueVarId = globalUniqueId++;
     }
 

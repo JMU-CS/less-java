@@ -9,6 +9,7 @@ public class HMTypeBase extends HMType
     public HMTypeBase(BaseDataType baseType)
     {
         this.baseType = baseType;
+        this.isConcrete = true;
     }
 
     public BaseDataType getBaseType()
@@ -27,6 +28,8 @@ public class HMTypeBase extends HMType
         switch (this.baseType) {
             case INT:
                 return "int";
+            case DOUBLE:
+                return "double";
             case BOOL:
                 return "boolean";
             case VOID:

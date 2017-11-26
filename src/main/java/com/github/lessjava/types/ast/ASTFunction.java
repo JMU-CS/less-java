@@ -108,6 +108,16 @@ public class ASTFunction extends ASTNode
         return params.toString();
     }
 
+    public String getNameParamString() {
+	StringBuilder sb = new StringBuilder(name);
+	for (Parameter e: parameters) {
+	    sb.append(e.type.toString() + ",");
+	}
+	
+	return sb.toString();
+    }
+
+
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */

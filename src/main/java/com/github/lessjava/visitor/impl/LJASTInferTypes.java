@@ -12,6 +12,7 @@ import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
+import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTVariable;
@@ -32,6 +33,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void preVisit(ASTProgram node) {
 	super.preVisit(node);
+
 	if (LJASTInferTypes.program == null) {
 	    LJASTInferTypes.program = node;
 	}
@@ -40,6 +42,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void preVisit(ASTFunction node) {
 	super.preVisit(node);
+
 	this.returnType = null;
 	this.parameters = node.parameters;
     }
@@ -50,10 +53,8 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
 	node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
 	this.parameters = null;
-
-	if (!node.concrete) {
-	    node.returnType = unify(node.returnType, this.returnType);
-	}
+	
+        node.returnType = unify(node.returnType, this.returnType);
     }
 
     @Override
@@ -66,44 +67,59 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void preVisit(ASTBinaryExpr node) {
 	super.preVisit(node);
+
 	node.type = new HMTypeBase(ASTBinaryExpr.opToReturnType(node.operator));
     }
 
     @Override
     public void postVisit(ASTBinaryExpr node) {
 	super.postVisit(node);
+
 	ASTExpression leftChild, rightChild;
 
 	leftChild = node.leftChild;
 	rightChild = node.rightChild;
-
+	
 	leftChild.type = rightChild.type = unify(leftChild.type, rightChild.type, node.operator);
     }
-
+    
     @Override
+    public void postVisit(ASTFunctionCall node) {
+	super.postVisit(node);
+	
+	if (nameparamFunctionMap.containsKey(node.getNameArgString())) {
+	    node.type = unify(node.type, nameparamFunctionMap.get(node.getNameArgString()).returnType);
+	}
+    }
+
+   @Override
     public void preVisit(ASTVariable node) {
 	super.preVisit(node);
-
+	
 	if (this.parameters == null) {
 	    return;
 	}
 
 	for (Parameter p : parameters) {
 	    if (p.name.equals(node.name)) {
-		node.type = p.type = unify(p.type, node.type);
+		node.type = unify(node.type, p.type);
 	    }
 	}
     }
 
     @Override
     public void preVisit(ASTArgList node) {
+	super.preVisit(node);
+
 	node.isConcrete = node.isConcrete || node.type instanceof HMTypeBase;
     }
 
     @Override
     public void postVisit(ASTArgList node) {
+	super.postVisit(node);
+
 	if (!node.arguments.isEmpty()) {
-	    node.type = unify(node.type, node.arguments.get(0).type);
+	    node.type = node.arguments.get(0).type = unify(node.type, node.arguments.get(0).type);
 	    node.collectionType = new HMTypeCollection(node.type);
 	}
     }
@@ -111,12 +127,11 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void postVisit(ASTVariable node) {
 	super.postVisit(node);
+
 	List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name);
-	
-	if (symbols != null) {
-            boolean isCollection = symbols.stream().anyMatch(sym -> sym.type instanceof HMTypeCollection);
-	    HMType unifiedType = unify(node.type, symbols.get(0).type);
-	    node.type = isCollection ? new HMTypeCollection(unifiedType) : unifiedType;
+
+	if (symbols != null && !symbols.isEmpty()) {
+	    node.type = unify(node.type, symbols.get(0).type);
 	}
     }
 
@@ -130,40 +145,35 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void preVisit(ASTConditional node) {
 	super.preVisit(node);
+
 	node.condition.type = unify(node.condition.type, new HMTypeBase(BaseDataType.BOOL));
     }
 
     private HMType unify(HMType left, HMType right) {
-	HMType unifiedType = null;
+	HMType unifiedType = left;
 	
-	// peel off collection layers
+	// Peel off collection layers
 	while (left instanceof HMTypeCollection || right instanceof HMTypeCollection) {
-            left = left instanceof HMTypeCollection ? ((HMTypeCollection) left).collectionType : left;
-            right = right instanceof HMTypeCollection ? ((HMTypeCollection) right).collectionType : right;
+            left = left instanceof HMTypeCollection ? ((HMTypeCollection) left).getCollectionType() : left;
+            right = right instanceof HMTypeCollection ? ((HMTypeCollection) right).getCollectionType() : right;
 	}
 
-	boolean leftIsVar = left instanceof HMTypeVar;
-	boolean rightIsVar = right instanceof HMTypeVar;
+	boolean leftIsBase = left instanceof HMTypeBase;
+	boolean rightIsBase = right instanceof HMTypeBase;
 
-	if (!leftIsVar && rightIsVar) {
+	if (leftIsBase && !rightIsBase) {
 	    unifiedType = left;
-	} else if (leftIsVar && !rightIsVar) {
+	} else if (!leftIsBase && rightIsBase) {
 	    unifiedType = right;
-	} else if (leftIsVar && rightIsVar) {
+	} else if (!leftIsBase && !rightIsBase) {
 	    unifiedType = left;
-	} else if (!leftIsVar && !rightIsVar) {
+	} else if (leftIsBase && rightIsBase) {
 	    HMTypeBase leftBase = (HMTypeBase) left;
 	    HMTypeBase rightBase = (HMTypeBase) right;
 	    
-	    System.err.printf("unifying %s and %s\n", leftBase, rightBase);
-
 	    if (unify(leftBase, rightBase)) {
 		unifiedType = leftBase;
 	    }
-	}
-
-	if (unifiedType == null) {
-	    addError(new InvalidProgramException(String.format("Type Unification Error:\t%s, %s", left, right)));
 	}
 
 	return unifiedType;

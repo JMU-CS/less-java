@@ -1,0 +1,9 @@
+eqc(a, b, c, d) {
+    return a == b && c == d
+}
+
+a = eqc(true, true, true, true)
+b = eqc(1, 2, true, false)
+
+print(a)
+print(b)

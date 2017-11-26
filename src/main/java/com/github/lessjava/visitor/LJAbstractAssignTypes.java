@@ -1,16 +1,11 @@
 package com.github.lessjava.visitor;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import com.github.lessjava.types.Symbol;
-import com.github.lessjava.types.SymbolTable;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
-import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
@@ -22,122 +17,61 @@ import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.impl.BuildSymbolTables;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
 
-public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJAssignTypes
-{
-    protected static Map<String, ASTFunction> nameFunctionMap = new HashMap<>();
-
-    protected Deque<SymbolTable> scopes = new ArrayDeque<>();
+public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJAssignTypes {
+    protected static Map<String, ASTFunction> nameparamFunctionMap = new HashMap<>();
 
     @Override
-    public void preVisit(ASTProgram node)
-    {
-        for (ASTFunction function : node.functions) {
-            nameFunctionMap.put(function.name, function);
-        }
-
-        scopes.push((SymbolTable) node.attributes.get("symbolTable"));
+    public void preVisit(ASTProgram node) {
+	for (ASTFunction function : node.functions) {
+	    nameparamFunctionMap.put(function.getNameParamString(), function);
+	}
     }
 
-    @Override
-    public void postVisit(ASTProgram node)
-    {
-        scopes.pop();
+    public HMType evalExprType(ASTExpression expr) {
+	HMType type;
+
+	if (expr instanceof ASTBinaryExpr) {
+	    type = evalExprType((ASTBinaryExpr) expr);
+	} else if (expr instanceof ASTUnaryExpr) {
+	    type = evalExprType((ASTUnaryExpr) expr);
+	} else if (expr instanceof ASTFunctionCall) {
+	    type = evalExprType((ASTFunctionCall) expr);
+	} else if (expr instanceof ASTVariable) {
+	    type = evalExprType((ASTVariable) expr);
+	} else {
+	    type = expr.type;
+	}
+
+	return type;
     }
 
-    @Override
-    public void preVisit(ASTFunction node)
-    {
-        scopes.push((SymbolTable) node.attributes.get("symbolTable"));
+    public HMType evalExprType(ASTBinaryExpr expr) {
+	return evalExprType(expr.leftChild);
     }
 
-    @Override
-    public void postVisit(ASTFunction node)
-    {
-        scopes.pop();
+    public HMType evalExprType(ASTUnaryExpr expr) {
+	return evalExprType(expr.child);
     }
 
-    @Override
-    public void preVisit(ASTBlock node)
-    {
-        scopes.push((SymbolTable) node.attributes.get("symbolTable"));
+    public HMType evalExprType(ASTFunctionCall expr) {
+	return nameparamFunctionMap.get(expr.getNameArgString()).returnType;
     }
 
-    @Override
-    public void postVisit(ASTBlock node)
-    {
-        scopes.pop();
+    public HMType evalExprType(ASTVariable expr) {
+
+	List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(expr, expr.name);
+
+	for (Symbol s : symbols) {
+	    if (s != null && s.type != null) {
+		return s.type;
+	    }
+	}
+
+	return new HMTypeVar();
     }
 
-    @Override
-    public void preVisit(ASTFunctionCall node)
-    {
-        List<Symbol> s = BuildSymbolTables.searchScopesForSymbol(node, node.name);
-
-        if (s != null && !s.isEmpty() && s.get(0) != null) {
-            node.type = s.get(0).type;
-        } else {
-            node.type = nameFunctionMap.get(node.name).returnType;
-        }
-    }
-    
-    public HMType evalExprType(ASTExpression expr)
-    {
-        HMType type;
-
-        if (expr instanceof ASTBinaryExpr) {
-            type = evalExprType((ASTBinaryExpr) expr);
-        } else if (expr instanceof ASTUnaryExpr) {
-            type = evalExprType((ASTUnaryExpr) expr);
-        } else if (expr instanceof ASTFunctionCall) {
-            type = evalExprType((ASTFunctionCall) expr);
-        } else if (expr instanceof ASTVariable) {
-            type = evalExprType((ASTVariable) expr);
-        } else {
-            type = expr.type;
-        }
-
-        return type;
-    }
-
-    public HMType evalExprType(ASTBinaryExpr expr)
-    {
-        return evalExprType(expr.leftChild);
-    }
-
-    public HMType evalExprType(ASTUnaryExpr expr)
-    {
-        return evalExprType(expr.child);
-    }
-
-    public HMType evalExprType(ASTFunctionCall expr)
-    {
-        return nameFunctionMap.get(expr.name).returnType;
-    }
-
-    public HMType evalExprType(ASTVariable expr)
-    {
-        try {
-            Iterator<SymbolTable> scopeIterator = scopes.iterator();
-
-            // Iterate over the current active scopes for the symbol
-            while (scopeIterator.hasNext()) {
-                SymbolTable scope = scopeIterator.next();
-
-                Symbol symbol = scope.lookup(expr.name).get(0);
-                if (symbol != null && symbol.type != null) {
-                    return symbol.type;
-                }
-            }
-
-        } catch (Exception e) {
-        }
-
-        return new HMTypeVar();
-    }
-
-    public boolean typeIsKnown(HMType type)
-    {
-        return type != null && !(type instanceof HMTypeVar);
+    public boolean typeIsKnown(HMType type) {
+	return type != null && !(type instanceof HMTypeVar);
     }
 
 }

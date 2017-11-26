@@ -15,7 +15,6 @@ import org.junit.runner.notification.Failure;
 
 import com.github.lessjava.generated.LJLexer;
 import com.github.lessjava.generated.LJParser;
-import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.visitor.impl.BuildParentLinks;
 import com.github.lessjava.visitor.impl.BuildSymbolTables;
@@ -85,22 +84,15 @@ public class LJCompiler {
 	LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
 	LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
 
-	int i = 0;
 	while (typesHaveChanged) {
 	    program.traverse(buildSymbolTables);
 	    program.traverse(inferTypes);
 	    program.traverse(checkTypesHaveChanged);
+            program.traverse(instantiateFunctions);
 
-	    typesHaveChanged = checkTypesHaveChanged.typesChanged;
-
-	    // TODO: Fix...........................
-	    if (i++ == 20) {
-		break;
-	    }
+	    typesHaveChanged = LJASTCheckTypesHaveChanged.typesChanged;
 	}
-
-	program.traverse(instantiateFunctions);
-
+	
 	program.traverse(printTree);
 	program.traverse(generateJava);
 

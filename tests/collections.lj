@@ -1,2 +1,3 @@
+print("enter 3 space-separated words\n")
 a = [readWord(), readWord(), readWord()]
 print("%s\n", a)
