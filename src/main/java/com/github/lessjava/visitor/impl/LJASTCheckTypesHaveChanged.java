@@ -20,47 +20,47 @@ public class LJASTCheckTypesHaveChanged extends StaticAnalysis {
 
     @Override
     public void preVisit(ASTProgram node) {
-	typesChanged = false;
+        typesChanged = false;
     }
 
     @Override
     public void postVisit(ASTFunction node) {
-	typesChanged = typeChanged(node, node.returnType);
+        typesChanged = typeChanged(node, node.returnType);
     }
 
     @Override
     public void postVisit(ASTFunctionCall node) {
-	typesChanged = typeChanged(node, node.type);
+        typesChanged = typeChanged(node, node.type);
     }
 
     @Override
     public void postVisit(ASTVariable node) {
-	typesChanged = typeChanged(node, node.type);
+        typesChanged = typeChanged(node, node.type);
     }
 
     @Override
     public void postVisit(ASTBinaryExpr node) {
-	typesChanged = typeChanged(node, node.type);
+        typesChanged = typeChanged(node, node.type);
     }
 
     @Override
     public void postVisit(ASTUnaryExpr node) {
-	typesChanged = typeChanged(node, node.type);
+        typesChanged = typeChanged(node, node.type);
     }
 
     private boolean typeChanged(ASTNode node, HMType type) {
-	boolean typeChanged = false;
-	
-	boolean notInMap = type == null || !exprTypeMap.containsKey(node);
-	boolean notEqualToMapValue = exprTypeMap.containsKey(node) && !exprTypeMap.get(node).equals(type);
+        boolean typeChanged = false;
 
-	if (notInMap || notEqualToMapValue) {
-	    exprTypeMap.put(node, type);
+        boolean notInMap = type == null || !exprTypeMap.containsKey(node);
+        boolean notEqualToMapValue = exprTypeMap.containsKey(node) && !exprTypeMap.get(node).equals(type);
 
-	    typeChanged = true;
-	}
-	
-	return typesChanged || typeChanged;
+        if (notInMap || notEqualToMapValue) {
+            exprTypeMap.put(node, type);
+
+            typeChanged = true;
+        }
+
+        return typesChanged || typeChanged;
     }
 
 }

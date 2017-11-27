@@ -8,8 +8,7 @@ package com.github.lessjava.types.ast;
  * for all of these functions) rather than attempt to implement
  * {@link ASTVisitor} directly.
  */
-public interface ASTVisitor
-{
+public interface ASTVisitor {
     public void preVisit(ASTProgram node);
 
     public void postVisit(ASTProgram node);

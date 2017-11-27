@@ -1,46 +1,62 @@
 // add : (int, int) -> int
-add (a, b) {
+add(a, b) {
     return a + b
 }
 
+test add(1, 2) == 3
+
 // eq : ForAll a, (a, a) -> bool
-eq (a, b) {
+eq(a, b) {
     return a == b
 }
 
-// eqBroken : (bool, bool, bool, bool) -> bool
-eqBroken (a, b, c, d) {
+test eq(1, 1)
+test !eq(1, 2)
+test eq("a", "a")
+test !eq("a", "b")
+
+// eqBIsTrue : (bool, bool, bool, bool) -> bool
+eqBIsTrue(a, b, c, d) {
     return a == b && c == d && b == true && b == c
 }
 
-// eqWorks : (bool, bool, bool, bool) -> bool
-eqWorks (a, b, c, d) {
+test eqBIsTrue(true, true, true, true)
+test !eqBIsTrue(true, false, true, true)
+
+// eqDIsTrue : (bool, bool, bool, bool) -> bool
+eqDIsTrue(a, b, c, d) {
     return a == b && c == d && b == c && b == true
 }
 
+test eqDIsTrue(true, true, true, true)
+test !eqDIsTrue(true, true, true, false)
+
 // eqComposite: ForAll a, ForAll b, (a, a, b, b) -> bool
-eqComposite (a, b, c, d) {
+eqComposite(a, b, c, d) {
     return eq(a, b) && eq(c, d)
 }
 
+test eqComposite(1, 1, "a", "a")
+test eqComposite("a", "a", 1, 1)
+test eqComposite(1, 1, 1, 1)
+test eqComposite("a", "a", "a", "a")
+test !eqComposite(1, 2, 3, 4)
+test !eqComposite("a", "b", "c", "d")
+
 // eqCompositeConstrained: ForAll a, (a, a, a) -> bool
-eqCompositeConstrained (a, b, c) {
+eqCompositeConstrained(a, b, c) {
     return eq(a, b) && eq(b, c)
 }
 
-// compareToInt : (int) -> bool
-compareToInt(c) {
+test eqCompositeConstrained(1, 1, 1)
+test eqCompositeConstrained("a", "a", "a")
+test !eqCompositeConstrained(1, 2, 3)
+test !eqCompositeConstrained("a", "b", "c")
+
+// compareToTen : (int) -> bool
+compareToTen(c) {
     return c == 10
 }
 
-add (1, 2)      // ok
-eq (1, 2)       // ok; instantiate to (int, int) -> bool
-
-// ok; instantiate to (int, int, int, int) -> bool
-eqComposite(1, 2, 3, 4)
-
-// ok; instantiate to (int, int, bool, bool) -> bool
-eqComposite(1, 2, true, false)
-
-// ok; instantiate to (int, int, int) -> bool
-eqCompositeConstrained(1, 2, 3)
+test compareToTen(10)
+test !compareToTen(11)

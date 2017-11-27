@@ -55,14 +55,12 @@ import com.github.lessjava.types.SymbolTable;
  * <caption>Potential attributes</caption>
  * </table>
  */
-public abstract class ASTNode
-{
+public abstract class ASTNode {
     public Map<String, Object> attributes;
-    
+
     private ASTNode parentScope;
 
-    public ASTNode()
-    {
+    public ASTNode() {
         attributes = new HashMap<String, Object>();
     }
 
@@ -71,8 +69,7 @@ public abstract class ASTNode
      * 
      * @return
      */
-    public String getASTTypeStr()
-    {
+    public String getASTTypeStr() {
         return getClass().getName().replace("edu.jmu.decaf.AST", "");
     }
 
@@ -81,8 +78,7 @@ public abstract class ASTNode
      * 
      * @param parent
      */
-    public void setParent(ASTNode parent)
-    {
+    public void setParent(ASTNode parent) {
         attributes.put("parent", parent);
     }
 
@@ -92,15 +88,14 @@ public abstract class ASTNode
      * @return Parent {@link ASTNode} reference or {@code null} if the corresponding
      *         attribute is not present
      */
-    public ASTNode getParent()
-    {
+    public ASTNode getParent() {
         ASTNode parent = null;
         if (attributes.containsKey("parent")) {
             parent = (ASTNode) attributes.get("parent");
         }
         return parent;
     }
-    
+
     public void setParentScope(ASTNode parentScope) {
         this.parentScope = parentScope;
     }
@@ -114,8 +109,7 @@ public abstract class ASTNode
      * 
      * @param depth
      */
-    public void setDepth(int depth)
-    {
+    public void setDepth(int depth) {
         attributes.put("depth", Integer.valueOf(depth));
     }
 
@@ -125,8 +119,7 @@ public abstract class ASTNode
      * @return Depth (as an integer) or -1 if the corresponding attribute is not
      *         present.
      */
-    public int getDepth()
-    {
+    public int getDepth() {
         int depth = -1;
         if (attributes.containsKey("depth")) {
             depth = ((Integer) attributes.get("depth")).intValue();
@@ -134,7 +127,6 @@ public abstract class ASTNode
         return depth;
     }
 
-    public void traverse(ASTVisitor visitor)
-    {
+    public void traverse(ASTVisitor visitor) {
     }
 }

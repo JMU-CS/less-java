@@ -11,8 +11,7 @@ import com.github.lessjava.types.inference.HMType;
  * Single Decaf symbol. Might represent a scalar variable, an array, or a formal
  * function parameter.
  */
-public class Symbol
-{
+public class Symbol {
     /**
      * Memory access locations.
      *
@@ -25,8 +24,7 @@ public class Symbol
      * <li>STACK_LOCAL - stack-dynamic w/ negative offset from stack pointer</li>
      * </ul>
      */
-    public enum MemLoc
-    {
+    public enum MemLoc {
         UNKNOWN, STATIC_VAR, STATIC_FUNC, STACK_PARAM, STACK_LOCAL
     };
 
@@ -34,7 +32,7 @@ public class Symbol
      * Name in source code
      */
     public String name;
-    
+
     /**
      * True if a concrete instance of a function
      */
@@ -91,8 +89,7 @@ public class Symbol
      * @param type
      *            Data type ({@link ASTNode.DataType})
      */
-    public Symbol(String name, HMType type)
-    {
+    public Symbol(String name, HMType type) {
         this(name, type, false);
     }
 
@@ -108,8 +105,7 @@ public class Symbol
      * @param length
      *            Array length (should be 1 for scalar)
      */
-    public Symbol(String name, HMType type, boolean isArray)
-    {
+    public Symbol(String name, HMType type, boolean isArray) {
         this.name = name;
         this.type = type;
         this.paramTypes = new ArrayList<HMType>();
@@ -126,8 +122,7 @@ public class Symbol
      * @param paramTypes
      *            List of formal parameter data types
      */
-    public Symbol(String name, HMType returnType, List<HMType> paramTypes)
-    {
+    public Symbol(String name, HMType returnType, List<HMType> paramTypes) {
         this.name = name;
         this.type = returnType;
         this.paramTypes = paramTypes;
@@ -148,8 +143,7 @@ public class Symbol
      * @param paramTypes
      *            List of formal parameter data types
      */
-    public Symbol(ASTFunction node, String name, HMType returnType, List<HMType> paramTypes, boolean concrete)
-    {
+    public Symbol(ASTFunction node, String name, HMType returnType, List<HMType> paramTypes, boolean concrete) {
         this.node = node;
         this.name = name;
         this.type = returnType;
@@ -165,16 +159,15 @@ public class Symbol
     /**
      * @return the name
      */
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     /**
-     * @param name the name to set
+     * @param name
+     *            the name to set
      */
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -182,8 +175,7 @@ public class Symbol
      * Simplified string representation
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuffer str = new StringBuffer();
         str.append(name);
         if (isArray) {
@@ -192,29 +184,29 @@ public class Symbol
         str.append(" : ");
         str.append(type.toString());
         switch (location) {
-            case STATIC_VAR:
-                str.append(" (0x" + Long.toHexString(offset) + ")");
-                break;
-            case STATIC_FUNC:
-                boolean comma = false;
-                str.append(" (");
-                for (HMType t : paramTypes) {
-                    if (comma) {
-                        str.append(",");
-                    }
-                    str.append(t.toString());
-                    comma = true;
+        case STATIC_VAR:
+            str.append(" (0x" + Long.toHexString(offset) + ")");
+            break;
+        case STATIC_FUNC:
+            boolean comma = false;
+            str.append(" (");
+            for (HMType t : paramTypes) {
+                if (comma) {
+                    str.append(",");
                 }
-                str.append(")");
-                break;
-            case STACK_PARAM:
-                str.append(" (BP+0x" + Long.toHexString(offset) + ")");
-                break;
-            case STACK_LOCAL:
-                str.append(" (BP-0x" + Long.toHexString(offset) + ")");
-                break;
-            default:
-                break;
+                str.append(t.toString());
+                comma = true;
+            }
+            str.append(")");
+            break;
+        case STACK_PARAM:
+            str.append(" (BP+0x" + Long.toHexString(offset) + ")");
+            break;
+        case STACK_LOCAL:
+            str.append(" (BP-0x" + Long.toHexString(offset) + ")");
+            break;
+        default:
+            break;
         }
         // str.append(" {total=" + Integer.toString(totalSize) + "}");
         return str.toString();

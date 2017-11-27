@@ -13,8 +13,7 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
  * usually not fatal to further analysis, and can be gathered and reported at
  * the end of the static analysis phase of compilation.
  */
-public class StaticAnalysis extends LJDefaultASTVisitor
-{
+public class StaticAnalysis extends LJDefaultASTVisitor {
     protected static List<String> errors = new ArrayList<String>();
 
     /**
@@ -24,8 +23,7 @@ public class StaticAnalysis extends LJDefaultASTVisitor
      * 
      * @param ex
      */
-    public static void addError(InvalidProgramException ex)
-    {
+    public static void addError(InvalidProgramException ex) {
         errors.add(ex.getMessage());
     }
 
@@ -34,16 +32,14 @@ public class StaticAnalysis extends LJDefaultASTVisitor
      * 
      * @param msg
      */
-    public static void addError(String msg)
-    {
+    public static void addError(String msg) {
         errors.add(msg);
     }
 
     /**
      * Clear all existing errors
      */
-    public static void resetErrors()
-    {
+    public static void resetErrors() {
         errors = new ArrayList<String>();
     }
 
@@ -53,8 +49,7 @@ public class StaticAnalysis extends LJDefaultASTVisitor
      * 
      * @return List of error strings
      */
-    public static List<String> getErrors()
-    {
+    public static List<String> getErrors() {
         return errors;
     }
 
@@ -64,8 +59,7 @@ public class StaticAnalysis extends LJDefaultASTVisitor
      * 
      * @return String of all error messages
      */
-    public static String getErrorString()
-    {
+    public static String getErrorString() {
         StringBuffer str = new StringBuffer();
         for (String s : new ArrayList<>(new HashSet<>(errors))) {
             str.append(s);

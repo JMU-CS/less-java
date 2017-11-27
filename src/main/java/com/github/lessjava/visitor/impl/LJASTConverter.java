@@ -60,456 +60,457 @@ public class LJASTConverter extends LJBaseListener {
     private Stack<ASTBlock> blocks;
 
     public LJASTConverter() {
-	map = new LinkedHashMap<>();
-	blocks = new Stack<ASTBlock>();
+        map = new LinkedHashMap<>();
+        blocks = new Stack<ASTBlock>();
     }
 
     @Override
     public void exitProgram(ProgramContext ctx) {
-	ast = new ASTProgram();
+        ast = new ASTProgram();
 
-	for (StatementContext s : ctx.statement()) {
-	    if (!s.getText().equals("\n")) {
-		ast.statements.add((ASTStatement) map.get(s));
-	    }
-	}
+        for (StatementContext s : ctx.statement()) {
+            if (!s.getText().equals("\n")) {
+                ast.statements.add((ASTStatement) map.get(s));
+            }
+        }
 
-	for (FunctionContext f : ctx.function()) {
-	    ast.functions.add((ASTFunction) map.get(f));
-	}
+        for (FunctionContext f : ctx.function()) {
+            ast.functions.add((ASTFunction) map.get(f));
+        }
 
-	for (TestContext t : ctx.test()) {
-	    ast.tests.add((ASTTest) map.get(t));
-	}
-	
-	addLibraryFunctions();
+        for (TestContext t : ctx.test()) {
+            ast.tests.add((ASTTest) map.get(t));
+        }
 
-	ast.setDepth(ctx.depth());
+        addLibraryFunctions();
 
-	map.put(ctx, ast);
+        ast.setDepth(ctx.depth());
+
+        map.put(ctx, ast);
     }
 
     @Override
     public void exitFunction(FunctionContext ctx) {
-	ASTFunction function;
-	ASTFunction.Parameter parameter;
+        ASTFunction function;
+        ASTFunction.Parameter parameter;
 
-	function = new ASTFunction(ctx.ID().getText(), (ASTBlock) map.get(ctx.block()));
-	if (ctx.paramList() != null && ctx.paramList().ID().size() > 0) {
-	    for (TerminalNode tn : ctx.paramList().ID()) {
-		parameter = new ASTFunction.Parameter(tn.getText(), new HMTypeVar());
-		function.parameters.add(parameter);
-	    }
-	}
+        function = new ASTFunction(ctx.ID().getText(), (ASTBlock) map.get(ctx.block()));
+        if (ctx.paramList() != null && ctx.paramList().ID().size() > 0) {
+            for (TerminalNode tn : ctx.paramList().ID()) {
+                parameter = new ASTFunction.Parameter(tn.getText(), new HMTypeVar());
+                function.parameters.add(parameter);
+            }
+        }
 
-	function.setDepth(ctx.depth());
+        function.setDepth(ctx.depth());
 
-	map.put(ctx, function);
+        map.put(ctx, function);
     }
 
     @Override
     public void exitTest(TestContext ctx) {
-	ASTTest test;
-	ASTExpression expr;
+        ASTTest test;
+        ASTExpression expr;
 
-	expr = (ASTExpression) map.get(ctx.expr());
-	test = new ASTTest(expr);
+        expr = (ASTExpression) map.get(ctx.expr());
+        test = new ASTTest(expr);
 
-	test.setDepth(ctx.depth());
+        test.setDepth(ctx.depth());
 
-	map.put(ctx, test);
+        map.put(ctx, test);
     }
 
     @Override
     public void enterBlock(BlockContext ctx) {
-	ASTBlock block;
+        ASTBlock block;
 
-	block = new ASTBlock();
+        block = new ASTBlock();
 
-	blocks.push(block);
+        blocks.push(block);
 
-	block.setDepth(ctx.depth());
+        block.setDepth(ctx.depth());
 
-	map.put(ctx, block);
+        map.put(ctx, block);
     }
 
     @Override
     public void exitBlock(BlockContext ctx) {
-	blocks.pop();
+        blocks.pop();
     }
-    
+
     @Override
     public void exitArgList(ArgListContext ctx) {
-	ASTArgList argList;
-	
-	List<ASTExpression> args = new ArrayList<>();
-	for (ExprContext e: ctx.expr()) {
-	    args.add((ASTExpression)map.get(e));
-	}
-	
-	argList = new ASTArgList(args);
-	
-	map.put(ctx, argList);
+        ASTArgList argList;
+
+        List<ASTExpression> args = new ArrayList<>();
+        for (ExprContext e : ctx.expr()) {
+            args.add((ASTExpression) map.get(e));
+        }
+
+        argList = new ASTArgList(args);
+
+        map.put(ctx, argList);
     }
-    
+
     @Override
     public void exitAssignment(AssignmentContext ctx) {
-	ASTAssignment assignment;
-	ASTVariable variable;
-	ASTExpression expression;
+        ASTAssignment assignment;
+        ASTVariable variable;
+        ASTExpression expression;
 
-	variable = (ASTVariable) map.get(ctx.var());
-	expression = (ASTExpression) map.get(ctx.expr());
-	
-	if (expression instanceof ASTArgList) {
-	    variable.isCollection = true;
-	}
+        variable = (ASTVariable) map.get(ctx.var());
+        expression = (ASTExpression) map.get(ctx.expr());
 
-	assignment = new ASTAssignment(variable, expression);
+        if (expression instanceof ASTArgList) {
+            variable.isCollection = true;
+        }
 
-	if (!blocks.empty()) {
-	    blocks.peek().statements.add(assignment);
-	}
+        assignment = new ASTAssignment(variable, expression);
 
-	assignment.setDepth(ctx.depth());
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(assignment);
+        }
 
-	map.put(ctx, assignment);
+        assignment.setDepth(ctx.depth());
+
+        map.put(ctx, assignment);
     }
 
     @Override
     public void exitConditional(ConditionalContext ctx) {
-	ASTConditional conditional;
-	ASTExpression condition;
-	ASTBlock ifBlock;
-	ASTBlock elseBlock;
+        ASTConditional conditional;
+        ASTExpression condition;
+        ASTBlock ifBlock;
+        ASTBlock elseBlock;
 
-	condition = (ASTExpression) map.get(ctx.expr());
-	ifBlock = (ASTBlock) map.get(ctx.block().get(0));
+        condition = (ASTExpression) map.get(ctx.expr());
+        ifBlock = (ASTBlock) map.get(ctx.block().get(0));
 
-	if (ctx.block().size() > 1) {
-	    elseBlock = (ASTBlock) map.get(ctx.block().get(1));
-	    conditional = new ASTConditional(condition, ifBlock, elseBlock);
-	} else {
-	    conditional = new ASTConditional(condition, ifBlock);
-	}
+        if (ctx.block().size() > 1) {
+            elseBlock = (ASTBlock) map.get(ctx.block().get(1));
+            conditional = new ASTConditional(condition, ifBlock, elseBlock);
+        } else {
+            conditional = new ASTConditional(condition, ifBlock);
+        }
 
-	if (!blocks.empty()) {
-	    blocks.peek().statements.add(conditional);
-	}
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(conditional);
+        }
 
-	conditional.setDepth(ctx.depth());
+        conditional.setDepth(ctx.depth());
 
-	map.put(ctx, conditional);
+        map.put(ctx, conditional);
     }
 
     @Override
     public void exitWhile(WhileContext ctx) {
-	ASTWhileLoop whileLoop;
-	ASTExpression guard;
-	ASTBlock body;
+        ASTWhileLoop whileLoop;
+        ASTExpression guard;
+        ASTBlock body;
 
-	guard = (ASTExpression) map.get(ctx.expr());
-	body = (ASTBlock) map.get(ctx.block());
+        guard = (ASTExpression) map.get(ctx.expr());
+        body = (ASTBlock) map.get(ctx.block());
 
-	whileLoop = new ASTWhileLoop(guard, body);
+        whileLoop = new ASTWhileLoop(guard, body);
 
-	if (!blocks.empty()) {
-	    blocks.peek().statements.add(whileLoop);
-	}
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(whileLoop);
+        }
 
-	whileLoop.setDepth(ctx.depth());
+        whileLoop.setDepth(ctx.depth());
 
-	map.put(ctx, whileLoop);
+        map.put(ctx, whileLoop);
     }
 
     @Override
     public void exitReturn(ReturnContext ctx) {
-	ASTReturn ret;
-	ASTExpression expression;
+        ASTReturn ret;
+        ASTExpression expression;
 
-	expression = (ASTExpression) map.get(ctx.expr());
+        expression = (ASTExpression) map.get(ctx.expr());
 
-	ret = new ASTReturn(expression);
+        ret = new ASTReturn(expression);
 
-	if (!blocks.empty()) {
-	    blocks.peek().statements.add(ret);
-	}
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(ret);
+        }
 
-	ret.setDepth(ctx.depth());
+        ret.setDepth(ctx.depth());
 
-	map.put(ctx, ret);
+        map.put(ctx, ret);
     }
 
     @Override
     public void exitBreak(BreakContext ctx) {
-	ASTBreak br;
+        ASTBreak br;
 
-	br = new ASTBreak();
+        br = new ASTBreak();
 
-	if (!blocks.empty()) {
-	    blocks.peek().statements.add(br);
-	}
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(br);
+        }
 
-	br.setDepth(ctx.depth());
+        br.setDepth(ctx.depth());
 
-	map.put(ctx, br);
+        map.put(ctx, br);
     }
 
     @Override
     public void exitContinue(ContinueContext ctx) {
-	ASTContinue cont;
+        ASTContinue cont;
 
-	cont = new ASTContinue();
+        cont = new ASTContinue();
 
-	if (!blocks.empty()) {
-	    blocks.peek().statements.add(cont);
-	}
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(cont);
+        }
 
-	cont.setDepth(ctx.depth());
+        cont.setDepth(ctx.depth());
 
-	map.put(ctx, cont);
+        map.put(ctx, cont);
     }
 
     @Override
     public void exitVoidFunctionCall(VoidFunctionCallContext ctx) {
-	ASTVoidFunctionCall voidFuncCall;
+        ASTVoidFunctionCall voidFuncCall;
 
-	voidFuncCall = new ASTVoidFunctionCall(ctx.funcCall().ID().getText());
+        voidFuncCall = new ASTVoidFunctionCall(ctx.funcCall().ID().getText());
 
-	for (ExprContext expr : ctx.funcCall().argList().expr()) {
-	    voidFuncCall.arguments.add((ASTExpression) map.get(expr));
-	}
+        for (ExprContext expr : ctx.funcCall().argList().expr()) {
+            voidFuncCall.arguments.add((ASTExpression) map.get(expr));
+        }
 
-	voidFuncCall.setDepth(ctx.depth());
+        voidFuncCall.setDepth(ctx.depth());
 
-	if (!blocks.empty()) {
-	    blocks.peek().statements.add(voidFuncCall);
-	}
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(voidFuncCall);
+        }
 
-	map.put(ctx, voidFuncCall);
+        map.put(ctx, voidFuncCall);
     }
 
     @Override
     public void exitExpr(ExprContext ctx) {
-	ASTExpression expr;
+        ASTExpression expr;
 
-	expr = (ASTExpression) map.get(ctx.exprBin());
+        expr = (ASTExpression) map.get(ctx.exprBin());
 
-	expr.setDepth(ctx.depth());
+        expr.setDepth(ctx.depth());
 
-	map.put(ctx, expr);
+        map.put(ctx, expr);
     }
 
     @Override
     public void exitExprBin(ExprBinContext ctx) {
-	ASTExpression expr;
-	ASTBinaryExpr binExpr;
-	ASTExpression left, right;
-	ASTBinaryExpr.BinOp binOp;
+        ASTExpression expr;
+        ASTBinaryExpr binExpr;
+        ASTExpression left, right;
+        ASTBinaryExpr.BinOp binOp;
 
-	// If unary expression
-	if (ctx.op == null) {
-	    expr = (ASTExpression) map.get(ctx.exprUn());
+        // If unary expression
+        if (ctx.op == null) {
+            expr = (ASTExpression) map.get(ctx.exprUn());
 
-	    expr.setDepth(ctx.depth());
+            expr.setDepth(ctx.depth());
 
-	    map.put(ctx, expr);
-	} else {
-	    left = (ASTExpression) map.get(ctx.left);
-	    right = (ASTExpression) map.get(ctx.right);
-	    binOp = findBinOp(ctx.op.getText());
+            map.put(ctx, expr);
+        } else {
+            left = (ASTExpression) map.get(ctx.left);
+            right = (ASTExpression) map.get(ctx.right);
+            binOp = findBinOp(ctx.op.getText());
 
-	    binExpr = new ASTBinaryExpr(binOp, left, right);
+            binExpr = new ASTBinaryExpr(binOp, left, right);
 
-	    binExpr.setDepth(ctx.depth());
+            binExpr.setDepth(ctx.depth());
 
-	    map.put(ctx, binExpr);
-	}
+            map.put(ctx, binExpr);
+        }
     }
 
     @Override
     public void exitExprUn(ExprUnContext ctx) {
-	ASTUnaryExpr unExpr;
-	ASTUnaryExpr.UnaryOp op;
-	ASTExpression expr;
+        ASTUnaryExpr unExpr;
+        ASTUnaryExpr.UnaryOp op;
+        ASTExpression expr;
 
-	// If base expression
-	if (ctx.op == null) {
-	    expr = (ASTExpression) map.get(ctx.exprBase());
+        // If base expression
+        if (ctx.op == null) {
+            expr = (ASTExpression) map.get(ctx.exprBase());
 
-	    expr.setDepth(ctx.depth());
+            expr.setDepth(ctx.depth());
 
-	    map.put(ctx, expr);
-	} else {
-	    op = findUnaryOp(ctx.op.getText());
-	    expr = (ASTExpression) map.get(ctx.expression);
+            map.put(ctx, expr);
+        } else {
+            op = findUnaryOp(ctx.op.getText());
+            expr = (ASTExpression) map.get(ctx.expression);
 
-	    unExpr = new ASTUnaryExpr(op, expr);
+            unExpr = new ASTUnaryExpr(op, expr);
 
-	    unExpr.setDepth(ctx.depth());
+            unExpr.setDepth(ctx.depth());
 
-	    map.put(ctx, unExpr);
-	}
+            map.put(ctx, unExpr);
+        }
     }
 
     @Override
     public void exitExprBase(ExprBaseContext ctx) {
-	ASTExpression expr;
+        ASTExpression expr;
 
-	if (ctx.funcCall() != null) {
-	    expr = (ASTFunctionCall) map.get(ctx.funcCall());
-	} else if (ctx.lit() != null) {
-	    expr = (ASTLiteral) map.get(ctx.lit());
-	} else if (ctx.var() != null ) {
-	    expr = (ASTVariable) map.get(ctx.var());
-	} else if (ctx.argList() != null) {
-	    expr = (ASTArgList) map.get(ctx.argList());
-	} else {
-	    expr = (ASTExpression) map.get(ctx.expr());
-	}
+        if (ctx.funcCall() != null) {
+            expr = (ASTFunctionCall) map.get(ctx.funcCall());
+        } else if (ctx.lit() != null) {
+            expr = (ASTLiteral) map.get(ctx.lit());
+        } else if (ctx.var() != null) {
+            expr = (ASTVariable) map.get(ctx.var());
+        } else if (ctx.argList() != null) {
+            expr = (ASTArgList) map.get(ctx.argList());
+        } else {
+            expr = (ASTExpression) map.get(ctx.expr());
+        }
 
-	expr.setDepth(ctx.depth());
+        expr.setDepth(ctx.depth());
 
-	map.put(ctx, expr);
+        map.put(ctx, expr);
     }
 
     @Override
     public void exitFuncCall(FuncCallContext ctx) {
-	ASTFunctionCall funcCall;
+        ASTFunctionCall funcCall;
 
-	funcCall = new ASTFunctionCall(ctx.ID().getText());
+        funcCall = new ASTFunctionCall(ctx.ID().getText());
 
-	for (ExprContext expr : ctx.argList().expr()) {
-	    funcCall.arguments.add((ASTExpression) map.get(expr));
-	}
+        for (ExprContext expr : ctx.argList().expr()) {
+            funcCall.arguments.add((ASTExpression) map.get(expr));
+        }
 
-	funcCall.setDepth(ctx.depth());
+        funcCall.setDepth(ctx.depth());
 
-	map.put(ctx, funcCall);
+        map.put(ctx, funcCall);
     }
 
     @Override
     public void exitVar(LJParser.VarContext ctx) {
-	ASTVariable var;
+        ASTVariable var;
 
-	var = new ASTVariable(ctx.ID().getText());
+        var = new ASTVariable(ctx.ID().getText());
 
-	var.setDepth(ctx.depth());
+        var.setDepth(ctx.depth());
 
-	map.put(ctx, var);
+        map.put(ctx, var);
     }
 
     @Override
     public void exitLit(LJParser.LitContext ctx) {
-	ASTLiteral lit;
+        ASTLiteral lit;
 
-	if (ctx.BOOL() != null) {
-	    lit = new ASTLiteral(HMType.BaseDataType.BOOL, Boolean.parseBoolean(ctx.BOOL().getText()));
-	} else if (ctx.DEC() != null) {
-	    lit = new ASTLiteral(HMType.BaseDataType.INT, Integer.parseInt(ctx.DEC().getText()));
-	} else {
-	    assert (ctx.STR() != null);
-	    lit = new ASTLiteral(HMType.BaseDataType.STR, ctx.STR().getText());
-	}
+        if (ctx.BOOL() != null) {
+            lit = new ASTLiteral(HMType.BaseDataType.BOOL, Boolean.parseBoolean(ctx.BOOL().getText()));
+        } else if (ctx.DEC() != null) {
+            lit = new ASTLiteral(HMType.BaseDataType.INT, Integer.parseInt(ctx.DEC().getText()));
+        } else {
+            assert (ctx.STR() != null);
+            lit = new ASTLiteral(HMType.BaseDataType.STR,
+                    ctx.STR().getText().substring(1, ctx.STR().getText().length() - 1));
+        }
 
-	lit.setDepth(ctx.depth());
+        lit.setDepth(ctx.depth());
 
-	map.put(ctx, lit);
+        map.put(ctx, lit);
     }
 
     public ASTProgram getAST() {
-	return ast;
+        return ast;
     }
 
     public ASTUnaryExpr.UnaryOp findUnaryOp(String op) {
-	switch (op) {
-	case "!":
-	    return ASTUnaryExpr.UnaryOp.NOT;
-	default:
-	    return ASTUnaryExpr.UnaryOp.INVALID;
-	}
+        switch (op) {
+        case "!":
+            return ASTUnaryExpr.UnaryOp.NOT;
+        default:
+            return ASTUnaryExpr.UnaryOp.INVALID;
+        }
     }
 
     private ASTBinaryExpr.BinOp findBinOp(String s) {
-	ASTBinaryExpr.BinOp op;
+        ASTBinaryExpr.BinOp op;
 
-	switch (s) {
-	case "+":
-	    op = ASTBinaryExpr.BinOp.ADD;
-	    break;
+        switch (s) {
+        case "+":
+            op = ASTBinaryExpr.BinOp.ADD;
+            break;
 
-	case "*":
-	    op = ASTBinaryExpr.BinOp.MUL;
-	    break;
+        case "*":
+            op = ASTBinaryExpr.BinOp.MUL;
+            break;
 
-	case "/":
-	    op = ASTBinaryExpr.BinOp.DIV;
-	    break;
+        case "/":
+            op = ASTBinaryExpr.BinOp.DIV;
+            break;
 
-	case "-":
-	    op = ASTBinaryExpr.BinOp.SUB;
-	    break;
+        case "-":
+            op = ASTBinaryExpr.BinOp.SUB;
+            break;
 
-	case ">":
-	    op = ASTBinaryExpr.BinOp.GT;
-	    break;
+        case ">":
+            op = ASTBinaryExpr.BinOp.GT;
+            break;
 
-	case ">=":
-	    op = ASTBinaryExpr.BinOp.GE;
-	    break;
+        case ">=":
+            op = ASTBinaryExpr.BinOp.GE;
+            break;
 
-	case "<":
-	    op = ASTBinaryExpr.BinOp.LT;
-	    break;
+        case "<":
+            op = ASTBinaryExpr.BinOp.LT;
+            break;
 
-	case "<=":
-	    op = ASTBinaryExpr.BinOp.LE;
-	    break;
+        case "<=":
+            op = ASTBinaryExpr.BinOp.LE;
+            break;
 
-	case "==":
-	    op = ASTBinaryExpr.BinOp.EQ;
-	    break;
+        case "==":
+            op = ASTBinaryExpr.BinOp.EQ;
+            break;
 
-	case "!=":
-	    op = ASTBinaryExpr.BinOp.NE;
-	    break;
+        case "!=":
+            op = ASTBinaryExpr.BinOp.NE;
+            break;
 
-	case "||":
-	    op = ASTBinaryExpr.BinOp.OR;
-	    break;
+        case "||":
+            op = ASTBinaryExpr.BinOp.OR;
+            break;
 
-	case "&&":
-	    op = ASTBinaryExpr.BinOp.AND;
-	    break;
+        case "&&":
+            op = ASTBinaryExpr.BinOp.AND;
+            break;
 
-	default:
-	    op = null;
-	}
+        default:
+            op = null;
+        }
 
-	return op;
+        return op;
     }
-    
-    private void addLibraryFunctions() {
-	// Add Library functions
-	List<ASTFunction> libraryFunctions = new ArrayList<>();
-	
-	// Output
-	ASTFunction print = new ASTFunction("print", new HMTypeBase(BaseDataType.VOID), null);
-	print.parameters.add(new ASTFunction.Parameter("args", new HMTypeBase(BaseDataType.STR)));
-	libraryFunctions.add(print);
 
-	// Input
-	libraryFunctions.add(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));
-	libraryFunctions.add(new ASTFunction("readDouble", new HMTypeBase(BaseDataType.DOUBLE), null));
-	libraryFunctions.add(new ASTFunction("readChar", new HMTypeBase(BaseDataType.STR), null));
-	libraryFunctions.add(new ASTFunction("readWord", new HMTypeBase(BaseDataType.STR), null));
-	libraryFunctions.add(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));
-	
-	for (ASTFunction f: libraryFunctions) {
-	    f.setDepth(2);
-	    f.setParent(ast);
-	}
-	
-	ast.functions.addAll(libraryFunctions);
+    private void addLibraryFunctions() {
+        // Add Library functions
+        List<ASTFunction> libraryFunctions = new ArrayList<>();
+
+        // Output
+        ASTFunction print = new ASTFunction("print", new HMTypeBase(BaseDataType.VOID), null);
+        print.parameters.add(new ASTFunction.Parameter("args", new HMTypeBase(BaseDataType.STR)));
+        libraryFunctions.add(print);
+
+        // Input
+        libraryFunctions.add(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));
+        libraryFunctions.add(new ASTFunction("readDouble", new HMTypeBase(BaseDataType.DOUBLE), null));
+        libraryFunctions.add(new ASTFunction("readChar", new HMTypeBase(BaseDataType.STR), null));
+        libraryFunctions.add(new ASTFunction("readWord", new HMTypeBase(BaseDataType.STR), null));
+        libraryFunctions.add(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));
+
+        for (ASTFunction f : libraryFunctions) {
+            f.setDepth(2);
+            f.setParent(ast);
+        }
+
+        ast.functions.addAll(libraryFunctions);
     }
 }

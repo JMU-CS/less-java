@@ -22,11 +22,9 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
  * analyses.
  *
  */
-public class BuildParentLinks extends LJDefaultASTVisitor
-{
+public class BuildParentLinks extends LJDefaultASTVisitor {
     @Override
-    public void preVisit(ASTProgram node)
-    {
+    public void preVisit(ASTProgram node) {
         for (ASTStatement statement : node.statements) {
             // TODO: why is it null???
             if (statement != null) {
@@ -42,17 +40,15 @@ public class BuildParentLinks extends LJDefaultASTVisitor
     }
 
     @Override
-    public void preVisit(ASTFunction node)
-    {
-	// Library functions have null bodies
-	if (node.body != null) {
+    public void preVisit(ASTFunction node) {
+        // Library functions have null bodies
+        if (node.body != null) {
             node.body.setParent(node);
-	}
+        }
     }
 
     @Override
-    public void preVisit(ASTBlock node)
-    {
+    public void preVisit(ASTBlock node) {
         for (ASTVariable var : node.variables) {
             var.setParent(node);
         }
@@ -62,23 +58,20 @@ public class BuildParentLinks extends LJDefaultASTVisitor
     }
 
     @Override
-    public void preVisit(ASTAssignment node)
-    {
+    public void preVisit(ASTAssignment node) {
         node.variable.setParent(node);
         node.value.setParent(node);
     }
 
     @Override
-    public void preVisit(ASTVoidFunctionCall node)
-    {
+    public void preVisit(ASTVoidFunctionCall node) {
         for (ASTExpression expr : node.arguments) {
             expr.setParent(node);
         }
     }
 
     @Override
-    public void preVisit(ASTConditional node)
-    {
+    public void preVisit(ASTConditional node) {
         node.condition.setParent(node);
         node.ifBlock.setParent(node);
         if (node.hasElseBlock()) {
@@ -87,44 +80,38 @@ public class BuildParentLinks extends LJDefaultASTVisitor
     }
 
     @Override
-    public void preVisit(ASTWhileLoop node)
-    {
+    public void preVisit(ASTWhileLoop node) {
         node.guard.setParent(node);
         node.body.setParent(node);
     }
 
     @Override
-    public void preVisit(ASTReturn node)
-    {
+    public void preVisit(ASTReturn node) {
         if (node.hasValue()) {
             node.value.setParent(node);
         }
     }
 
     @Override
-    public void preVisit(ASTTest node)
-    {
+    public void preVisit(ASTTest node) {
         node.expr.setParent(node);
     }
-    
+
     // no need for ASTBreak or ASTContinue handlers (no children)
 
     @Override
-    public void preVisit(ASTBinaryExpr node)
-    {
+    public void preVisit(ASTBinaryExpr node) {
         node.leftChild.setParent(node);
         node.rightChild.setParent(node);
     }
 
     @Override
-    public void preVisit(ASTUnaryExpr node)
-    {
+    public void preVisit(ASTUnaryExpr node) {
         node.child.setParent(node);
     }
 
     @Override
-    public void preVisit(ASTFunctionCall node)
-    {
+    public void preVisit(ASTFunctionCall node) {
         for (ASTExpression expr : node.arguments) {
             expr.setParent(node);
         }

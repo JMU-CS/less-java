@@ -29,8 +29,7 @@ import com.github.lessjava.types.inference.impl.HMTypeBase;
  * <td>{@code null}</td> <caption></caption>
  * </table>
  */
-public class ASTLiteral extends ASTExpression
-{
+public class ASTLiteral extends ASTExpression {
     /**
      * Remove escape codes from string literals and replace them with the
      * corresponding special character (quotes, newlines, or tabs) Removes carriage
@@ -40,8 +39,7 @@ public class ASTLiteral extends ASTExpression
      *            String to manipulate
      * @return String with escape codes replaced by special characters
      */
-    public static String removeEscapeCodes(String str)
-    {
+    public static String removeEscapeCodes(String str) {
         return str.replaceAll("\\\\\"", "\"").replaceAll("\\\\n", "\n").replaceAll("\\\\t", "\t").replaceAll("\r", "");
     }
 
@@ -53,32 +51,34 @@ public class ASTLiteral extends ASTExpression
      *            String to manipulate
      * @return String with special characters replaced by escape codes
      */
-    public static String addEscapeCodes(String str)
-    {
+    public static String addEscapeCodes(String str) {
         return str.replaceAll("\"", "\\\\\"").replaceAll("\n", "\\\\n").replaceAll("\t", "\\\\t").replaceAll("\r", "");
     }
 
     public Object value;
     public HMType hmType;
 
-    public ASTLiteral(BaseDataType type, Object value)
-    {
+    public ASTLiteral(BaseDataType type, Object value) {
         super.type = new HMTypeBase(type);
         this.value = value;
     }
 
     @Override
-    public void traverse(ASTVisitor visitor)
-    {
+    public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
         visitor.postVisit(this);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         if (this.value instanceof String) {
             return "\"" + addEscapeCodes(value.toString()) + "\"";
+        } else if (this.value instanceof Boolean) {
+            return String.format("Boolean.valueOf(%s)", this.value);
+        } else if (this.value instanceof Integer) {
+            return String.format("Integer.valueOf(%s)", this.value);
+        } else if (this.value instanceof Double) {
+            return String.format("Double.valueOf(%s)", this.value);
         } else {
             return this.value.toString();
         }

@@ -1,17 +1,14 @@
 package com.github.lessjava.types.inference;
 
-public abstract class HMType
-{
+public abstract class HMType {
     public boolean isConcrete;
 
-    public static enum BaseDataType
-    {
+    public static enum BaseDataType {
         INT, DOUBLE, BOOL, VOID, STR
     }
 
     @Override
-    public boolean equals(Object other)
-    {
+    public boolean equals(Object other) {
         return other != null && other instanceof HMType && (this.toString()).equals(((HMType) other).toString());
     }
 }

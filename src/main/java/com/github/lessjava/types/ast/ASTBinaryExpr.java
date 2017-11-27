@@ -14,8 +14,7 @@ import com.github.lessjava.types.inference.impl.HMTypeBase;
  * right-hand side separately and then perform the given operation on the two
  * values. Some operations (e.g., boolean AND and OR) can be short-circuited.
  */
-public class ASTBinaryExpr extends ASTExpression
-{
+public class ASTBinaryExpr extends ASTExpression {
     /**
      * List of permitted binary operations.
      *
@@ -35,90 +34,84 @@ public class ASTBinaryExpr extends ASTExpression
      * <li>MOD - modular (remainder) division</li>
      * </ul>
      */
-    public enum BinOp
-    {
+    public enum BinOp {
         INVALID, OR, AND, EQ, NE, LT, GT, LE, GE, ADD, SUB, MUL, DIV, MOD
     }
 
-    public static Set<BinOp> flexibleOperators = new HashSet<>(
-            Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE }));
+    public static Set<BinOp> flexibleOperators = new HashSet<>(Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE }));
 
     public static Set<BinOp> arithmeticOperators = new HashSet<>(
             Arrays.asList(new BinOp[] { BinOp.ADD, BinOp.SUB, BinOp.MUL, BinOp.DIV, BinOp.MOD, BinOp.LT, BinOp.GT }));
 
     public static Set<BinOp> booleanOperators = new HashSet<>(Arrays.asList(new BinOp[] { BinOp.OR, BinOp.AND }));
 
-    public static String opToString(BinOp op)
-    {
+    public static String opToString(BinOp op) {
         switch (op) {
-            case OR:
-                return "||";
-            case AND:
-                return "&&";
-            case EQ:
-                return "==";
-            case NE:
-                return "!=";
-            case LT:
-                return "<";
-            case GT:
-                return ">";
-            case LE:
-                return "<=";
-            case GE:
-                return ">=";
-            case ADD:
-                return "+";
-            case SUB:
-                return "-";
-            case MUL:
-                return "*";
-            case DIV:
-                return "/";
-            case MOD:
-                return "%";
-            default:
-                return "???";
+        case OR:
+            return "||";
+        case AND:
+            return "&&";
+        case EQ:
+            return "==";
+        case NE:
+            return "!=";
+        case LT:
+            return "<";
+        case GT:
+            return ">";
+        case LE:
+            return "<=";
+        case GE:
+            return ">=";
+        case ADD:
+            return "+";
+        case SUB:
+            return "-";
+        case MUL:
+            return "*";
+        case DIV:
+            return "/";
+        case MOD:
+            return "%";
+        default:
+            return "???";
         }
     }
 
-    public static BaseDataType opToReturnType(BinOp op)
-    {
+    public static BaseDataType opToReturnType(BinOp op) {
         switch (op) {
-            case OR:
-            case AND:
-            case EQ:
-            case NE:
-            case LT:
-            case GT:
-            case LE:
-            case GE:
-                return HMType.BaseDataType.BOOL;
-            case ADD:
-            case SUB:
-            case MUL:
-            case DIV:
-            case MOD:
-                return HMType.BaseDataType.INT;
-            default:
-                return null;
+        case OR:
+        case AND:
+        case EQ:
+        case NE:
+        case LT:
+        case GT:
+        case LE:
+        case GE:
+            return HMType.BaseDataType.BOOL;
+        case ADD:
+        case SUB:
+        case MUL:
+        case DIV:
+        case MOD:
+            return HMType.BaseDataType.INT;
+        default:
+            return null;
         }
     }
 
-    public BinOp         operator;
+    public BinOp operator;
     public ASTExpression leftChild;
     public ASTExpression rightChild;
 
-    public ASTBinaryExpr(BinOp operator, ASTExpression leftChild, ASTExpression rightChild)
-    {
+    public ASTBinaryExpr(BinOp operator, ASTExpression leftChild, ASTExpression rightChild) {
         this.operator = operator;
         this.leftChild = leftChild;
         this.rightChild = rightChild;
     }
 
     @Override
-    public void traverse(ASTVisitor visitor)
-    {
+    public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
         leftChild.traverse(visitor);
         visitor.inVisit(this);
@@ -127,13 +120,12 @@ public class ASTBinaryExpr extends ASTExpression
     }
 
     @Override
-    public String toString()
-    {
-	String right = opToString(operator) + rightChild.toString();
-        if (leftChild.type instanceof HMTypeBase && ((HMTypeBase) leftChild.type).getBaseType().equals(BaseDataType.STR)) {
+    public String toString() {
+        String right = opToString(operator) + rightChild.toString();
+        if (operator.equals(BinOp.EQ)) {
             right = ".equals(" + rightChild.toString() + ")";
         }
 
-        return ("(" + leftChild.toString() + right + ")").replaceAll("\\\\\"", "");
+        return ("(" + leftChild.toString() + right + ")");
     }
 }

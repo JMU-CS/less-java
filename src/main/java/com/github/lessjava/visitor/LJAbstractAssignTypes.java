@@ -22,56 +22,56 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
 
     @Override
     public void preVisit(ASTProgram node) {
-	for (ASTFunction function : node.functions) {
-	    nameparamFunctionMap.put(function.getNameParamString(), function);
-	}
+        for (ASTFunction function : node.functions) {
+            nameparamFunctionMap.put(function.getNameParamString(), function);
+        }
     }
 
     public HMType evalExprType(ASTExpression expr) {
-	HMType type;
+        HMType type;
 
-	if (expr instanceof ASTBinaryExpr) {
-	    type = evalExprType((ASTBinaryExpr) expr);
-	} else if (expr instanceof ASTUnaryExpr) {
-	    type = evalExprType((ASTUnaryExpr) expr);
-	} else if (expr instanceof ASTFunctionCall) {
-	    type = evalExprType((ASTFunctionCall) expr);
-	} else if (expr instanceof ASTVariable) {
-	    type = evalExprType((ASTVariable) expr);
-	} else {
-	    type = expr.type;
-	}
+        if (expr instanceof ASTBinaryExpr) {
+            type = evalExprType((ASTBinaryExpr) expr);
+        } else if (expr instanceof ASTUnaryExpr) {
+            type = evalExprType((ASTUnaryExpr) expr);
+        } else if (expr instanceof ASTFunctionCall) {
+            type = evalExprType((ASTFunctionCall) expr);
+        } else if (expr instanceof ASTVariable) {
+            type = evalExprType((ASTVariable) expr);
+        } else {
+            type = expr.type;
+        }
 
-	return type;
+        return type;
     }
 
     public HMType evalExprType(ASTBinaryExpr expr) {
-	return evalExprType(expr.leftChild);
+        return evalExprType(expr.leftChild);
     }
 
     public HMType evalExprType(ASTUnaryExpr expr) {
-	return evalExprType(expr.child);
+        return evalExprType(expr.child);
     }
 
     public HMType evalExprType(ASTFunctionCall expr) {
-	return nameparamFunctionMap.get(expr.getNameArgString()).returnType;
+        return nameparamFunctionMap.get(expr.getNameArgString()).returnType;
     }
 
     public HMType evalExprType(ASTVariable expr) {
 
-	List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(expr, expr.name);
+        List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(expr, expr.name);
 
-	for (Symbol s : symbols) {
-	    if (s != null && s.type != null) {
-		return s.type;
-	    }
-	}
+        for (Symbol s : symbols) {
+            if (s != null && s.type != null) {
+                return s.type;
+            }
+        }
 
-	return new HMTypeVar();
+        return new HMTypeVar();
     }
 
     public boolean typeIsKnown(HMType type) {
-	return type != null && !(type instanceof HMTypeVar);
+        return type != null && !(type instanceof HMTypeVar);
     }
 
 }

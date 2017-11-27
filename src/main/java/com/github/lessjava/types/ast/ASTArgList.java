@@ -9,12 +9,12 @@ public class ASTArgList extends ASTExpression {
     public List<ASTExpression> arguments;
     public boolean isConcrete;
     public HMType collectionType;
-    
+
     public ASTArgList(List<ASTExpression> arguments) {
-	this.arguments = arguments;
-	this.collectionType = new HMTypeCollection(this.type);
+        this.arguments = arguments;
+        this.collectionType = new HMTypeCollection(this.type);
     }
-    
+
     @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
@@ -26,18 +26,19 @@ public class ASTArgList extends ASTExpression {
 
     @Override
     public String toString() {
-	StringBuilder sb = new StringBuilder();
-	StringBuilder argString = new StringBuilder();
-	
+        StringBuilder sb = new StringBuilder();
+        StringBuilder argString = new StringBuilder();
+
         argString.append("{ ");
-	for (ASTExpression e: arguments) {
-	    argString.append(e.toString() + ",");
-	}
+        for (ASTExpression e : arguments) {
+            argString.append(e.toString() + ",");
+        }
         argString.append(" }");
 
-	sb.append(String.format("new ArrayDeque<%s>(Arrays.asList(new %s[] %s))", type, type, argString.toString()).replaceAll("\\\\\"", ""));
-	
-	return sb.toString();
+        sb.append(String.format("new ArrayDeque<%s>(Arrays.asList(new %s[] %s))", type, type, argString.toString())
+                .replaceAll("\\\\\"", ""));
+
+        return sb.toString();
     }
 
 }

@@ -22,105 +22,104 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
     @Override
     public void preVisit(ASTProgram node) {
-	super.preVisit(node);
-	if (LJInstantiateFunctions.program == null) {
-	    LJInstantiateFunctions.program = node;
-	}
-	
-	this.functionsToAdd = new ArrayList<>();
+        super.preVisit(node);
+        if (LJInstantiateFunctions.program == null) {
+            LJInstantiateFunctions.program = node;
+        }
+
+        this.functionsToAdd = new ArrayList<>();
     }
 
     @Override
     public void postVisit(ASTProgram node) {
-	super.preVisit(node);
-	
-	program.functions.addAll(functionsToAdd);
+        super.preVisit(node);
+
+        program.functions.addAll(functionsToAdd);
     }
 
     @Override
     public void postVisit(ASTFunctionCall node) {
-	super.postVisit(node);
+        super.postVisit(node);
 
         ASTFunction f = nameparamFunctionMap.get(node.getNameArgString());
 
-	if (f != null && f.concrete) {
-	    return;
-	}
+        if (f != null && f.concrete) {
+            return;
+        }
 
-	f = instantiateFunction(node.name, node.arguments);
-	
+        f = instantiateFunction(node.name, node.arguments);
 
-	if (f != null) {
+        if (f != null) {
             if (functionsToAdd.contains(f)) {
                 return;
             }
-            
+
             functionsToAdd.add(f);
-	    nameparamFunctionMap.put(node.getNameArgString(), f);
-	}
+            nameparamFunctionMap.put(node.getNameArgString(), f);
+        }
     }
 
     @Override
     public void postVisit(ASTVoidFunctionCall node) {
-	super.postVisit(node);
+        super.postVisit(node);
 
         ASTFunction f = nameparamFunctionMap.get(node.getNameArgString());
 
-	if (f != null && f.concrete) {
-	    return;
-	}
+        if (f != null && f.concrete) {
+            return;
+        }
 
-	f = instantiateFunction(node.name, node.arguments);
+        f = instantiateFunction(node.name, node.arguments);
 
-	if (f != null) {
+        if (f != null) {
             if (functionsToAdd.contains(f)) {
                 return;
             }
-            
+
             functionsToAdd.add(f);
-	    nameparamFunctionMap.put(node.getNameArgString(), f);
-	}
+            nameparamFunctionMap.put(node.getNameArgString(), f);
+        }
     }
 
     private ASTFunction instantiateFunction(String name, List<ASTExpression> arguments) {
-	if (arguments.stream().anyMatch(arg -> !arg.type.isConcrete)) {
-	    // Can't instantiate; arg isn't concrete
-	    return null;
-	}
+        if (arguments.stream().anyMatch(arg -> !arg.type.isConcrete)) {
+            // Can't instantiate; arg isn't concrete
+            return null;
+        }
 
-	List<ASTFunction> functions = program.functions.stream().filter(func -> func.name.equals(name))
-		.collect(Collectors.toList());
+        List<ASTFunction> functions = program.functions.stream().filter(func -> func.name.equals(name))
+                .collect(Collectors.toList());
 
-	Optional<ASTFunction> prototype = functions.stream().filter(func -> !func.concrete).findFirst();
+        Optional<ASTFunction> prototype = functions.stream().filter(func -> !func.concrete).findFirst();
 
-	if (!prototype.isPresent()) {
-	    // Can't instantiate
-	    return null;
-	}
+        if (!prototype.isPresent()) {
+            // Can't instantiate
+            return null;
+        }
 
-	ASTFunction functionInstance = new ASTFunction(prototype.get().name, prototype.get().returnType,
-		prototype.get().body);
+        ASTFunction functionInstance = new ASTFunction(prototype.get().name, prototype.get().returnType,
+                prototype.get().body);
 
-	functionInstance.concrete = true;
-	functionInstance.parameters = new ArrayList<>();
+        functionInstance.concrete = true;
+        functionInstance.parameters = new ArrayList<>();
 
-	for (int i = 0; i < arguments.size(); i++) {
-	    String pname = prototype.get().parameters.get(i).name;
-	    HMType type = new HMTypeBase(((HMTypeBase) arguments.get(i).type).getBaseType());
-	    Parameter parameter = new Parameter(pname, type);
-	    functionInstance.parameters.add(parameter);
-	}
+        for (int i = 0; i < arguments.size(); i++) {
+            String pname = prototype.get().parameters.get(i).name;
+            HMType type = new HMTypeBase(((HMTypeBase) arguments.get(i).type).getBaseType());
+            Parameter parameter = new Parameter(pname, type);
+            functionInstance.parameters.add(parameter);
+        }
 
-	for (ASTFunction f : program.functions) {
-	    if (functionInstance.equals(f)) {
-		return null;
-	    }
-	}
+        for (ASTFunction f : program.functions) {
+            if (functionInstance.equals(f)) {
+                return null;
+            }
+        }
 
-	functionInstance.setParent(program);
-	functionInstance.setDepth(2);
-	
-	return functionInstance;
+        functionInstance.setParent(program);
+        functionInstance.setDepth(2);
+
+        return functionInstance;
     }
 
 }

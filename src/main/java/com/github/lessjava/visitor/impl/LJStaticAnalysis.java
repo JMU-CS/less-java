@@ -18,239 +18,203 @@ import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 
-public class LJStaticAnalysis extends StaticAnalysis
-{
+public class LJStaticAnalysis extends StaticAnalysis {
     @Override
-    public void preVisit(ASTProgram node)
-    {
+    public void preVisit(ASTProgram node) {
     }
 
     @Override
-    public void postVisit(ASTProgram node)
-    {
+    public void postVisit(ASTProgram node) {
     }
 
     @Override
-    public void preVisit(ASTFunction node)
-    {
+    public void preVisit(ASTFunction node) {
     }
 
     @Override
-    public void postVisit(ASTFunction node)
-    {
+    public void postVisit(ASTFunction node) {
     }
 
     @Override
-    public void preVisit(ASTVariable node)
-    {
+    public void preVisit(ASTVariable node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTVariable node)
-    {
+    public void postVisit(ASTVariable node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTBlock node)
-    {
+    public void preVisit(ASTBlock node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTBlock node)
-    {
+    public void postVisit(ASTBlock node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTAssignment node)
-    {
+    public void preVisit(ASTAssignment node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTAssignment node)
-    {
+    public void postVisit(ASTAssignment node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTVoidFunctionCall node)
-    {
+    public void preVisit(ASTVoidFunctionCall node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTVoidFunctionCall node)
-    {
+    public void postVisit(ASTVoidFunctionCall node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTConditional node)
-    {
+    public void preVisit(ASTConditional node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTConditional node)
-    {
+    public void postVisit(ASTConditional node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTWhileLoop node)
-    {
+    public void preVisit(ASTWhileLoop node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTWhileLoop node)
-    {
+    public void postVisit(ASTWhileLoop node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTReturn node)
-    {
+    public void preVisit(ASTReturn node) {
     }
 
     @Override
-    public void postVisit(ASTReturn node)
-    {
+    public void postVisit(ASTReturn node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTBreak node)
-    {
+    public void preVisit(ASTBreak node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTBreak node)
-    {
+    public void postVisit(ASTBreak node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTContinue node)
-    {
+    public void preVisit(ASTContinue node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTContinue node)
-    {
+    public void postVisit(ASTContinue node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTTest node)
-    {
+    public void preVisit(ASTTest node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTTest node)
-    {
+    public void postVisit(ASTTest node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTBinaryExpr node)
-    {
+    public void preVisit(ASTBinaryExpr node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void inVisit(ASTBinaryExpr node)
-    {
+    public void inVisit(ASTBinaryExpr node) {
         // TODO Auto-generated method stub
         super.inVisit(node);
     }
 
     @Override
-    public void postVisit(ASTBinaryExpr node)
-    {
+    public void postVisit(ASTBinaryExpr node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTUnaryExpr node)
-    {
+    public void preVisit(ASTUnaryExpr node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTUnaryExpr node)
-    {
+    public void postVisit(ASTUnaryExpr node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTFunctionCall node)
-    {
+    public void preVisit(ASTFunctionCall node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTFunctionCall node)
-    {
+    public void postVisit(ASTFunctionCall node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTLocation node)
-    {
+    public void preVisit(ASTLocation node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTLocation node)
-    {
+    public void postVisit(ASTLocation node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }
 
     @Override
-    public void preVisit(ASTLiteral node)
-    {
+    public void preVisit(ASTLiteral node) {
         // TODO Auto-generated method stub
         super.preVisit(node);
     }
 
     @Override
-    public void postVisit(ASTLiteral node)
-    {
+    public void postVisit(ASTLiteral node) {
         // TODO Auto-generated method stub
         super.postVisit(node);
     }

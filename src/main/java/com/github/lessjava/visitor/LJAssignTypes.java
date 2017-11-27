@@ -1,6 +1,5 @@
 package com.github.lessjava.visitor;
 
-public interface LJAssignTypes
-{
+public interface LJAssignTypes {
 
 }

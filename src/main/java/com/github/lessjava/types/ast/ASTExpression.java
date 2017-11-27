@@ -17,7 +17,6 @@ import com.github.lessjava.types.inference.impl.HMTypeVar;
  * </ul>
  *
  */
-public abstract class ASTExpression extends ASTNode
-{
+public abstract class ASTExpression extends ASTNode {
     public HMType type = new HMTypeVar();
 }

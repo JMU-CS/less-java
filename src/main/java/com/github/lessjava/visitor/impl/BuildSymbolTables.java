@@ -45,130 +45,129 @@ public class BuildSymbolTables extends StaticAnalysis {
      * symbol name ¦* @return Symbol information ¦
      */
     public static List<Symbol> searchScopesForSymbol(ASTNode node, String name) {
-	List<Symbol> symbols = null;
-	try {
-	    if (node.attributes.containsKey("symbolTable")) {
-		SymbolTable table = (SymbolTable) node.attributes.get("symbolTable");
-		symbols = table.lookup(name);
-	    } else if (node.getParent() != null) {
-		symbols = searchScopesForSymbol(node.getParent(), name);
-	    } else {
-		addError(new InvalidProgramException("Symbol not found: " + name));
-	    }
-	} catch (InvalidProgramException ex) {
-	    addError(new InvalidProgramException(ex.getMessage()));
-	}
-	return symbols;
+        List<Symbol> symbols = null;
+        try {
+            if (node.attributes.containsKey("symbolTable")) {
+                SymbolTable table = (SymbolTable) node.attributes.get("symbolTable");
+                symbols = table.lookup(name);
+            } else if (node.getParent() != null) {
+                symbols = searchScopesForSymbol(node.getParent(), name);
+            } else {
+                addError(new InvalidProgramException("Symbol not found: " + name));
+            }
+        } catch (InvalidProgramException ex) {
+            addError(new InvalidProgramException(ex.getMessage()));
+        }
+        return symbols;
     }
 
     public BuildSymbolTables() {
-	tableStack = new ArrayDeque<SymbolTable>();
-	nameVarMap = new HashMap<>();
+        tableStack = new ArrayDeque<SymbolTable>();
+        nameVarMap = new HashMap<>();
     }
 
     /**
      * Return the innermost active symbol table.
      */
     protected SymbolTable getCurrentTable() {
-	assert (tableStack.size() > 0);
-	return tableStack.peek();
+        assert (tableStack.size() > 0);
+        return tableStack.peek();
     }
 
     /**
      * Return the previous active symbol table.
      */
     protected SymbolTable getPreviousTable() {
-	assert (tableStack.size() > 0);
+        assert (tableStack.size() > 0);
 
-	SymbolTable current = tableStack.pop();
-	SymbolTable previous = (tableStack.size() > 0) ? tableStack.pop() : current;
+        SymbolTable current = tableStack.pop();
+        SymbolTable previous = (tableStack.size() > 0) ? tableStack.pop() : current;
 
-	tableStack.push(previous);
+        tableStack.push(previous);
 
-	if (previous != current) {
-	    tableStack.push(current);
-	}
+        if (previous != current) {
+            tableStack.push(current);
+        }
 
-	return previous;
+        return previous;
     }
 
     /**
      * Create a new innermost symbol table scope and push it on the stack.
      */
     protected SymbolTable initializeScope() {
-	SymbolTable table = null;
-	if (tableStack.size() > 0) {
-	    table = new SymbolTable(getCurrentTable());
-	} else {
-	    table = new SymbolTable();
-	}
-	tableStack.push(table);
-	return table;
+        SymbolTable table = null;
+        if (tableStack.size() > 0) {
+            table = new SymbolTable(getCurrentTable());
+        } else {
+            table = new SymbolTable();
+        }
+        tableStack.push(table);
+        return table;
     }
 
     /**
      * Pop the stack and move outwards one scope level.
      */
     protected void finalizeScope() {
-	assert (tableStack.size() > 0);
-	tableStack.pop();
+        assert (tableStack.size() > 0);
+        tableStack.pop();
     }
 
     /**
      * Add a symbol for the given function to the current (innermost) scope.
      */
     protected void insertFunctionSymbol(ASTFunction node) {
-	try {
-	    boolean isConcrete = node.returnType instanceof HMTypeVar;
-	    List<HMType> ptypes = new ArrayList<>();
-	    for (ASTFunction.Parameter p : node.parameters) {
-		Symbol param = new Symbol(p.name, p.type);
-		getCurrentTable().insert(node.name, param);
-		ptypes.add(p.type);
+        try {
+            boolean isConcrete = node.returnType instanceof HMTypeVar;
+            List<HMType> ptypes = new ArrayList<>();
+            for (ASTFunction.Parameter p : node.parameters) {
+                insertParamSymbol(p);
+                ptypes.add(p.type);
 
-		if (p.type instanceof HMTypeVar) {
-		    isConcrete = false;
-		}
-	    }
-	    Symbol symbol = new Symbol(node, node.name, node.returnType, ptypes, isConcrete);
+                if (p.type instanceof HMTypeVar) {
+                    isConcrete = false;
+                }
+            }
+            Symbol symbol = new Symbol(node, node.name, node.returnType, ptypes, isConcrete);
 
-	    getCurrentTable().insert(node.name, symbol);
-	} catch (InvalidProgramException ex) {
-	    addError(ex);
-	}
+            getCurrentTable().insert(node.name, symbol);
+        } catch (InvalidProgramException ex) {
+            addError(ex);
+        }
     }
 
     protected void insertLibrarySymbols() {
-	// Output
-	ASTFunction print = new ASTFunction("print", new HMTypeBase(BaseDataType.VOID), null);
-	print.parameters.add(new ASTFunction.Parameter("args", new HMTypeBase(BaseDataType.STR)));
-	insertFunctionSymbol(print);
+        // Output
+        ASTFunction print = new ASTFunction("print", new HMTypeBase(BaseDataType.VOID), null);
+        print.parameters.add(new ASTFunction.Parameter("args", new HMTypeBase(BaseDataType.STR)));
+        insertFunctionSymbol(print);
 
-	// Input
-	insertFunctionSymbol(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));
-	insertFunctionSymbol(new ASTFunction("readDouble", new HMTypeBase(BaseDataType.DOUBLE), null));
-	insertFunctionSymbol(new ASTFunction("readChar", new HMTypeBase(BaseDataType.STR), null));
-	insertFunctionSymbol(new ASTFunction("readWord", new HMTypeBase(BaseDataType.STR), null));
-	insertFunctionSymbol(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));
+        // Input
+        insertFunctionSymbol(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));
+        insertFunctionSymbol(new ASTFunction("readDouble", new HMTypeBase(BaseDataType.DOUBLE), null));
+        insertFunctionSymbol(new ASTFunction("readChar", new HMTypeBase(BaseDataType.STR), null));
+        insertFunctionSymbol(new ASTFunction("readWord", new HMTypeBase(BaseDataType.STR), null));
+        insertFunctionSymbol(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));
     }
 
     protected void insertVariableSymbol(ASTVariable node) {
-	try {
-	    SymbolTable st = getPreviousTable();
+        try {
+            SymbolTable st = getPreviousTable();
 
-	    // Get names of parent symbols
-	    Set<String> varNames = st.getAllSymbols().stream().map(Symbol::getName).collect(Collectors.toSet());
+            // Get names of parent symbols
+            Set<String> varNames = st.getAllSymbols().stream().map(Symbol::getName).collect(Collectors.toSet());
 
-	    // Don't add the symbol if we've already encountered it
-	    if (varNames.contains(node.name)) {
-		return;
-	    }
+            // Don't add the symbol if we've already encountered it
+            if (varNames.contains(node.name)) {
+                return;
+            }
 
-	    Symbol symbol = new Symbol(node.name, node.type, node.isCollection);
-	    getCurrentTable().insert(node.name, symbol);
-	} catch (InvalidProgramException ex) {
-	    addError(ex);
-	}
+            Symbol symbol = new Symbol(node.name, node.type, node.isCollection);
+            getCurrentTable().insert(node.name, symbol);
+        } catch (InvalidProgramException ex) {
+            addError(ex);
+        }
     }
 
     /**
@@ -176,56 +175,51 @@ public class BuildSymbolTables extends StaticAnalysis {
      * scope.
      */
     protected void insertParamSymbol(Parameter p) {
-	try {
-	    Symbol symbol = new Symbol(p.name, p.type);
-	    getCurrentTable().insert(p.name, symbol);
-	} catch (InvalidProgramException ex) {
-	    addError(ex);
-	}
+        try {
+            Symbol symbol = new Symbol(p.name, p.type);
+            getCurrentTable().insert(p.name, symbol);
+        } catch (InvalidProgramException ex) {
+            addError(ex);
+        }
     }
 
     @Override
     public void preVisit(ASTProgram node) {
-	node.attributes.put("symbolTable", initializeScope());
-	//insertLibrarySymbols();
+        node.attributes.put("symbolTable", initializeScope());
     }
 
     @Override
     public void postVisit(ASTProgram node) {
-	nodeSymbolTableMap.put(node, getCurrentTable());
-	finalizeScope();
+        nodeSymbolTableMap.put(node, getCurrentTable());
+        finalizeScope();
     }
 
     @Override
     public void preVisit(ASTFunction node) {
-	insertFunctionSymbol(node);
-	node.attributes.put("symbolTable", initializeScope());
-
-	for (ASTFunction.Parameter p : node.parameters) {
-	    insertParamSymbol(p);
-	}
+        insertFunctionSymbol(node);
+        node.attributes.put("symbolTable", initializeScope());
     }
 
     @Override
     public void postVisit(ASTFunction node) {
-	nodeSymbolTableMap.put(node, getCurrentTable());
-	finalizeScope();
+        nodeSymbolTableMap.put(node, getCurrentTable());
+        finalizeScope();
     }
 
     @Override
     public void preVisit(ASTBlock node) {
-	node.attributes.put("symbolTable", initializeScope());
+        node.attributes.put("symbolTable", initializeScope());
     }
 
     @Override
     public void postVisit(ASTBlock node) {
-	nodeSymbolTableMap.put(node, getCurrentTable());
-	finalizeScope();
+        nodeSymbolTableMap.put(node, getCurrentTable());
+        finalizeScope();
     }
 
     @Override
     public void postVisit(ASTVariable node) {
-	insertVariableSymbol(node);
+        insertVariableSymbol(node);
     }
 
 }

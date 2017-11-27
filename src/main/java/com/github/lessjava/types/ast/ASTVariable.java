@@ -9,17 +9,28 @@ public class ASTVariable extends ASTExpression {
     public boolean isCollection;
 
     public ASTVariable(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     @Override
     public String toString() {
-	return name;
+        ASTNode n = this;
+        boolean inTest = false;
+
+        while (n != null && !((n = n.getParent()) instanceof ASTProgram)) {
+            inTest = n instanceof ASTTest;
+        }
+
+        if (inTest) {
+            return String.format("__test%s", this.name);
+        }
+
+        return name;
     }
 
     @Override
     public void traverse(ASTVisitor visitor) {
-	visitor.preVisit(this);
-	visitor.postVisit(this);
+        visitor.preVisit(this);
+        visitor.postVisit(this);
     }
 }

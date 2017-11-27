@@ -1,6 +1,0 @@
-eq(a, b){
-    return a == b
-}
-
-intsAreEqual = eq(1, 2)
-stringsAreEqual = eq("A", "B")
