@@ -424,10 +424,10 @@ public class LJASTConverter extends LJBaseListener {
 
     public ASTUnaryExpr.UnaryOp findUnaryOp(String op) {
         switch (op) {
-        case "!":
-            return ASTUnaryExpr.UnaryOp.NOT;
-        default:
-            return ASTUnaryExpr.UnaryOp.INVALID;
+            case "!":
+                return ASTUnaryExpr.UnaryOp.NOT;
+            default:
+                return ASTUnaryExpr.UnaryOp.INVALID;
         }
     }
 
@@ -435,56 +435,60 @@ public class LJASTConverter extends LJBaseListener {
         ASTBinaryExpr.BinOp op;
 
         switch (s) {
-        case "+":
-            op = ASTBinaryExpr.BinOp.ADD;
-            break;
+            case "+":
+                op = ASTBinaryExpr.BinOp.ADD;
+                break;
 
-        case "*":
-            op = ASTBinaryExpr.BinOp.MUL;
-            break;
+            case "*":
+                op = ASTBinaryExpr.BinOp.MUL;
+                break;
 
-        case "/":
-            op = ASTBinaryExpr.BinOp.DIV;
-            break;
+            case "%":
+                op = ASTBinaryExpr.BinOp.MOD;
+                break;
 
-        case "-":
-            op = ASTBinaryExpr.BinOp.SUB;
-            break;
+            case "/":
+                op = ASTBinaryExpr.BinOp.DIV;
+                break;
 
-        case ">":
-            op = ASTBinaryExpr.BinOp.GT;
-            break;
+            case "-":
+                op = ASTBinaryExpr.BinOp.SUB;
+                break;
 
-        case ">=":
-            op = ASTBinaryExpr.BinOp.GE;
-            break;
+            case ">":
+                op = ASTBinaryExpr.BinOp.GT;
+                break;
 
-        case "<":
-            op = ASTBinaryExpr.BinOp.LT;
-            break;
+            case ">=":
+                op = ASTBinaryExpr.BinOp.GE;
+                break;
 
-        case "<=":
-            op = ASTBinaryExpr.BinOp.LE;
-            break;
+            case "<":
+                op = ASTBinaryExpr.BinOp.LT;
+                break;
 
-        case "==":
-            op = ASTBinaryExpr.BinOp.EQ;
-            break;
+            case "<=":
+                op = ASTBinaryExpr.BinOp.LE;
+                break;
 
-        case "!=":
-            op = ASTBinaryExpr.BinOp.NE;
-            break;
+            case "==":
+                op = ASTBinaryExpr.BinOp.EQ;
+                break;
 
-        case "||":
-            op = ASTBinaryExpr.BinOp.OR;
-            break;
+            case "!=":
+                op = ASTBinaryExpr.BinOp.NE;
+                break;
 
-        case "&&":
-            op = ASTBinaryExpr.BinOp.AND;
-            break;
+            case "||":
+                op = ASTBinaryExpr.BinOp.OR;
+                break;
 
-        default:
-            op = null;
+            case "&&":
+                op = ASTBinaryExpr.BinOp.AND;
+                break;
+
+            default:
+                op = null;
         }
 
         return op;

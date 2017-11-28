@@ -81,6 +81,9 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         rightChild = node.rightChild;
 
         leftChild.type = rightChild.type = unify(leftChild.type, rightChild.type, node.operator);
+        System.err.println(node);
+        System.err.println(node.leftChild.type);
+        System.err.println(node.rightChild.type);
     }
 
     @Override
@@ -95,7 +98,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void preVisit(ASTVariable node) {
         super.preVisit(node);
-
+        
         if (this.parameters == null) {
             return;
         }
@@ -182,26 +185,26 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     private HMType unify(HMType left, HMType right, BinOp op) {
         HMType unifiedType = unify(left, right);
 
-        if (unifiedType != null && op != BinOp.EQ) {
+        if (unifiedType != null && op != BinOp.EQ && op != BinOp.NE) {
             switch (op) {
-            case ADD:
-            case SUB:
-            case MUL:
-            case DIV:
-            case MOD:
-            case GT:
-            case LT:
-            case GE:
-            case LE:
-                unifiedType = new HMTypeBase(BaseDataType.INT);
-                break;
-            case AND:
-            case OR:
-                unifiedType = new HMTypeBase(BaseDataType.BOOL);
-                break;
-            case EQ:
-            default:
-                return null;
+                case ADD:
+                case SUB:
+                case MUL:
+                case DIV:
+                case MOD:
+                case GT:
+                case LT:
+                case GE:
+                case LE:
+                    unifiedType = new HMTypeBase(BaseDataType.INT);
+                    break;
+                case AND:
+                case OR:
+                    unifiedType = new HMTypeBase(BaseDataType.BOOL);
+                    break;
+                case EQ:
+                default:
+                    return null;
             }
         }
 

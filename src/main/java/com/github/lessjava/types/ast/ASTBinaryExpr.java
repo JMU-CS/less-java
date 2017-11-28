@@ -47,56 +47,56 @@ public class ASTBinaryExpr extends ASTExpression {
 
     public static String opToString(BinOp op) {
         switch (op) {
-        case OR:
-            return "||";
-        case AND:
-            return "&&";
-        case EQ:
-            return "==";
-        case NE:
-            return "!=";
-        case LT:
-            return "<";
-        case GT:
-            return ">";
-        case LE:
-            return "<=";
-        case GE:
-            return ">=";
-        case ADD:
-            return "+";
-        case SUB:
-            return "-";
-        case MUL:
-            return "*";
-        case DIV:
-            return "/";
-        case MOD:
-            return "%";
-        default:
-            return "???";
+            case OR:
+                return "||";
+            case AND:
+                return "&&";
+            case EQ:
+                return "==";
+            case NE:
+                return "!=";
+            case LT:
+                return "<";
+            case GT:
+                return ">";
+            case LE:
+                return "<=";
+            case GE:
+                return ">=";
+            case ADD:
+                return "+";
+            case SUB:
+                return "-";
+            case MUL:
+                return "*";
+            case DIV:
+                return "/";
+            case MOD:
+                return "%";
+            default:
+                return "???";
         }
     }
 
     public static BaseDataType opToReturnType(BinOp op) {
         switch (op) {
-        case OR:
-        case AND:
-        case EQ:
-        case NE:
-        case LT:
-        case GT:
-        case LE:
-        case GE:
-            return HMType.BaseDataType.BOOL;
-        case ADD:
-        case SUB:
-        case MUL:
-        case DIV:
-        case MOD:
-            return HMType.BaseDataType.INT;
-        default:
-            return null;
+            case OR:
+            case AND:
+            case EQ:
+            case NE:
+            case LT:
+            case GT:
+            case LE:
+            case GE:
+                return HMType.BaseDataType.BOOL;
+            case ADD:
+            case SUB:
+            case MUL:
+            case DIV:
+            case MOD:
+                return HMType.BaseDataType.INT;
+            default:
+                return null;
         }
     }
 
@@ -126,6 +126,22 @@ public class ASTBinaryExpr extends ASTExpression {
             right = ".equals(" + rightChild.toString() + ")";
         }
 
-        return ("(" + leftChild.toString() + right + ")");
+        String s = ("(" + leftChild.toString() + right + ")");
+        
+        HMTypeBase t = this.type instanceof HMTypeBase ? (HMTypeBase) this.type : null;
+        
+        if (t == null) {
+            return s;
+        }
+        
+        if (t.getBaseType() == BaseDataType.BOOL) {
+            return String.format("Boolean.valueOf(%s)", s);
+        } else if (t.getBaseType() == BaseDataType.INT) {
+            return String.format("Integer.valueOf(%s)", s);
+        } else if (t.getBaseType() == BaseDataType.DOUBLE) {
+            return String.format("Double.valueOf(%s)", s);
+        } else {
+            return null;
+        }
     }
 }

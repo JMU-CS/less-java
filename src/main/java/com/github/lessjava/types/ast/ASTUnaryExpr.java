@@ -20,10 +20,10 @@ public class ASTUnaryExpr extends ASTExpression {
 
     public static String opToString(UnaryOp op) {
         switch (op) {
-        case NOT:
-            return "!";
-        default:
-            return "???";
+            case NOT:
+                return "!";
+            default:
+                return "???";
         }
     }
 

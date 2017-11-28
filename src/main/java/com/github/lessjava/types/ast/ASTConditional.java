@@ -1,5 +1,7 @@
 package com.github.lessjava.types.ast;
 
+import com.github.lessjava.visitor.impl.LJGenerateJava;
+
 /**
  * Decaf control structure; a block of code that is only executed if the
  * {@link condition} is true when the code is encountered during execution. The
@@ -10,6 +12,8 @@ public class ASTConditional extends ASTStatement {
     public ASTExpression condition;
     public ASTBlock ifBlock;
     public ASTBlock elseBlock; // could be null (no else-block)
+    public boolean ifBlockEmitted;
+    public boolean elseBlockEmitted;
 
     public ASTConditional(ASTExpression condition, ASTBlock ifBlock) {
         this(condition, ifBlock, null);
@@ -19,6 +23,8 @@ public class ASTConditional extends ASTStatement {
         this.condition = condition;
         this.ifBlock = ifBlock;
         this.elseBlock = elseBlock;
+        this.ifBlockEmitted = false;
+        this.elseBlockEmitted = false;
     }
 
     public boolean hasElseBlock() {
@@ -30,8 +36,14 @@ public class ASTConditional extends ASTStatement {
         visitor.preVisit(this);
         condition.traverse(visitor);
         ifBlock.traverse(visitor);
+        if (visitor instanceof LJGenerateJava) {
+            this.ifBlockEmitted = true;
+        }
         if (hasElseBlock()) {
             elseBlock.traverse(visitor);
+            if (visitor instanceof LJGenerateJava) {
+                this.elseBlockEmitted = true;
+            }
         }
         visitor.postVisit(this);
     }

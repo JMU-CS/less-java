@@ -21,18 +21,18 @@ public class HMTypeBase extends HMType {
     @Override
     public String toString() {
         switch (this.baseType) {
-        case INT:
-            return "Integer";
-        case DOUBLE:
-            return "Double";
-        case BOOL:
-            return "Boolean";
-        case VOID:
-            return "void";
-        case STR:
-            return "String";
-        default:
-            return "???";
+            case INT:
+                return "Integer";
+            case DOUBLE:
+                return "Double";
+            case BOOL:
+                return "Boolean";
+            case VOID:
+                return "void";
+            case STR:
+                return "String";
+            default:
+                return "???";
         }
 
     }

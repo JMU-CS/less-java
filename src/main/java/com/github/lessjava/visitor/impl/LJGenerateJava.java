@@ -64,7 +64,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     private ASTFunction currentFunction;
 
-    private boolean inTest;
+    private boolean hasElse;
 
     @Override
     public void preVisit(ASTProgram node) {
@@ -135,6 +135,15 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTBlock node) {
         String line = String.format("{");
+        
+        if (node.getParent() instanceof ASTConditional) {
+            ASTConditional c = (ASTConditional) node.getParent();
+            
+            if (c.ifBlockEmitted) {
+                line = String.format("else %s", line);
+            }
+        }
+
         addLine(node, line);
         indent++;
     }
@@ -148,7 +157,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTAssignment node) {
-        // Emit main declarations
+        // Emit declarations
         if (this.currentFunction == null) {
             if (node.variable.name.startsWith("__")) {
                 String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
@@ -175,7 +184,12 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         String line = String.format("if (%s)", node.condition);
         addLine(node, line);
     }
-
+    
+    @Override
+    public void postVisit(ASTConditional node) {
+        this.hasElse = false;
+    }
+    
     @Override
     public void preVisit(ASTWhileLoop node) {
         String line = String.format("while (%s)", node.guard);
@@ -235,22 +249,22 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
         if (libraryFunctions.containsKey(node.name)) {
             switch (node.name) {
-            case "print":
-                List<String> printArgs = new ArrayList<>();
+                case "print":
+                    List<String> printArgs = new ArrayList<>();
 
-                for (ASTExpression e : node.arguments) {
-                    printArgs.add(e.type instanceof HMTypeCollection ? e.toString() + ".toString()" : e.toString());
-                }
-                arguments = String.join(",", printArgs).replaceAll("\\\\\"", "");
+                    for (ASTExpression e : node.arguments) {
+                        printArgs.add(e.type instanceof HMTypeCollection ? e.toString() + ".toString()" : e.toString());
+                    }
+                    arguments = String.join(",", printArgs).replaceAll("\\\\\"", "");
 
-                if (node.arguments.size() == 1) {
-                    line = String.format("System.out.println(%s);", arguments);
-                } else {
-                    line = String.format(libraryFunctions.get(node.name), arguments);
-                }
-                break;
-            default:
-                line = String.format("%s;", libraryFunctions.get(node.name));
+                    if (node.arguments.size() == 1) {
+                        line = String.format("System.out.println(%s);", arguments);
+                    } else {
+                        line = String.format(libraryFunctions.get(node.name), arguments);
+                    }
+                    break;
+                default:
+                    line = String.format("%s;", libraryFunctions.get(node.name));
             }
         } else {
             line = String.format("%s(%s);", node.name, arguments);
