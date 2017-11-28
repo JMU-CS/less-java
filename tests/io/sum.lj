@@ -1,0 +1,9 @@
+x = readInt()
+sum = 0
+while (x >= 0) {
+    sum = sum + x
+    print(sum)
+    x = readInt()
+}
+print("Sum: ")
+print(sum)

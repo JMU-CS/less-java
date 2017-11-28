@@ -1,0 +1,57 @@
+//cycle_len(n)
+//{
+//    len = 1
+//    while (n != 1) {
+//        if (n % 2 == 0) {
+//            n = n / 2
+//        } else {
+//            n = 3*n + 1
+//        }
+//        len = len + 1
+//    }
+//    return len
+//}
+
+//max_3np1_cycle(low, high)
+//{
+//    max = 0
+//    while (low <= high) {
+//        len = cycle_len(low)
+//        if (len > max) {
+//            max = len
+//        }
+//        low = low + 1
+//    }
+//    return max
+//}
+
+//test max_3np1_cycle(1,   10)   == 20
+//test max_3np1_cycle(100, 200)  == 125
+//test max_3np1_cycle(201, 210)  == 89
+//test max_3np1_cycle(900, 1000) == 174
+
+//print(max_3np1_cycle(1, 10))
+
+low = readInt()
+high = readInt()
+max = 0
+while (low <= high) {
+    len = 1
+    n = low
+    while (n != 1) {
+        if (n % 2 == 0) {
+            n = n / 2
+        } else {
+            n = 3*n + 1
+        }
+        len = len + 1
+    }
+    if (len > max) {
+        max = len
+    }
+    low = low + 1
+}
+print("Max 3n+1 cycle length: ")
+print(max)
+
+
