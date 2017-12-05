@@ -26,6 +26,10 @@ public class ASTFunction extends ASTNode {
         public Parameter(String name) {
             this(name, null);
         }
+        
+        public String getName() {
+            return this.name;
+        }
 
         /*
          * (non-Javadoc)

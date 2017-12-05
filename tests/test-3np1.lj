@@ -25,10 +25,6 @@ max_3np1_cycle(low, high)
     return max
 }
 
-test max_3np1_cycle(1,   10)   == 20
-test max_3np1_cycle(100, 200)  == 125
-test max_3np1_cycle(201, 210)  == 89
 test max_3np1_cycle(900, 1000) == 174
 
 print(max_3np1_cycle(1, 10))
-

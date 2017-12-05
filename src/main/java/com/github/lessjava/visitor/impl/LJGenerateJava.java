@@ -20,6 +20,7 @@ import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -54,11 +55,14 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public Path mainFile = Paths.get("generated/Main.java");
 
     private List<String> lines = new ArrayList<>();
-    private List<String> mainLines = new ArrayList<>();
     private List<String> testLines = new ArrayList<>();
+    private List<String> mainLines = new ArrayList<>();
+    private List<String> functionLines = new ArrayList<>();
     private List<String> testDeclarationLines = new ArrayList<>();
     private List<String> mainDeclarationLines = new ArrayList<>();
+    private Set<String> functionDeclarationLines = new HashSet<>();
     private Set<String> mainVariables = new HashSet<>();
+    private Set<String> functionVariables = new HashSet<>();
     private int indent = 1;
     private int testIndex = 0;
 
@@ -108,14 +112,22 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public void preVisit(ASTFunction node) {
         this.currentFunction = node;
 
+        this.functionLines.clear();
+        this.functionVariables.clear();
+        this.functionDeclarationLines.clear();
+
         // Library function
         if (node.body == null) {
             return;
         }
 
+        // Prototype
         if (!node.concrete) {
             return;
         }
+        
+        // Add parameters so they don't get declared
+        this.functionVariables.addAll(node.parameters.stream().map(Parameter::getName).collect(Collectors.toList()));
 
         String line = "";
         String parameterString = this.currentFunction.parameters.toString().substring(1,
@@ -124,6 +136,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
                 this.currentFunction.name, parameterString);
 
         line = String.format("%s", functionHeader);
+
         addLine(node, line);
     }
 
@@ -134,25 +147,36 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTBlock node) {
-        String line = String.format("{");
+        ASTFunction parent = node.getParent() instanceof ASTFunction ? (ASTFunction) node.getParent() : null;
         
-        if (node.getParent() instanceof ASTConditional) {
-            ASTConditional c = (ASTConditional) node.getParent();
-            
-            if (c.ifBlockEmitted) {
-                line = String.format("else %s", line);
-            }
+        if (parent != null && !parent.concrete) {
+            return;
         }
+
+        String line = String.format("{");
 
         addLine(node, line);
         indent++;
+
     }
 
     @Override
     public void postVisit(ASTBlock node) {
+        ASTFunction parent = node.getParent() instanceof ASTFunction ? (ASTFunction) node.getParent() : null;
+        
+        // Ignore non-concrete function's blocks
+        if (parent != null && !parent.concrete) {
+            return;
+        }
+
         indent--;
         String line = String.format("}");
         addLine(node, line);
+
+        if (node.getParent() instanceof ASTFunction) {
+            functionLines.addAll(2, functionDeclarationLines);
+            lines.addAll(functionLines);
+        }
     }
 
     @Override
@@ -163,16 +187,24 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
                 String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
                 String declaration = String.format("%sprivate static %s %s;", spaces, node.variable.type,
                         node.variable.name);
+
                 testDeclarationLines.add(declaration);
             } else if (!mainVariables.contains(node.variable.name)) {
                 String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
 
                 String declaration = String.format("%s%s%s %s;", spaces, spaces, node.variable.type,
                         node.variable.name);
-                mainDeclarationLines.add(declaration);
 
+                mainDeclarationLines.add(declaration);
                 mainVariables.add(node.variable.name);
             }
+        } else if (!functionVariables.contains(node.variable.name)) {
+            String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
+
+            String declaration = String.format("%s%s %s;", spaces, node.variable.type, node.variable.name);
+
+            functionVariables.add(node.variable.name);
+            functionDeclarationLines.add(declaration);
         }
 
         String line = String.format("%s = %s;", node.variable.name, node.value);
@@ -184,12 +216,18 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         String line = String.format("if (%s)", node.condition);
         addLine(node, line);
     }
-    
+
+    @Override
+    public void inVisit(ASTConditional node) {
+        String line = String.format("else ", node.condition);
+        addLine(node, line);
+    }
+
     @Override
     public void postVisit(ASTConditional node) {
         this.hasElse = false;
     }
-    
+
     @Override
     public void preVisit(ASTWhileLoop node) {
         String line = String.format("while (%s)", node.guard);
@@ -274,6 +312,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     }
 
     private void addLine(ASTNode node, String line) {
+        // Don't emit prototypes
         if (this.currentFunction != null && !this.currentFunction.concrete) {
             return;
         }
@@ -283,9 +322,12 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         if (node instanceof ASTTest) {
             testLines.add(String.format("%s%s", spaces, line));
         } else if (currentFunction == null) {
+            // debug
+            System.err.println(node);
+            System.err.println("entered");
             mainLines.add(String.format("%s%s%s", spaces, spaces, line));
         } else {
-            lines.add(String.format("%s%s", spaces, line));
+            functionLines.add(String.format("%s%s", spaces, line));
         }
     }
 

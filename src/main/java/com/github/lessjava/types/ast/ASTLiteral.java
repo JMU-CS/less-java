@@ -74,16 +74,7 @@ public class ASTLiteral extends ASTExpression {
         if (this.value instanceof String) {
             return "\"" + addEscapeCodes(value.toString()) + "\"";
         }
-//        } else if (this.value instanceof Boolean) {
-//            return String.format("Boolean.valueOf(%s)", this.value);
-//        } else if (this.value instanceof Integer) {
-//            return String.format("Integer.valueOf(%s)", this.value);
-//        } else if (this.value instanceof Double) {
-//            return String.format("Double.valueOf(%s)", this.value);
-//        } else {
-//            return this.value.toString();
-//        }
-        
+       
         return this.value.toString();
     }
 }

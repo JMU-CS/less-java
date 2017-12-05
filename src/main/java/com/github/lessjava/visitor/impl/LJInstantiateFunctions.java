@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
@@ -13,12 +14,10 @@ import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
-import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 public class LJInstantiateFunctions extends LJAbstractAssignTypes {
     private static ASTProgram program;
-    private List<ASTFunction> functionsToAdd;
 
     @Override
     public void preVisit(ASTProgram node) {
@@ -26,15 +25,11 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         if (LJInstantiateFunctions.program == null) {
             LJInstantiateFunctions.program = node;
         }
-
-        this.functionsToAdd = new ArrayList<>();
     }
 
     @Override
     public void postVisit(ASTProgram node) {
         super.preVisit(node);
-
-        program.functions.addAll(functionsToAdd);
     }
 
     @Override
@@ -50,11 +45,12 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         f = instantiateFunction(node.name, node.arguments);
 
         if (f != null) {
-            if (functionsToAdd.contains(f)) {
+            if (program.functions.contains(f)) {
                 return;
             }
+            
+            program.functions.add(f);
 
-            functionsToAdd.add(f);
             nameparamFunctionMap.put(node.getNameArgString(), f);
         }
     }
@@ -72,11 +68,12 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         f = instantiateFunction(node.name, node.arguments);
 
         if (f != null) {
-            if (functionsToAdd.contains(f)) {
+            if (program.functions.contains(f)) {
                 return;
             }
+            
+            program.functions.add(f);
 
-            functionsToAdd.add(f);
             nameparamFunctionMap.put(node.getNameArgString(), f);
         }
     }
@@ -97,8 +94,13 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             return null;
         }
 
-        ASTFunction functionInstance = new ASTFunction(prototype.get().name, prototype.get().returnType,
-                prototype.get().body);
+        ASTBlock blockCopy = new ASTBlock();
+        blockCopy.statements = prototype.get().body.statements;
+        blockCopy.variables = prototype.get().body.variables;
+
+        ASTFunction functionInstance = new ASTFunction(prototype.get().name, prototype.get().returnType, blockCopy);
+
+        blockCopy.setParent(functionInstance);
 
         functionInstance.concrete = true;
         functionInstance.parameters = new ArrayList<>();

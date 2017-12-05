@@ -186,4 +186,8 @@ public class LJDefaultASTVisitor implements ASTVisitor {
     public void postVisit(ASTLiteral node) {
         defaultPostVisit(node);
     }
+
+    public void inVisit(ASTConditional node) {
+        defaultInVisit(node);
+    }
 }

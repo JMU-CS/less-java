@@ -35,6 +35,8 @@ public interface ASTVisitor {
 
     public void preVisit(ASTConditional node);
 
+    public void inVisit(ASTConditional node);
+
     public void postVisit(ASTConditional node);
 
     public void preVisit(ASTWhileLoop node);

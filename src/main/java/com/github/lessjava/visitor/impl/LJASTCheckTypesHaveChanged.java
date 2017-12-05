@@ -55,8 +55,6 @@ public class LJASTCheckTypesHaveChanged extends StaticAnalysis {
         boolean equalToMapValue = inMap && exprTypeMap.get(node).equals(type);
 
         if (!equalToMapValue) {
-            System.err.println(node);
-            System.err.println(type);
             exprTypeMap.put(node, type);
 
             typeChanged = true;

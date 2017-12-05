@@ -81,9 +81,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         rightChild = node.rightChild;
 
         leftChild.type = rightChild.type = unify(leftChild.type, rightChild.type, node.operator);
-        System.err.println(node);
-        System.err.println(node.leftChild.type);
-        System.err.println(node.rightChild.type);
     }
 
     @Override
