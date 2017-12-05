@@ -9,26 +9,29 @@ paramList:      ID((','ID)+)?;
 argList:        (expr((','expr)+)?)?;
 block:          (EOL)? '{' (EOL)? statement* '}' (EOL)?;
 
-statement:      var '=' expr EOL                        #Assignment
-                | IF '(' expr ')' block (ELSE block)?   #Conditional
-                | WHILE '(' expr ')' block              #While
-                | RETURN expr EOL                       #Return
-                | BREAK EOL                             #Break
-                | CONTINUE EOL                          #Continue
-                | funcCall EOL                          #VoidFunctionCall
-                | EOL                                   #Terminator
+statement:      IF '(' expr ')' block (ELSE block)?             #Conditional
+                | WHILE '(' expr ')' block                      #While
+                | FOR '(' var ':' (expr '->')? expr ')' block   #For
+                | RETURN expr EOL                               #Return
+                | BREAK EOL                                     #Break
+                | CONTINUE EOL                                  #Continue
+                | funcCall EOL                                  #VoidFunctionCall
+                | assignment EOL                                #VoidAssignment
+                | EOL                                           #Terminator
                 ;
 
 test:           TEST expr EOL;
 
 expr:           exprBin;
 
-exprBin:        left=exprBin op=PREC1 right=exprBin
+exprBin:        left = exprBin '['right=exprBin']'
+                | left=exprBin op=PREC1 right=exprBin
                 | left=exprBin op=PREC2 right=exprBin
                 | left=exprBin op=PREC3 right=exprBin
                 | left=exprBin op=PREC4 right=exprBin
                 | left=exprBin op=PREC5 right=exprBin
                 | left=exprBin op=PREC6 right=exprBin
+                | assignment
                 | exprUn
                 ;
 
@@ -36,17 +39,19 @@ exprUn:         op=UNOP expression=exprUn
                 | exprBase
                 ;
 
-exprBase:       funcCall
+exprBase:       assignment
+                | funcCall
                 | var
                 | lit
                 | '[' argList ']'
                 | '(' expr ')'
                 ;
 
+assignment:     var PREC7 expr;
 
 funcCall:       ID '('argList')';
 
-var:            ID;
+var:            ID ('['expr']')?;
 lit:            DEC | BOOL | STR;
 
 
@@ -56,6 +61,7 @@ lit:            DEC | BOOL | STR;
 IF:         'if';
 ELSE:       'else';
 WHILE:      'while';
+FOR:        'for';
 RETURN:     'return';
 BREAK:      'break';
 CONTINUE:   'continue';
@@ -85,7 +91,13 @@ PREC5:      AND;
 
 PREC6:      OR;
 
-UNOP:       NOT;
+PREC7:      ASGN;
+
+UNOP:       NOT
+            | SUB
+            ;
+
+NOT:        '!';
 
 ADD:        '+';
 SUB:        '-';
@@ -100,11 +112,11 @@ ET:        '==';
 NET:       '!=';
 OR:        '||';
 AND:       '&&';
+ASGN:       '=';
 
-NOT:        '!';
 
 // Literals
-DEC:        [0-9]+;
+DEC:        (SUB)?[0-9]+;
 BOOL:       'true'|'false';
 STR:        '\"'.*?'\"';
 

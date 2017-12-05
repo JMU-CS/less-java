@@ -19,4 +19,5 @@ import com.github.lessjava.types.inference.impl.HMTypeVar;
  */
 public abstract class ASTExpression extends ASTNode {
     public HMType type = new HMTypeVar();
+    public boolean isCollection;
 }

@@ -16,6 +16,7 @@ import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
@@ -68,7 +69,14 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void preVisit(ASTBinaryExpr node) {
         super.preVisit(node);
 
-        node.type = new HMTypeBase(ASTBinaryExpr.opToReturnType(node.operator));
+        if (node.operator.equals(BinOp.INDEX)) {
+            node.type = ((HMTypeCollection)node.leftChild.type).getCollectionType();
+            System.err.println("hi");
+        } else if (node.operator.equals(BinOp.ASGN)) {
+            node.type = node.rightChild.type;
+        } else {
+            node.type = new HMTypeBase(ASTBinaryExpr.opToReturnType(node.operator));
+        }
     }
 
     @Override
@@ -76,6 +84,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.postVisit(node);
 
         ASTExpression leftChild, rightChild;
+
 
         leftChild = node.leftChild;
         rightChild = node.rightChild;
@@ -95,7 +104,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void preVisit(ASTVariable node) {
         super.preVisit(node);
-        
+
         if (this.parameters == null) {
             return;
         }
@@ -120,7 +129,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         if (!node.arguments.isEmpty()) {
             node.type = node.arguments.get(0).type = unify(node.type, node.arguments.get(0).type);
-            node.collectionType = new HMTypeCollection(node.type);
+            node.type.isCollection = true;
         }
     }
 
@@ -136,10 +145,20 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     @Override
+    public void postVisit(ASTVoidAssignment node) {
+        super.postVisit(node);
+
+        node.variable.type = node.value.isCollection ? ((HMTypeCollection) node.value.type).getCollectionType()
+                : node.value.type;
+    }
+
+    @Override
     public void postVisit(ASTAssignment node) {
         super.postVisit(node);
 
-        node.variable.type = node.variable.isCollection ? new HMTypeCollection(node.value.type) : node.value.type;
+        node.variable.type = node.value.isCollection ? ((HMTypeCollection) node.value.type).getCollectionType()
+                : node.value.type;
+        node.type = node.variable.type;
     }
 
     @Override
@@ -152,21 +171,27 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     private HMType unify(HMType left, HMType right) {
         HMType unifiedType = left;
 
-        // Peel off collection layers
-        while (left instanceof HMTypeCollection || right instanceof HMTypeCollection) {
-            left = left instanceof HMTypeCollection ? ((HMTypeCollection) left).getCollectionType() : left;
-            right = right instanceof HMTypeCollection ? ((HMTypeCollection) right).getCollectionType() : right;
-        }
-
         boolean leftIsBase = left instanceof HMTypeBase;
         boolean rightIsBase = right instanceof HMTypeBase;
+        boolean leftIsVar = left instanceof HMTypeVar;
+        boolean rightIsVar = right instanceof HMTypeVar;
+        boolean leftIsCollection = left instanceof HMTypeCollection;
+        boolean rightIsCollection = right instanceof HMTypeCollection;
 
-        if (leftIsBase && !rightIsBase) {
+        if (leftIsCollection && !rightIsCollection) {
+            HMTypeCollection cleft = (HMTypeCollection) left;
+            unifiedType = new HMTypeCollection(unify(cleft.getCollectionType(), right));
+        } else if (!leftIsCollection && rightIsCollection) {
+            HMTypeCollection cright = (HMTypeCollection) right;
+            unifiedType = new HMTypeCollection(unify(cright.getCollectionType(), left));
+        } else if (leftIsCollection && rightIsCollection) {
+            HMTypeCollection cleft = (HMTypeCollection) left;
+            HMTypeCollection cright = (HMTypeCollection) left;
+            unifiedType = new HMTypeCollection(unify(cleft.getCollectionType(), cright.getCollectionType()));
+        } else if (!leftIsBase && rightIsVar) {
             unifiedType = left;
-        } else if (!leftIsBase && rightIsBase) {
+        } else if (leftIsVar && rightIsBase) {
             unifiedType = right;
-        } else if (!leftIsBase && !rightIsBase) {
-            unifiedType = left;
         } else if (leftIsBase && rightIsBase) {
             HMTypeBase leftBase = (HMTypeBase) left;
             HMTypeBase rightBase = (HMTypeBase) right;
@@ -180,9 +205,10 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     private HMType unify(HMType left, HMType right, BinOp op) {
-        HMType unifiedType = unify(left, right);
+        // HMType unifiedType = unify(left, right);
+        HMType unifiedType = null;
 
-        if (unifiedType != null && op != BinOp.EQ && op != BinOp.NE) {
+        if (op != BinOp.EQ && op != BinOp.NE) {
             switch (op) {
                 case ADD:
                 case SUB:
@@ -199,10 +225,14 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
                 case OR:
                     unifiedType = new HMTypeBase(BaseDataType.BOOL);
                     break;
-                case EQ:
+                case ASGN:
+                    unifiedType = unify(left, right);
+                    break;
                 default:
                     return null;
             }
+        } else {
+            unifiedType = unify(left, right);
         }
 
         return unifiedType;

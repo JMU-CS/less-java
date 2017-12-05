@@ -35,7 +35,7 @@ public class ASTBinaryExpr extends ASTExpression {
      * </ul>
      */
     public enum BinOp {
-        INVALID, OR, AND, EQ, NE, LT, GT, LE, GE, ADD, SUB, MUL, DIV, MOD
+        INVALID, ASGN, INDEX, OR, AND, EQ, NE, LT, GT, LE, GE, ADD, SUB, MUL, DIV, MOD
     }
 
     public static Set<BinOp> flexibleOperators = new HashSet<>(Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE }));
@@ -47,6 +47,8 @@ public class ASTBinaryExpr extends ASTExpression {
 
     public static String opToString(BinOp op) {
         switch (op) {
+            case ASGN:
+                return "=";
             case OR:
                 return "||";
             case AND:
@@ -140,6 +142,8 @@ public class ASTBinaryExpr extends ASTExpression {
             return String.format("Integer.valueOf(%s)", s);
         } else if (t.getBaseType() == BaseDataType.DOUBLE) {
             return String.format("Double.valueOf(%s)", s);
+        } else if (t.getBaseType() == BaseDataType.STR) {
+            return String.format("%s", s);
         } else {
             return null;
         }

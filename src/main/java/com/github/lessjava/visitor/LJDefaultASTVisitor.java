@@ -7,6 +7,7 @@ import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
+import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTLiteral;
@@ -18,6 +19,7 @@ import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVisitor;
+import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 
@@ -79,11 +81,11 @@ public class LJDefaultASTVisitor implements ASTVisitor {
         defaultPostVisit(node);
     }
 
-    public void preVisit(ASTAssignment node) {
+    public void preVisit(ASTVoidAssignment node) {
         defaultPreVisit(node);
     }
 
-    public void postVisit(ASTAssignment node) {
+    public void postVisit(ASTVoidAssignment node) {
         defaultPostVisit(node);
     }
 
@@ -108,6 +110,14 @@ public class LJDefaultASTVisitor implements ASTVisitor {
     }
 
     public void postVisit(ASTWhileLoop node) {
+        defaultPostVisit(node);
+    }
+
+    public void preVisit(ASTForLoop node) {
+        defaultPreVisit(node);
+    }
+
+    public void postVisit(ASTForLoop node) {
         defaultPostVisit(node);
     }
 
@@ -160,6 +170,14 @@ public class LJDefaultASTVisitor implements ASTVisitor {
     }
 
     public void postVisit(ASTUnaryExpr node) {
+        defaultPostVisit(node);
+    }
+
+    public void preVisit(ASTAssignment node) {
+        defaultPreVisit(node);
+    }
+
+    public void postVisit(ASTAssignment node) {
         defaultPostVisit(node);
     }
 

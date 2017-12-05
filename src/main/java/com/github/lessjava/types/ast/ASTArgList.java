@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
+import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public class ASTArgList extends ASTExpression {
     public List<ASTExpression> arguments;
@@ -12,7 +13,9 @@ public class ASTArgList extends ASTExpression {
 
     public ASTArgList(List<ASTExpression> arguments) {
         this.arguments = arguments;
-        this.collectionType = new HMTypeCollection(this.type);
+        this.collectionType = arguments.isEmpty() ? new HMTypeVar() : arguments.get(0).type;
+        this.isCollection = true;
+        this.type = new HMTypeCollection(this.collectionType);
     }
 
     @Override
@@ -35,8 +38,8 @@ public class ASTArgList extends ASTExpression {
         }
         argString.append(" }");
 
-        sb.append(String.format("new ArrayDeque<%s>(Arrays.asList(new %s[] %s))", type, type, argString.toString())
-                .replaceAll("\\\\\"", ""));
+        sb.append(String.format("new %s(Arrays.asList(new %s[] %s))", type, collectionType,
+                argString.toString()).replaceAll("\\\\\"", ""));
 
         return sb.toString();
     }

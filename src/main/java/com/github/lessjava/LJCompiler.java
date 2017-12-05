@@ -102,7 +102,7 @@ public class LJCompiler {
         program.traverse(generateJava);
 
         if (!StaticAnalysis.getErrors().isEmpty()) {
-            System.out.printf("%n%s%n", StaticAnalysis.getErrorString());
+            //System.out.printf("%n%s%n", StaticAnalysis.getErrorString());
         }
 
         // Compile java source file

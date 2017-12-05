@@ -48,6 +48,10 @@ public class ASTFunctionCall extends ASTExpression {
         }
         argString.append(")");
 
+        if (name.equals("size")) {
+            return String.format("%s.size()", this.arguments.get(0));
+        }
+
         if (LJGenerateJava.libraryFunctions.containsKey(name)) {
             return LJGenerateJava.libraryFunctions.get(name) + argString;
         }

@@ -4,14 +4,13 @@ package com.github.lessjava.types.ast;
  * Decaf assignment statement. When executed, the program should fully evaluate
  * the value expression and store the result in the given memory location.
  */
-public class ASTAssignment extends ASTBinaryExpr {
+public class ASTVoidAssignment extends ASTStatement {
     public ASTVariable variable;
     public ASTExpression value;
 
-    public ASTAssignment(ASTVariable variable, ASTExpression value) {
-        super(BinOp.ASGN, variable, value);
-        this.variable = (ASTVariable) super.leftChild;
-        this.value = super.rightChild;
+    public ASTVoidAssignment(ASTVariable variable, ASTExpression value) {
+        this.variable = variable;
+        this.value = value;
     }
 
     @Override
@@ -21,9 +20,5 @@ public class ASTAssignment extends ASTBinaryExpr {
         value.traverse(visitor);
         visitor.postVisit(this);
     }
-
-    @Override
-    public String toString() {
-        return String.format("%s = %s", variable, value);
-    }
 }
+

@@ -14,17 +14,22 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTBinaryExpr;
+import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTExpression;
+import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTTest;
+import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
@@ -44,6 +49,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public static Map<String, String> libraryFunctions = new HashMap<>();
 
     static {
+        libraryFunctions.put("size", "");
         libraryFunctions.put("print", "System.out.printf(%s);");
         libraryFunctions.put("readInt", "scn.nextInt");
         libraryFunctions.put("readDouble", "scn.nextDouble");
@@ -67,8 +73,6 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     private int testIndex = 0;
 
     private ASTFunction currentFunction;
-
-    private boolean hasElse;
 
     @Override
     public void preVisit(ASTProgram node) {
@@ -125,7 +129,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         if (!node.concrete) {
             return;
         }
-        
+
         // Add parameters so they don't get declared
         this.functionVariables.addAll(node.parameters.stream().map(Parameter::getName).collect(Collectors.toList()));
 
@@ -148,7 +152,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTBlock node) {
         ASTFunction parent = node.getParent() instanceof ASTFunction ? (ASTFunction) node.getParent() : null;
-        
+
         if (parent != null && !parent.concrete) {
             return;
         }
@@ -163,7 +167,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void postVisit(ASTBlock node) {
         ASTFunction parent = node.getParent() instanceof ASTFunction ? (ASTFunction) node.getParent() : null;
-        
+
         // Ignore non-concrete function's blocks
         if (parent != null && !parent.concrete) {
             return;
@@ -180,7 +184,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     }
 
     @Override
-    public void preVisit(ASTAssignment node) {
+    public void preVisit(ASTVoidAssignment node) {
         // Emit declarations
         if (this.currentFunction == null) {
             if (node.variable.name.startsWith("__")) {
@@ -212,6 +216,68 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     }
 
     @Override
+    public void preVisit(ASTAssignment node) {
+        // Emit declarations
+        if (this.currentFunction == null) {
+            if (node.variable.name.startsWith("__")) {
+                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
+                String declaration = String.format("%sprivate static %s %s;", spaces, node.variable.type,
+                        node.variable.name);
+
+                testDeclarationLines.add(declaration);
+            } else if (!mainVariables.contains(node.variable.name)) {
+                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
+
+                String declaration = String.format("%s%s%s %s;", spaces, spaces, node.variable.type,
+                        node.variable.name);
+
+                mainDeclarationLines.add(declaration);
+                mainVariables.add(node.variable.name);
+            }
+        } else if (!functionVariables.contains(node.variable.name)) {
+            String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
+
+            String declaration = String.format("%s%s %s;", spaces, node.variable.type, node.variable.name);
+
+            functionVariables.add(node.variable.name);
+            functionDeclarationLines.add(declaration);
+        }
+    }
+
+    @Override
+    public void preVisit(ASTBinaryExpr node) {
+        if (!node.operator.equals(BinOp.ASGN)) {
+            return;
+        }
+
+        ASTVariable var = (ASTVariable) node.leftChild;
+
+        // Emit declarations
+        if (this.currentFunction == null) {
+            if (var.name.startsWith("__")) {
+                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
+                String declaration = String.format("%sprivate static %s %s;", spaces, var.type, var.name);
+
+                testDeclarationLines.add(declaration);
+            } else if (!mainVariables.contains(var.name)) {
+                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
+
+                String declaration = String.format("%s%s%s %s;", spaces, spaces, var.type, var.name);
+
+                mainDeclarationLines.add(declaration);
+                mainVariables.add(var.name);
+            }
+        } else if (!functionVariables.contains(var.name)) {
+            String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
+
+            String declaration = String.format("%s%s %s;", spaces, var.type, var.name);
+
+            functionVariables.add(var.name);
+            functionDeclarationLines.add(declaration);
+        }
+    }
+
+    @Override
     public void preVisit(ASTConditional node) {
         String line = String.format("if (%s)", node.condition);
         addLine(node, line);
@@ -224,13 +290,17 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     }
 
     @Override
-    public void postVisit(ASTConditional node) {
-        this.hasElse = false;
+    public void preVisit(ASTWhileLoop node) {
+        String line = String.format("while (%s)", node.guard);
+        addLine(node, line);
     }
 
     @Override
-    public void preVisit(ASTWhileLoop node) {
-        String line = String.format("while (%s)", node.guard);
+    public void preVisit(ASTForLoop node) {
+        String lowerBound = node.lowerBound == null ? "0" : node.lowerBound.toString();
+        String upperBound = node.upperBound.toString();
+        String line = String.format("for (int %s = %s; %s < %s; %s++)", node.var, lowerBound, node.var, upperBound,
+                node.var);
         addLine(node, line);
     }
 
@@ -322,9 +392,6 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         if (node instanceof ASTTest) {
             testLines.add(String.format("%s%s", spaces, line));
         } else if (currentFunction == null) {
-            // debug
-            System.err.println(node);
-            System.err.println("entered");
             mainLines.add(String.format("%s%s%s", spaces, spaces, line));
         } else {
             functionLines.add(String.format("%s%s", spaces, line));

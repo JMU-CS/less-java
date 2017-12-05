@@ -1,9 +1,9 @@
 package com.github.lessjava.visitor.impl;
 
-import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJAssignTestVariables extends LJDefaultASTVisitor {
@@ -52,6 +52,6 @@ public class LJAssignTestVariables extends LJDefaultASTVisitor {
         testVar.setParent(program);
         testVar.setParentScope(program);
 
-        this.program.statements.add(new ASTAssignment(testVar, testVal));
+        this.program.statements.add(new ASTVoidAssignment(testVar, testVal));
     }
 }

@@ -1,0 +1,15 @@
+oddGnome(gnomes) {
+    lastGnome = gnomes[0]
+
+    for (i: 1 -> size(gnomes)) {
+        if (gnomes[i] != lastGnome + 1) {
+            return gnomes[i]
+        }
+
+        lastGnome = gnomes[i]
+    }
+}
+
+test oddGnome([1,2,3,7,4,5]) == 7
+
+print(oddGnome([1,2,3,7,4,5]))

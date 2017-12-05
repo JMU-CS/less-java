@@ -14,6 +14,7 @@ import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 public class LJInstantiateFunctions extends LJAbstractAssignTypes {
@@ -107,7 +108,12 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
         for (int i = 0; i < arguments.size(); i++) {
             String pname = prototype.get().parameters.get(i).name;
-            HMType type = new HMTypeBase(((HMTypeBase) arguments.get(i).type).getBaseType());
+            HMType type;
+            if (arguments.get(i).type.isCollection) {
+                type = new HMTypeCollection(((HMTypeBase) arguments.get(i).type));
+            } else {
+                type = new HMTypeBase(((HMTypeBase) arguments.get(i).type).getBaseType());
+            }
             Parameter parameter = new Parameter(pname, type);
             functionInstance.parameters.add(parameter);
         }

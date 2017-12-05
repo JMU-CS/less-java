@@ -27,6 +27,6 @@ public class HMTypeCollection extends HMType {
 
     @Override
     public String toString() {
-        return String.format("ArrayDeque<%s>", this.collectionType.toString());
+        return String.format("ArrayDeque<%s>", this.collectionType);
     }
 }

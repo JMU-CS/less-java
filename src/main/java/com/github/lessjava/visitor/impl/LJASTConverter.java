@@ -9,7 +9,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.github.lessjava.generated.LJBaseListener;
-import com.github.lessjava.generated.LJParser;
 import com.github.lessjava.generated.LJParser.ArgListContext;
 import com.github.lessjava.generated.LJParser.AssignmentContext;
 import com.github.lessjava.generated.LJParser.BlockContext;
@@ -20,22 +19,28 @@ import com.github.lessjava.generated.LJParser.ExprBaseContext;
 import com.github.lessjava.generated.LJParser.ExprBinContext;
 import com.github.lessjava.generated.LJParser.ExprContext;
 import com.github.lessjava.generated.LJParser.ExprUnContext;
+import com.github.lessjava.generated.LJParser.ForContext;
 import com.github.lessjava.generated.LJParser.FuncCallContext;
 import com.github.lessjava.generated.LJParser.FunctionContext;
+import com.github.lessjava.generated.LJParser.LitContext;
 import com.github.lessjava.generated.LJParser.ProgramContext;
 import com.github.lessjava.generated.LJParser.ReturnContext;
 import com.github.lessjava.generated.LJParser.StatementContext;
 import com.github.lessjava.generated.LJParser.TestContext;
+import com.github.lessjava.generated.LJParser.VarContext;
+import com.github.lessjava.generated.LJParser.VoidAssignmentContext;
 import com.github.lessjava.generated.LJParser.VoidFunctionCallContext;
 import com.github.lessjava.generated.LJParser.WhileContext;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
+import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTExpression;
+import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTLiteral;
@@ -46,6 +51,7 @@ import com.github.lessjava.types.ast.ASTStatement;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.types.inference.HMType;
@@ -153,27 +159,27 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitAssignment(AssignmentContext ctx) {
-        ASTAssignment assignment;
+    public void exitVoidAssignment(VoidAssignmentContext ctx) {
+        ASTVoidAssignment voidAssignment;
         ASTVariable variable;
         ASTExpression expression;
 
-        variable = (ASTVariable) map.get(ctx.var());
-        expression = (ASTExpression) map.get(ctx.expr());
+        variable = (ASTVariable) map.get(ctx.assignment().var());
+        expression = (ASTExpression) map.get(ctx.assignment().expr());
 
         if (expression instanceof ASTArgList) {
             variable.isCollection = true;
         }
 
-        assignment = new ASTAssignment(variable, expression);
+        voidAssignment = new ASTVoidAssignment(variable, expression);
 
         if (!blocks.empty()) {
-            blocks.peek().statements.add(assignment);
+            blocks.peek().statements.add(voidAssignment);
         }
 
-        assignment.setDepth(ctx.depth());
+        voidAssignment.setDepth(ctx.depth());
 
-        map.put(ctx, assignment);
+        map.put(ctx, voidAssignment);
     }
 
     @Override
@@ -220,6 +226,35 @@ public class LJASTConverter extends LJBaseListener {
         whileLoop.setDepth(ctx.depth());
 
         map.put(ctx, whileLoop);
+    }
+
+    @Override
+    public void exitFor(ForContext ctx) {
+        ASTForLoop forLoop;
+        ASTVariable var;
+        ASTExpression lowerBound;
+        ASTExpression upperBound;
+        ASTBlock block;
+
+        var = (ASTVariable) map.get(ctx.var());
+        block = (ASTBlock) map.get(ctx.block());
+
+        if (ctx.expr().size() > 1) {
+            lowerBound = (ASTExpression) map.get(ctx.expr(0));
+            upperBound = (ASTExpression) map.get(ctx.expr(1));
+            forLoop = new ASTForLoop(var, lowerBound, upperBound, block);
+        } else {
+            upperBound = (ASTExpression) map.get(ctx.expr(0));
+            forLoop = new ASTForLoop(var, upperBound, block);
+        }
+
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(forLoop);
+        }
+
+        forLoop.setDepth(ctx.depth());
+
+        map.put(ctx, forLoop);
     }
 
     @Override
@@ -303,28 +338,36 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitExprBin(ExprBinContext ctx) {
         ASTExpression expr;
-        ASTBinaryExpr binExpr;
         ASTExpression left, right;
-        ASTBinaryExpr.BinOp binOp;
+        BinOp binOp;
 
-        // If unary expression
-        if (ctx.op == null) {
+        if (ctx.op == null && ctx.left != null) {
+            left = (ASTExpression) map.get(ctx.left);
+            right = (ASTExpression) map.get(ctx.right);
+            binOp = BinOp.INDEX;
+
+            expr = new ASTBinaryExpr(binOp, left, right);
+        } else if (ctx.op == null && ctx.assignment() == null) {
             expr = (ASTExpression) map.get(ctx.exprUn());
 
             expr.setDepth(ctx.depth());
+        } else if(ctx.assignment() != null) {
+            left = (ASTExpression) map.get(ctx.assignment().var());
+            right = (ASTExpression) map.get(ctx.assignment().expr());
+            binOp = findBinOp(ctx.assignment().PREC7().getText());
 
-            map.put(ctx, expr);
-        } else {
+            expr = new ASTBinaryExpr(binOp, left, right);
+        }
+        else {
             left = (ASTExpression) map.get(ctx.left);
             right = (ASTExpression) map.get(ctx.right);
             binOp = findBinOp(ctx.op.getText());
 
-            binExpr = new ASTBinaryExpr(binOp, left, right);
-
-            binExpr.setDepth(ctx.depth());
-
-            map.put(ctx, binExpr);
+            expr = new ASTBinaryExpr(binOp, left, right);
         }
+
+        expr.setDepth(ctx.depth());
+        map.put(ctx, expr);
     }
 
     @Override
@@ -356,7 +399,9 @@ public class LJASTConverter extends LJBaseListener {
     public void exitExprBase(ExprBaseContext ctx) {
         ASTExpression expr;
 
-        if (ctx.funcCall() != null) {
+        if (ctx.assignment() != null) {
+            expr = (ASTAssignment) map.get(ctx.assignment());
+        } else if (ctx.funcCall() != null) {
             expr = (ASTFunctionCall) map.get(ctx.funcCall());
         } else if (ctx.lit() != null) {
             expr = (ASTLiteral) map.get(ctx.lit());
@@ -371,6 +416,26 @@ public class LJASTConverter extends LJBaseListener {
         expr.setDepth(ctx.depth());
 
         map.put(ctx, expr);
+    }
+
+    @Override
+    public void exitAssignment(AssignmentContext ctx) {
+        ASTAssignment assignment;
+        ASTVariable variable;
+        ASTExpression expression;
+
+        variable = (ASTVariable) map.get(ctx.var());
+        expression = (ASTExpression) map.get(ctx.expr());
+
+        if (expression instanceof ASTArgList) {
+            variable.isCollection = true;
+        }
+
+        assignment = new ASTAssignment(variable, expression);
+
+        assignment.setDepth(ctx.depth());
+
+        map.put(ctx, assignment);
     }
 
     @Override
@@ -389,10 +454,14 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitVar(LJParser.VarContext ctx) {
+    public void exitVar(VarContext ctx) {
         ASTVariable var;
 
-        var = new ASTVariable(ctx.ID().getText());
+        if (ctx.expr() == null) {
+            var = new ASTVariable(ctx.ID().getText());
+        } else {
+            var = new ASTVariable(ctx.ID().getText(), (ASTExpression) map.get(ctx.expr()));
+        }
 
         var.setDepth(ctx.depth());
 
@@ -400,7 +469,7 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
-    public void exitLit(LJParser.LitContext ctx) {
+    public void exitLit(LitContext ctx) {
         ASTLiteral lit;
 
         if (ctx.BOOL() != null) {
@@ -485,6 +554,9 @@ public class LJASTConverter extends LJBaseListener {
 
             case "&&":
                 op = ASTBinaryExpr.BinOp.AND;
+                break;
+            case "=":
+                op = ASTBinaryExpr.BinOp.ASGN;
                 break;
 
             default:

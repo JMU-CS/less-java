@@ -25,9 +25,9 @@ public interface ASTVisitor {
 
     public void postVisit(ASTBlock node);
 
-    public void preVisit(ASTAssignment node);
+    public void preVisit(ASTVoidAssignment node);
 
-    public void postVisit(ASTAssignment node);
+    public void postVisit(ASTVoidAssignment node);
 
     public void preVisit(ASTVoidFunctionCall node);
 
@@ -71,6 +71,10 @@ public interface ASTVisitor {
 
     public void preVisit(ASTFunctionCall node);
 
+    public void postVisit(ASTAssignment node);
+
+    public void preVisit(ASTAssignment node);
+
     public void postVisit(ASTFunctionCall node);
 
     public void preVisit(ASTLocation node);
@@ -84,4 +88,8 @@ public interface ASTVisitor {
     public void preVisit(ASTArgList astArgList);
 
     public void postVisit(ASTArgList astArgList);
+
+    void preVisit(ASTForLoop node);
+
+    public void postVisit(ASTForLoop astForLoop);
 }
