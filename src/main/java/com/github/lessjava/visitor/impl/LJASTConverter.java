@@ -311,17 +311,21 @@ public class LJASTConverter extends LJBaseListener {
 
         voidFuncCall = new ASTVoidFunctionCall(ctx.funcCall().ID().getText());
 
-        for (ExprContext expr : ctx.funcCall().argList().expr()) {
-            voidFuncCall.arguments.add((ASTExpression) map.get(expr));
-        }
-
         voidFuncCall.setDepth(ctx.depth());
+
+        map.put(ctx, voidFuncCall);
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(voidFuncCall);
         }
 
-        map.put(ctx, voidFuncCall);
+        if (ctx.funcCall().argList() == null) {
+            return;
+        }
+
+        for (ExprContext expr : ctx.funcCall().argList().expr()) {
+            voidFuncCall.arguments.add((ASTExpression) map.get(expr));
+        }
     }
 
     @Override
@@ -341,24 +345,17 @@ public class LJASTConverter extends LJBaseListener {
         ASTExpression left, right;
         BinOp binOp;
 
-        if (ctx.op == null && ctx.left != null) {
-            left = (ASTExpression) map.get(ctx.left);
-            right = (ASTExpression) map.get(ctx.right);
-            binOp = BinOp.INDEX;
-
-            expr = new ASTBinaryExpr(binOp, left, right);
-        } else if (ctx.op == null && ctx.assignment() == null) {
+        if (ctx.op == null && ctx.assignment() == null) {
             expr = (ASTExpression) map.get(ctx.exprUn());
 
             expr.setDepth(ctx.depth());
-        } else if(ctx.assignment() != null) {
+        } else if (ctx.assignment() != null) {
             left = (ASTExpression) map.get(ctx.assignment().var());
             right = (ASTExpression) map.get(ctx.assignment().expr());
             binOp = findBinOp(ctx.assignment().PREC7().getText());
 
             expr = new ASTBinaryExpr(binOp, left, right);
-        }
-        else {
+        } else {
             left = (ASTExpression) map.get(ctx.left);
             right = (ASTExpression) map.get(ctx.right);
             binOp = findBinOp(ctx.op.getText());
@@ -399,9 +396,7 @@ public class LJASTConverter extends LJBaseListener {
     public void exitExprBase(ExprBaseContext ctx) {
         ASTExpression expr;
 
-        if (ctx.assignment() != null) {
-            expr = (ASTAssignment) map.get(ctx.assignment());
-        } else if (ctx.funcCall() != null) {
+        if (ctx.funcCall() != null) {
             expr = (ASTFunctionCall) map.get(ctx.funcCall());
         } else if (ctx.lit() != null) {
             expr = (ASTLiteral) map.get(ctx.lit());
@@ -444,13 +439,17 @@ public class LJASTConverter extends LJBaseListener {
 
         funcCall = new ASTFunctionCall(ctx.ID().getText());
 
-        for (ExprContext expr : ctx.argList().expr()) {
-            funcCall.arguments.add((ASTExpression) map.get(expr));
-        }
-
         funcCall.setDepth(ctx.depth());
 
         map.put(ctx, funcCall);
+
+        if (ctx.argList() == null) {
+            return;
+        }
+
+        for (ExprContext expr : ctx.argList().expr()) {
+            funcCall.arguments.add((ASTExpression) map.get(expr));
+        }
     }
 
     @Override
@@ -504,6 +503,10 @@ public class LJASTConverter extends LJBaseListener {
         ASTBinaryExpr.BinOp op;
 
         switch (s) {
+            case "[":
+                op = ASTBinaryExpr.BinOp.INDEX;
+                break;
+
             case "+":
                 op = ASTBinaryExpr.BinOp.ADD;
                 break;
@@ -566,14 +569,21 @@ public class LJASTConverter extends LJBaseListener {
         return op;
     }
 
+    /**
+     * Add Library functions
+     */
     private void addLibraryFunctions() {
-        // Add Library functions
         List<ASTFunction> libraryFunctions = new ArrayList<>();
 
         // Output
         ASTFunction print = new ASTFunction("print", new HMTypeBase(BaseDataType.VOID), null);
+        ASTFunction println = new ASTFunction("println", new HMTypeBase(BaseDataType.VOID), null);
+
         print.parameters.add(new ASTFunction.Parameter("args", new HMTypeBase(BaseDataType.STR)));
+        println.parameters.add(new ASTFunction.Parameter("args", new HMTypeBase(BaseDataType.STR)));
+
         libraryFunctions.add(print);
+        libraryFunctions.add(println);
 
         // Input
         libraryFunctions.add(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));

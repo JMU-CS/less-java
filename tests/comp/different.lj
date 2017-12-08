@@ -1,0 +1,12 @@
+different(a, b) {
+    if (a > b) {
+        return a - b
+    } else {
+        return b - a
+    }
+}
+
+test different(10, 12) == 2
+test different(12, 10) == 2
+test different(100, 1000) == 900
+test different(1000, 100) == 900

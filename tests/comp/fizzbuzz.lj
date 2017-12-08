@@ -1,0 +1,21 @@
+fizzbuzz(x, y, n) {
+    for (i: 1->n+1) {
+        if (i % x == 0) {
+            print("Fizz")
+        }
+
+        if (i % y == 0) {
+            print("Buzz")
+        }
+
+        if (i % x != 0 && i % y != 0) {
+            print(i)
+        }
+
+        println()
+    }
+}
+
+fizzbuzz(2, 3, 7)
+fizzbuzz(2, 4, 7)
+fizzbuzz(3, 5, 7)

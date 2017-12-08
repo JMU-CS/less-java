@@ -1,0 +1,9 @@
+print(1)
+print("a")
+print(true)
+println()
+
+println(1)
+println(true)
+
+printf("a%s", "hi")

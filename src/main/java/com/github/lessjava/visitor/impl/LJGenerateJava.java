@@ -32,6 +32,7 @@ import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
+import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
@@ -50,7 +51,9 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     static {
         libraryFunctions.put("size", "");
-        libraryFunctions.put("print", "System.out.printf(%s);");
+        libraryFunctions.put("print", "System.out.print(%s);");
+        libraryFunctions.put("printf", "System.out.printf(%s);");
+        libraryFunctions.put("println", "System.out.println(%s);");
         libraryFunctions.put("readInt", "scn.nextInt");
         libraryFunctions.put("readDouble", "scn.nextDouble");
         libraryFunctions.put("readChar", "scn.useDelimiter(\"\").next");
@@ -297,11 +300,17 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTForLoop node) {
-        String lowerBound = node.lowerBound == null ? "0" : node.lowerBound.toString();
-        String upperBound = node.upperBound.toString();
-        String line = String.format("for (int %s = %s; %s < %s; %s++)", node.var, lowerBound, node.var, upperBound,
-                node.var);
-        addLine(node, line);
+        if (node.lowerBound == null) {
+            HMType cType = ((HMTypeCollection) node.upperBound.type).getCollectionType();
+            String line = String.format("for (%s i : %s)", cType, node.upperBound);
+            addLine(node, line);
+        } else {
+            String lowerBound = node.lowerBound == null ? "0" : node.lowerBound.toString();
+            String upperBound = node.upperBound.toString();
+            String line = String.format("for (int %s = %s; %s < %s; %s++)", node.var, lowerBound, node.var, upperBound,
+                    node.var);
+            addLine(node, line);
+        }
     }
 
     @Override
@@ -355,21 +364,18 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         String arguments = node.arguments.stream().map(ASTExpression::toString).collect(Collectors.joining(","))
                 .replaceAll("\\\\\"", "");
 
+        List<String> printArgs = new ArrayList<>();
         if (libraryFunctions.containsKey(node.name)) {
             switch (node.name) {
                 case "print":
-                    List<String> printArgs = new ArrayList<>();
-
+                case "println":
+                case "printf":
                     for (ASTExpression e : node.arguments) {
                         printArgs.add(e.type instanceof HMTypeCollection ? e.toString() + ".toString()" : e.toString());
                     }
-                    arguments = String.join(",", printArgs).replaceAll("\\\\\"", "");
 
-                    if (node.arguments.size() == 1) {
-                        line = String.format("System.out.println(%s);", arguments);
-                    } else {
-                        line = String.format(libraryFunctions.get(node.name), arguments);
-                    }
+                    arguments = String.join(",", printArgs).replaceAll("\\\\\"", "");
+                    line = String.format(libraryFunctions.get(node.name), arguments);
                     break;
                 default:
                     line = String.format("%s;", libraryFunctions.get(node.name));

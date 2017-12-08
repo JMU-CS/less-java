@@ -49,7 +49,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             if (program.functions.contains(f)) {
                 return;
             }
-            
+
             program.functions.add(f);
 
             nameparamFunctionMap.put(node.getNameArgString(), f);
@@ -72,7 +72,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             if (program.functions.contains(f)) {
                 return;
             }
-            
+
             program.functions.add(f);
 
             nameparamFunctionMap.put(node.getNameArgString(), f);
@@ -110,7 +110,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             String pname = prototype.get().parameters.get(i).name;
             HMType type;
             if (arguments.get(i).type.isCollection) {
-                type = new HMTypeCollection(((HMTypeBase) arguments.get(i).type));
+                type = new HMTypeCollection(((HMTypeCollection) arguments.get(i).type).getCollectionType());
             } else {
                 type = new HMTypeBase(((HMTypeBase) arguments.get(i).type).getBaseType());
             }

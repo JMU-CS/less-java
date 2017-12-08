@@ -55,14 +55,27 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
         this.parameters = null;
 
-        node.returnType = unify(node.returnType, this.returnType);
+        node.returnType = this.returnType == null ? new HMTypeBase(BaseDataType.VOID)
+                : unify(node.returnType, this.returnType);
     }
 
     @Override
     public void postVisit(ASTReturn node) {
         super.postVisit(node);
 
-        this.returnType = node.value == null ? new HMTypeBase(BaseDataType.VOID) : node.value.type;
+        if (node.value == null) {
+            this.returnType = new HMTypeBase(BaseDataType.VOID);
+        } else if (node.value instanceof ASTVariable) {
+            ASTVariable var = (ASTVariable) node.value;
+
+            if (var.index != null && var.type instanceof HMTypeCollection) {
+                this.returnType = ((HMTypeCollection) var.type).getCollectionType();
+            } else {
+                this.returnType = node.value.type;
+            }
+        } else {
+            this.returnType = node.value.type;
+        }
     }
 
     @Override
@@ -70,8 +83,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.preVisit(node);
 
         if (node.operator.equals(BinOp.INDEX)) {
-            node.type = ((HMTypeCollection)node.leftChild.type).getCollectionType();
-            System.err.println("hi");
+            node.type = ((HMTypeCollection) node.leftChild.type).getCollectionType();
         } else if (node.operator.equals(BinOp.ASGN)) {
             node.type = node.rightChild.type;
         } else {
@@ -84,7 +96,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.postVisit(node);
 
         ASTExpression leftChild, rightChild;
-
 
         leftChild = node.leftChild;
         rightChild = node.rightChild;
@@ -105,7 +116,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void preVisit(ASTVariable node) {
         super.preVisit(node);
 
-        if (this.parameters == null) {
+        if (parameters == null) {
             return;
         }
 
@@ -120,7 +131,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void preVisit(ASTArgList node) {
         super.preVisit(node);
 
-        node.isConcrete = node.isConcrete || node.type instanceof HMTypeBase;
+        node.isConcrete = node.isConcrete || node.collectionType instanceof HMTypeBase;
     }
 
     @Override
@@ -130,6 +141,8 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         if (!node.arguments.isEmpty()) {
             node.type = node.arguments.get(0).type = unify(node.type, node.arguments.get(0).type);
             node.type.isCollection = true;
+            // TODO: actually determine if concrete..
+            node.type.isConcrete = true;
         }
     }
 
@@ -140,7 +153,9 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name);
 
         if (symbols != null && !symbols.isEmpty()) {
-            node.type = unify(node.type, symbols.get(0).type);
+            for (Symbol symbol : symbols) {
+                node.type = unify(node.type, symbol.type);
+            }
         }
     }
 
@@ -148,16 +163,31 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTVoidAssignment node) {
         super.postVisit(node);
 
-        node.variable.type = node.value.isCollection ? ((HMTypeCollection) node.value.type).getCollectionType()
-                : node.value.type;
+        node.variable.type = node.value.type;
+
+        if (node.value instanceof ASTVariable) {
+            ASTVariable var = (ASTVariable) node.value;
+
+            if (var.index != null && var.type instanceof HMTypeCollection) {
+                node.variable.type = ((HMTypeCollection) var.type).getCollectionType();
+            }
+        }
     }
 
     @Override
     public void postVisit(ASTAssignment node) {
         super.postVisit(node);
 
-        node.variable.type = node.value.isCollection ? ((HMTypeCollection) node.value.type).getCollectionType()
-                : node.value.type;
+        node.variable.type = node.value.type;
+
+        if (node.value instanceof ASTVariable) {
+            ASTVariable var = (ASTVariable) node.value;
+
+            if (var.index != null && var.type instanceof HMTypeCollection) {
+                node.variable.type = ((HMTypeCollection) var.type).getCollectionType();
+            }
+        }
+
         node.type = node.variable.type;
     }
 

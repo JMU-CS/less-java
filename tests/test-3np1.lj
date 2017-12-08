@@ -1,30 +1,15 @@
-cycle_len(n)
-{
-    len = 1
-    while (n != 1) {
-        if (n % 2 == 0) {
-            n = n / 2
-        } else {
-            n = 3*n + 1
+oddGnome(gnomes) {
+    lastGnome = gnomes[0]
+
+    for (i: 1 -> size(gnomes)) {
+        if (gnomes[i] != lastGnome + 1) {
+            return gnomes[i]
         }
-        len = len + 1
+
+        lastGnome = gnomes[i]
     }
-    return len
+
+    return -1
 }
 
-max_3np1_cycle(low, high)
-{
-    max = 0
-    while (low <= high) {
-        len = cycle_len(low)
-        if (len > max) {
-            max = len
-        }
-        low = low + 1
-    }
-    return max
-}
-
-test max_3np1_cycle(900, 1000) == 174
-
-print(max_3np1_cycle(1, 10))
+test oddGnome([1,2,3,4,7,5,6]) == 7

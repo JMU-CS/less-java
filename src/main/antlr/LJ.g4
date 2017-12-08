@@ -4,14 +4,14 @@ grammar LJ;
 
 program:        (statement | function | test)*;
 
-function:       ID ('('paramList')')? block;
+function:       ID (LP paramList RP )? block;
 paramList:      ID((','ID)+)?;
-argList:        (expr((','expr)+)?)?;
+argList:        expr((','expr)+)?;
 block:          (EOL)? '{' (EOL)? statement* '}' (EOL)?;
 
-statement:      IF '(' expr ')' block (ELSE block)?             #Conditional
-                | WHILE '(' expr ')' block                      #While
-                | FOR '(' var ':' (expr '->')? expr ')' block   #For
+statement:      IF LP  expr RP  block (ELSE block)?             #Conditional
+                | WHILE LP  expr RP  block                      #While
+                | FOR LP  var ':' (expr '->')? expr RP  block   #For
                 | RETURN expr EOL                               #Return
                 | BREAK EOL                                     #Break
                 | CONTINUE EOL                                  #Continue
@@ -24,8 +24,7 @@ test:           TEST expr EOL;
 
 expr:           exprBin;
 
-exprBin:        left = exprBin '['right=exprBin']'
-                | left=exprBin op=PREC1 right=exprBin
+exprBin:        left=exprBin op=PREC1 right=exprBin
                 | left=exprBin op=PREC2 right=exprBin
                 | left=exprBin op=PREC3 right=exprBin
                 | left=exprBin op=PREC4 right=exprBin
@@ -39,19 +38,18 @@ exprUn:         op=UNOP expression=exprUn
                 | exprBase
                 ;
 
-exprBase:       assignment
-                | funcCall
+exprBase:       funcCall
                 | var
                 | lit
-                | '[' argList ']'
-                | '(' expr ')'
+                | LB  (argList)? RB
+                | LP  expr RP
                 ;
 
 assignment:     var PREC7 expr;
 
-funcCall:       ID '('argList')';
+funcCall:       ID LP (argList)? RP;
 
-var:            ID ('['expr']')?;
+var:            ID (LB (expr)? RB )?;
 lit:            DEC | BOOL | STR;
 
 
@@ -98,7 +96,6 @@ UNOP:       NOT
             ;
 
 NOT:        '!';
-
 ADD:        '+';
 SUB:        '-';
 MULT:       '*';
@@ -113,6 +110,11 @@ NET:       '!=';
 OR:        '||';
 AND:       '&&';
 ASGN:       '=';
+
+LB:         '[';
+RB:         ']';
+LP:         '(';
+RP:         ')';
 
 
 // Literals
