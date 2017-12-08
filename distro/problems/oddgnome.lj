@@ -1,0 +1,8 @@
+oddGnome(gnomes) {
+    // TODO
+    return -1
+}
+
+test oddGnome([1,2,3,7,4,5]) == 7
+
+print(oddGnome([1,2,3,7,4,5]))

@@ -1,0 +1,7 @@
+fizzbuzz(x, y, n) {
+    // TODO
+}
+
+fizzbuzz(2, 3, 7)
+fizzbuzz(2, 4, 7)
+fizzbuzz(3, 5, 7)

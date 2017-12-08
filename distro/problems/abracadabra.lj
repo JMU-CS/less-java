@@ -1,0 +1,6 @@
+abracadabra(n) {
+    // TODO
+}
+
+abracadabra(5)
+abracadabra(10)
