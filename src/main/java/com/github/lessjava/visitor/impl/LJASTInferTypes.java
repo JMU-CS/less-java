@@ -52,8 +52,13 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTFunction node) {
         super.postVisit(node);
 
+
         node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
         this.parameters = null;
+
+        if (node.body == null) {
+            return;
+        }
 
         node.returnType = this.returnType == null ? new HMTypeBase(BaseDataType.VOID)
                 : unify(node.returnType, this.returnType);
@@ -162,6 +167,8 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void postVisit(ASTVoidAssignment node) {
         super.postVisit(node);
+
+        System.err.println(node.value.type);
 
         node.variable.type = node.value.type;
 

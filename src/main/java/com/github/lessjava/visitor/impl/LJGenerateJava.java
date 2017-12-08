@@ -301,13 +301,14 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTForLoop node) {
         if (node.lowerBound == null) {
+            System.err.println(node.upperBound.type);
             HMType cType = ((HMTypeCollection) node.upperBound.type).getCollectionType();
             String line = String.format("for (%s i : %s)", cType, node.upperBound);
             addLine(node, line);
         } else {
             String lowerBound = node.lowerBound == null ? "0" : node.lowerBound.toString();
             String upperBound = node.upperBound.toString();
-            String line = String.format("for (int %s = %s; %s < %s; %s++)", node.var, lowerBound, node.var, upperBound,
+            String line = String.format("for (Integer %s = %s; %s < %s; %s++)", node.var, lowerBound, node.var, upperBound,
                     node.var);
             addLine(node, line);
         }

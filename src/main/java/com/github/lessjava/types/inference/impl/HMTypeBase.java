@@ -34,7 +34,5 @@ public class HMTypeBase extends HMType {
             default:
                 return "???";
         }
-
     }
-
 }
