@@ -183,31 +183,7 @@ public class Symbol {
         }
         str.append(" : ");
         str.append(type.toString());
-        switch (location) {
-            case STATIC_VAR:
-                str.append(" (0x" + Long.toHexString(offset) + ")");
-                break;
-            case STATIC_FUNC:
-                boolean comma = false;
-                str.append(" (");
-                for (HMType t : paramTypes) {
-                    if (comma) {
-                        str.append(",");
-                    }
-                    str.append(t.toString());
-                    comma = true;
-                }
-                str.append(")");
-                break;
-            case STACK_PARAM:
-                str.append(" (BP+0x" + Long.toHexString(offset) + ")");
-                break;
-            case STACK_LOCAL:
-                str.append(" (BP-0x" + Long.toHexString(offset) + ")");
-                break;
-            default:
-                break;
-        }
+        
         // str.append(" {total=" + Integer.toString(totalSize) + "}");
         return str.toString();
     }

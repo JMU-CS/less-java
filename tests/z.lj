@@ -1,0 +1,15 @@
+a(d) {
+    c = d
+
+    for (i: 1 -> 10) {
+        c = c + b(i)
+    }
+
+    return c
+}
+
+b(i) {
+    return i
+}
+
+a(1)

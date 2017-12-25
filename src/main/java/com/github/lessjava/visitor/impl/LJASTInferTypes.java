@@ -10,6 +10,7 @@ import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTExpression;
+import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTFunctionCall;
@@ -52,16 +53,22 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTFunction node) {
         super.postVisit(node);
 
-
-        node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
         this.parameters = null;
 
         if (node.body == null) {
             return;
         }
 
-        node.returnType = this.returnType == null ? new HMTypeBase(BaseDataType.VOID)
-                : unify(node.returnType, this.returnType);
+        node.returnType = unify(node.returnType, this.returnType);
+    }
+
+    @Override
+    public void preVisit(ASTForLoop node) {
+        if (node.lowerBound == null) {
+            node.var.type = ((HMTypeCollection) node.upperBound.type).getCollectionType();
+        } else {
+            node.var.type = new HMTypeBase(BaseDataType.INT);
+        }
     }
 
     @Override
@@ -133,6 +140,25 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     @Override
+    public void postVisit(ASTVariable node) {
+        super.postVisit(node);
+
+        List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name);
+
+        if (node.name.equals("i")) {
+            if (symbols == null) {
+                System.err.println(node.getParent().getParent());
+                System.err.println(node.type);
+                System.err.println(symbols);
+            }
+        }
+
+        if (symbols != null && !symbols.isEmpty()) {
+            symbols.forEach(s -> node.type = unify(node.type, s.type));
+        }
+    }
+
+    @Override
     public void preVisit(ASTArgList node) {
         super.preVisit(node);
 
@@ -152,25 +178,10 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     @Override
-    public void postVisit(ASTVariable node) {
-        super.postVisit(node);
-
-        List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name);
-
-        if (symbols != null && !symbols.isEmpty()) {
-            for (Symbol symbol : symbols) {
-                node.type = unify(node.type, symbol.type);
-            }
-        }
-    }
-
-    @Override
     public void postVisit(ASTVoidAssignment node) {
         super.postVisit(node);
 
-        System.err.println(node.value.type);
-
-        node.variable.type = node.value.type;
+        node.variable.type = unify(node.variable.type, node.value.type);
 
         if (node.value instanceof ASTVariable) {
             ASTVariable var = (ASTVariable) node.value;
@@ -185,7 +196,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTAssignment node) {
         super.postVisit(node);
 
-        node.variable.type = node.value.type;
+        node.variable.type = unify(node.variable.type, node.value.type);
 
         if (node.value instanceof ASTVariable) {
             ASTVariable var = (ASTVariable) node.value;

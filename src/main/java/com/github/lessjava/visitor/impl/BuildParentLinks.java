@@ -14,6 +14,7 @@ import com.github.lessjava.types.ast.ASTStatement;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
@@ -60,6 +61,12 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTAssignment node) {
+        node.variable.setParent(node);
+        node.value.setParent(node);
+    }
+
+    @Override
+    public void preVisit(ASTVoidAssignment node) {
         node.variable.setParent(node);
         node.value.setParent(node);
     }

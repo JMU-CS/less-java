@@ -37,6 +37,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
+
         ASTFunction f = nameparamFunctionMap.get(node.getNameArgString());
 
         if (f != null && f.concrete) {
@@ -90,7 +91,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
         Optional<ASTFunction> prototype = functions.stream().filter(func -> !func.concrete).findFirst();
 
-        if (!prototype.isPresent()) {
+        if (!prototype.isPresent() || prototype.get().body == null) {
             // Can't instantiate
             return null;
         }

@@ -13,6 +13,7 @@ import com.github.lessjava.exceptions.InvalidProgramException;
 import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.SymbolTable;
 import com.github.lessjava.types.ast.ASTBlock;
+import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTNode;
@@ -38,11 +39,10 @@ public class BuildSymbolTables extends StaticAnalysis {
     public static Map<ASTNode, SymbolTable> nodeSymbolTableMap = new HashMap<>();
 
     /**
-     * ¦* Retrieves symbol information for a given symbol name. Searches for ¦*
-     * symbol tables up the parent tree if there is no table at the given ¦* node.
-     * Adds a static analysis error and returns null if the symbol ¦* cannot be
-     * found. ¦* ¦* @param node {@link ASTNode} to search ¦* @param name Decaf
-     * symbol name ¦* @return Symbol information ¦
+     * Retrieves symbol information for a given symbol name. Searches for symbol
+     * tables up the parent tree if there is no table at the given node. Adds a
+     * static analysis error and returns null if the symbol cannot be found.
+     *
      */
     public static List<Symbol> searchScopesForSymbol(ASTNode node, String name) {
         List<Symbol> symbols = null;
@@ -50,11 +50,15 @@ public class BuildSymbolTables extends StaticAnalysis {
             if (node.attributes.containsKey("symbolTable")) {
                 SymbolTable table = (SymbolTable) node.attributes.get("symbolTable");
                 symbols = table.lookup(name);
-            } else if (node.getParent() != null) {
-                symbols = searchScopesForSymbol(node.getParent(), name);
-            } else {
-                addError(new InvalidProgramException("Symbol not found: " + name));
             }
+
+            if ((symbols == null || symbols.isEmpty()) && node.getParent() != null) {
+                symbols = searchScopesForSymbol(node.getParent(), name);
+
+                if (name.equals("i") && node instanceof ASTForLoop ) {
+                    System.err.println("found: " + symbols);
+                }
+            } 
         } catch (InvalidProgramException ex) {
             addError(new InvalidProgramException(ex.getMessage()));
         }
@@ -190,6 +194,17 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     @Override
     public void postVisit(ASTProgram node) {
+        nodeSymbolTableMap.put(node, getCurrentTable());
+        finalizeScope();
+    }
+
+    @Override
+    public void preVisit(ASTForLoop node) {
+        node.attributes.put("symbolTable", initializeScope());
+    }
+
+    @Override
+    public void postVisit(ASTForLoop node) {
         nodeSymbolTableMap.put(node, getCurrentTable());
         finalizeScope();
     }

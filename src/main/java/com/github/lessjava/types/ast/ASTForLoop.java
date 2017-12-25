@@ -21,6 +21,11 @@ public class ASTForLoop extends ASTStatement {
     @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
+        var.traverse(visitor);
+        if (lowerBound != null) {
+            lowerBound.traverse(visitor);
+        }
+        upperBound.traverse(visitor);
         block.traverse(visitor);
         visitor.postVisit(this);
     }
