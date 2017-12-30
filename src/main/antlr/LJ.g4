@@ -41,15 +41,21 @@ exprUn:         op=UNOP expression=exprUn
 exprBase:       funcCall
                 | var
                 | lit
-                | LB  (argList)? RB
+                | collection
                 | LP  expr RP
                 ;
+
+collection:     LSB  (argList)? RSB     #List
+                | LCB  (argList)? RCB   #Set
+                | LAB  (entryList)? RAB #Map;
+
+entryList:      expr ':' expr (',' expr ':' expr)*;
 
 assignment:     var PREC7 expr;
 
 funcCall:       ID LP (argList)? RP;
 
-var:            ID (LB (expr)? RB )?;
+var:            ID (LSB (expr)? RSB )?;
 lit:            INT | REAL | BOOL | STR;
 
 
@@ -111,8 +117,12 @@ OR:        '||';
 AND:       '&&';
 ASGN:       '=';
 
-LB:         '[';
-RB:         ']';
+LSB:         '[';
+RSB:         ']';
+LCB:         '{';
+RCB:         '}';
+LAB:         '<';
+RAB:         '>';
 LP:         '(';
 RP:         ')';
 
