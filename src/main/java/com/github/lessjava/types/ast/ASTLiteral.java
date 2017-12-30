@@ -34,7 +34,7 @@ public class ASTLiteral extends ASTExpression {
      * Remove escape codes from string literals and replace them with the
      * corresponding special character (quotes, newlines, or tabs) Removes carriage
      * returns ("\r") entirely.
-     * 
+     *
      * @param str
      *            String to manipulate
      * @return String with escape codes replaced by special characters
@@ -46,7 +46,7 @@ public class ASTLiteral extends ASTExpression {
     /**
      * Remove quotes, newlines, and tabs from string literals and replace them with
      * their escape codes.
-     * 
+     *
      * @param str
      *            String to manipulate
      * @return String with special characters replaced by escape codes
@@ -71,10 +71,18 @@ public class ASTLiteral extends ASTExpression {
 
     @Override
     public String toString() {
+        String s = String.format("%%s.valueOf(%s)", this.value.toString());
+
         if (this.value instanceof String) {
-            return "\"" + addEscapeCodes(value.toString()) + "\"";
+            s = "\"" + addEscapeCodes(value.toString()) + "\"";
+        } else if (this.value instanceof Boolean) {
+            s = String.format(s, "Boolean");
+        } else if (this.value instanceof Integer) {
+            s = String.format(s, "Integer");
+        } else if (this.value instanceof Double) {
+            s = String.format(s, "Double");
         }
-       
-        return this.value.toString();
+
+        return s;
     }
 }

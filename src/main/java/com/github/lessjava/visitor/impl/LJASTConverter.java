@@ -473,8 +473,10 @@ public class LJASTConverter extends LJBaseListener {
 
         if (ctx.BOOL() != null) {
             lit = new ASTLiteral(HMType.BaseDataType.BOOL, Boolean.parseBoolean(ctx.BOOL().getText()));
-        } else if (ctx.DEC() != null) {
-            lit = new ASTLiteral(HMType.BaseDataType.INT, Integer.parseInt(ctx.DEC().getText()));
+        } else if (ctx.INT() != null) {
+            lit = new ASTLiteral(HMType.BaseDataType.INT, Integer.parseInt(ctx.INT().getText()));
+        } else if (ctx.REAL() != null) {
+            lit = new ASTLiteral(HMType.BaseDataType.REAL, Double.parseDouble(ctx.REAL().getText()));
         } else {
             assert (ctx.STR() != null);
             lit = new ASTLiteral(HMType.BaseDataType.STR,
@@ -573,6 +575,7 @@ public class LJASTConverter extends LJBaseListener {
      * Add Library functions
      */
     private void addLibraryFunctions() {
+        // TODO: MAKE STATIC; duplicate code in build symbol tables
         List<ASTFunction> libraryFunctions = new ArrayList<>();
 
         // Output
@@ -587,7 +590,7 @@ public class LJASTConverter extends LJBaseListener {
 
         // Input
         libraryFunctions.add(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));
-        libraryFunctions.add(new ASTFunction("readDouble", new HMTypeBase(BaseDataType.DOUBLE), null));
+        libraryFunctions.add(new ASTFunction("readReal", new HMTypeBase(BaseDataType.REAL), null));
         libraryFunctions.add(new ASTFunction("readChar", new HMTypeBase(BaseDataType.STR), null));
         libraryFunctions.add(new ASTFunction("readWord", new HMTypeBase(BaseDataType.STR), null));
         libraryFunctions.add(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));

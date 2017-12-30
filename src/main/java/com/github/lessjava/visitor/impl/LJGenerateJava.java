@@ -33,6 +33,7 @@ import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.types.inference.HMType;
+import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
@@ -347,7 +348,21 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         line = String.format("    main(null);");
         addLine(node, line);
 
-        line = String.format("%4sassertTrue(%s);", "", node.expr);
+        if (node.expr instanceof ASTBinaryExpr) {
+            ASTBinaryExpr expr = (ASTBinaryExpr) node.expr;
+
+            if (expr.leftChild.type.equals(HMTypeBase.INT)) {
+                line = String.format("%4sassertEquals(%s, %s);", "", expr.rightChild, expr.leftChild);
+            } else if(expr.leftChild.type.equals(HMTypeBase.REAL)) {
+                line = String.format("%4sassertEquals(%s, %s, 0.0000001);", "", expr.rightChild, expr.leftChild);
+            } else {
+                line = String.format("%4sassertTrue(%s);", "", node.expr);
+            }
+
+        } else {
+            line = String.format("%4sassertTrue(%s);", "", node.expr);
+        }
+
         addLine(node, line);
 
         line = "    System.setOut(originalStream);";

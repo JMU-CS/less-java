@@ -5,7 +5,7 @@ public abstract class HMType {
     public boolean isCollection;
 
     public static enum BaseDataType {
-        INT, DOUBLE, BOOL, VOID, STR
+        INT, REAL, BOOL, VOID, STR
     }
 
     @Override

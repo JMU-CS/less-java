@@ -54,11 +54,7 @@ public class BuildSymbolTables extends StaticAnalysis {
 
             if ((symbols == null || symbols.isEmpty()) && node.getParent() != null) {
                 symbols = searchScopesForSymbol(node.getParent(), name);
-
-                if (name.equals("i") && node instanceof ASTForLoop ) {
-                    System.err.println("found: " + symbols);
-                }
-            } 
+            }
         } catch (InvalidProgramException ex) {
             addError(new InvalidProgramException(ex.getMessage()));
         }
@@ -149,7 +145,7 @@ public class BuildSymbolTables extends StaticAnalysis {
 
         // Input
         insertFunctionSymbol(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));
-        insertFunctionSymbol(new ASTFunction("readDouble", new HMTypeBase(BaseDataType.DOUBLE), null));
+        insertFunctionSymbol(new ASTFunction("readReal", new HMTypeBase(BaseDataType.REAL), null));
         insertFunctionSymbol(new ASTFunction("readChar", new HMTypeBase(BaseDataType.STR), null));
         insertFunctionSymbol(new ASTFunction("readWord", new HMTypeBase(BaseDataType.STR), null));
         insertFunctionSymbol(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));

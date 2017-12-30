@@ -2,7 +2,6 @@ package com.github.lessjava.visitor.impl;
 
 import java.util.List;
 
-import com.github.lessjava.exceptions.InvalidProgramException;
 import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
@@ -94,12 +93,29 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void preVisit(ASTBinaryExpr node) {
         super.preVisit(node);
 
-        if (node.operator.equals(BinOp.INDEX)) {
-            node.type = ((HMTypeCollection) node.leftChild.type).getCollectionType();
-        } else if (node.operator.equals(BinOp.ASGN)) {
-            node.type = node.rightChild.type;
-        } else {
-            node.type = new HMTypeBase(ASTBinaryExpr.opToReturnType(node.operator));
+        switch (node.operator) {
+            case INDEX:
+                node.type = ((HMTypeCollection) node.leftChild.type).getCollectionType();
+                break;
+            case ASGN:
+            case ADD:
+            case SUB:
+            case MUL:
+            case DIV:
+            case MOD:
+                HMType unifiedType = unify(node.leftChild.type, node.rightChild.type);
+                node.type = unifiedType != null ? unifiedType : node.type;
+                break;
+            case OR:
+            case AND:
+            case EQ:
+            case NE:
+            case LT:
+            case GT:
+            case LE:
+            case GE:
+                node.type = new HMTypeBase(BaseDataType.BOOL);
+                break;
         }
     }
 
@@ -144,14 +160,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.postVisit(node);
 
         List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name);
-
-        if (node.name.equals("i")) {
-            if (symbols == null) {
-                System.err.println(node.getParent().getParent());
-                System.err.println(node.type);
-                System.err.println(symbols);
-            }
-        }
 
         if (symbols != null && !symbols.isEmpty()) {
             symbols.forEach(s -> node.type = unify(node.type, s.type));
@@ -241,20 +249,14 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         } else if (leftIsVar && rightIsBase) {
             unifiedType = right;
         } else if (leftIsBase && rightIsBase) {
-            HMTypeBase leftBase = (HMTypeBase) left;
-            HMTypeBase rightBase = (HMTypeBase) right;
-
-            if (unify(leftBase, rightBase)) {
-                unifiedType = leftBase;
-            }
+            unifiedType = unify((HMTypeBase) left, (HMTypeBase) right);
         }
 
         return unifiedType;
     }
 
     private HMType unify(HMType left, HMType right, BinOp op) {
-        // HMType unifiedType = unify(left, right);
-        HMType unifiedType = null;
+        HMType unifiedType = unify(left, right);
 
         if (op != BinOp.EQ && op != BinOp.NE) {
             switch (op) {
@@ -267,34 +269,32 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
                 case LT:
                 case GE:
                 case LE:
-                    unifiedType = new HMTypeBase(BaseDataType.INT);
+                case ASGN:
+                    unifiedType = unify(left, right);
                     break;
                 case AND:
                 case OR:
                     unifiedType = new HMTypeBase(BaseDataType.BOOL);
                     break;
-                case ASGN:
-                    unifiedType = unify(left, right);
-                    break;
                 default:
                     return null;
             }
-        } else {
-            unifiedType = unify(left, right);
         }
 
         return unifiedType;
     }
 
-    private boolean unify(HMTypeBase left, HMTypeBase right) {
-        boolean successfullyUnified = true;
-
-        if (left.getBaseType() != right.getBaseType()) {
-            successfullyUnified = false;
-            addError(new InvalidProgramException(
-                    String.format("Type Unification Error:\t%s, %s", left.toString(), right.toString())));
+    private HMTypeBase unify(HMTypeBase left, HMTypeBase right) {
+        if (left.getBaseType().equals(right.getBaseType())) {
+            return left;
+        } else if (left.getBaseType().equals(BaseDataType.REAL) && right.getBaseType().equals(BaseDataType.INT)) {
+            return left;
+        } else if (right.getBaseType().equals(BaseDataType.REAL) && left.getBaseType().equals(BaseDataType.INT)) {
+            return right;
+        } else if (left.getBaseType().equals(right.getBaseType())) {
+            return left;
         }
 
-        return successfullyUnified;
+        return left;
     }
 }

@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 
@@ -35,7 +34,7 @@ public class ASTBinaryExpr extends ASTExpression {
      * </ul>
      */
     public enum BinOp {
-        INVALID, ASGN, INDEX, OR, AND, EQ, NE, LT, GT, LE, GE, ADD, SUB, MUL, DIV, MOD
+        ASGN, INDEX, OR, AND, EQ, NE, LT, GT, LE, GE, ADD, SUB, MUL, DIV, MOD
     }
 
     public static Set<BinOp> flexibleOperators = new HashSet<>(Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE }));
@@ -80,28 +79,6 @@ public class ASTBinaryExpr extends ASTExpression {
         }
     }
 
-    public static BaseDataType opToReturnType(BinOp op) {
-        switch (op) {
-            case OR:
-            case AND:
-            case EQ:
-            case NE:
-            case LT:
-            case GT:
-            case LE:
-            case GE:
-                return HMType.BaseDataType.BOOL;
-            case ADD:
-            case SUB:
-            case MUL:
-            case DIV:
-            case MOD:
-                return HMType.BaseDataType.INT;
-            default:
-                return null;
-        }
-    }
-
     public BinOp operator;
     public ASTExpression leftChild;
     public ASTExpression rightChild;
@@ -129,18 +106,18 @@ public class ASTBinaryExpr extends ASTExpression {
         }
 
         String s = ("(" + leftChild.toString() + right + ")");
-        
+
         HMTypeBase t = this.type instanceof HMTypeBase ? (HMTypeBase) this.type : null;
-        
+
         if (t == null) {
             return s;
         }
-        
+
         if (t.getBaseType() == BaseDataType.BOOL) {
             return String.format("Boolean.valueOf(%s)", s);
         } else if (t.getBaseType() == BaseDataType.INT) {
             return String.format("Integer.valueOf(%s)", s);
-        } else if (t.getBaseType() == BaseDataType.DOUBLE) {
+        } else if (t.getBaseType() == BaseDataType.REAL) {
             return String.format("Double.valueOf(%s)", s);
         } else if (t.getBaseType() == BaseDataType.STR) {
             return String.format("%s", s);

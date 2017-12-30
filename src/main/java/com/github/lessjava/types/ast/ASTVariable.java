@@ -27,6 +27,7 @@ public class ASTVariable extends ASTExpression {
         ASTNode n = this;
         boolean inTest = false;
 
+        //TODO: Better way to handle this??
         while (n != null && !((n = n.getParent()) instanceof ASTProgram)) {
             inTest = n instanceof ASTTest;
         }

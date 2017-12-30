@@ -50,7 +50,7 @@ assignment:     var PREC7 expr;
 funcCall:       ID LP (argList)? RP;
 
 var:            ID (LB (expr)? RB )?;
-lit:            DEC | BOOL | STR;
+lit:            INT | REAL | BOOL | STR;
 
 
 /* Lexer Rules */
@@ -118,7 +118,8 @@ RP:         ')';
 
 
 // Literals
-DEC:        (SUB)?[0-9]+;
+INT:        (SUB)?[0-9]+;
+REAL:       (SUB)?[0-9]*'.'[0-9]+;
 BOOL:       'true'|'false';
 STR:        '\"'.*?'\"';
 

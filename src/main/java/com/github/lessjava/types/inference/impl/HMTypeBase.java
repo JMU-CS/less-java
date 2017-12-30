@@ -3,6 +3,11 @@ package com.github.lessjava.types.inference.impl;
 import com.github.lessjava.types.inference.HMType;
 
 public class HMTypeBase extends HMType {
+    public static final HMTypeBase INT = new HMTypeBase(BaseDataType.INT);
+    public static final HMTypeBase REAL = new HMTypeBase(BaseDataType.REAL);
+    public static final HMTypeBase BOOL = new HMTypeBase(BaseDataType.BOOL);
+    public static final HMTypeBase STR = new HMTypeBase(BaseDataType.STR);
+
     private BaseDataType baseType;
 
     public HMTypeBase(BaseDataType baseType) {
@@ -23,7 +28,7 @@ public class HMTypeBase extends HMType {
         switch (this.baseType) {
             case INT:
                 return "Integer";
-            case DOUBLE:
+            case REAL:
                 return "Double";
             case BOOL:
                 return "Boolean";
