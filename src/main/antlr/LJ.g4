@@ -5,8 +5,10 @@ grammar LJ;
 program:        (statement | function | test)*;
 
 function:       ID (LP paramList RP )? block;
-paramList:      ID((','ID)+)?;
-argList:        expr((','expr)+)?;
+paramList:      ID (',' ID)*;
+argList:        expr (','expr)*
+                | expr ':' expr (',' expr ':' expr)*
+                ;
 block:          (EOL)? '{' (EOL)? statement* '}' (EOL)?;
 
 statement:      IF LP  expr RP  block (ELSE block)?             #Conditional
@@ -47,9 +49,9 @@ exprBase:       funcCall
 
 collection:     LSB  (argList)? RSB     #List
                 | LCB  (argList)? RCB   #Set
-                | LAB  (entryList)? RAB #Map;
+                | LAB  (argList)? RAB #Map;
 
-entryList:      expr ':' expr (',' expr ':' expr)*;
+entryList:      ;
 
 assignment:     var PREC7 expr;
 
