@@ -29,7 +29,6 @@ public class ASTArgList extends ASTExpression {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
         StringBuilder argString = new StringBuilder();
 
         argString.append("{ ");
@@ -38,10 +37,7 @@ public class ASTArgList extends ASTExpression {
         }
         argString.append(" }");
 
-        sb.append(String.format("new %s(Arrays.asList(new %s[] %s))", type, collectionType,
-                argString.toString()).replaceAll("\\\\\"", ""));
-
-        return sb.toString();
+        return argString.toString();
     }
 
 }

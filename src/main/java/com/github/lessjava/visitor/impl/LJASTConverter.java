@@ -15,6 +15,7 @@ import com.github.lessjava.generated.LJParser.BlockContext;
 import com.github.lessjava.generated.LJParser.BreakContext;
 import com.github.lessjava.generated.LJParser.ConditionalContext;
 import com.github.lessjava.generated.LJParser.ContinueContext;
+import com.github.lessjava.generated.LJParser.EntryContext;
 import com.github.lessjava.generated.LJParser.ExprBaseContext;
 import com.github.lessjava.generated.LJParser.ExprBinContext;
 import com.github.lessjava.generated.LJParser.ExprContext;
@@ -40,16 +41,21 @@ import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
+import com.github.lessjava.types.ast.ASTCollection;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
+import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTLiteral;
+import com.github.lessjava.types.ast.ASTMap;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
+import com.github.lessjava.types.ast.ASTSet;
 import com.github.lessjava.types.ast.ASTStatement;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
@@ -156,7 +162,13 @@ public class LJASTConverter extends LJBaseListener {
             args.add((ASTExpression) parserASTMap.get(e));
         }
 
+        for (EntryContext e : ctx.entry()) {
+            args.add((ASTExpression) parserASTMap.get(e));
+        }
+
         argList = new ASTArgList(args);
+
+        System.err.println(argList);
 
         parserASTMap.put(ctx, argList);
     }
@@ -494,6 +506,10 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitList(ListContext ctx) {
         ASTList list;
+        ASTArgList initialElements;
+
+        initialElements = (ASTArgList) parserASTMap.get(ctx.argList());
+        list = new ASTList(initialElements);
 
         list.setDepth(ctx.depth());
 
@@ -503,6 +519,10 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitSet(SetContext ctx) {
         ASTSet set;
+        ASTArgList initialElements;
+
+        initialElements = (ASTArgList) parserASTMap.get(ctx.argList());
+        set = new ASTSet(initialElements);
 
         set.setDepth(ctx.depth());
 
@@ -512,10 +532,29 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitMap(MapContext ctx) {
         ASTMap map;
+        ASTArgList initialElements;
+
+        initialElements = (ASTArgList) parserASTMap.get(ctx.argList());
+        map = new ASTMap(initialElements);
 
         map.setDepth(ctx.depth());
 
         parserASTMap.put(ctx, map);
+    }
+
+    @Override
+    public void exitEntry(EntryContext ctx) {
+        ASTEntry entry;
+        ASTExpression key;
+        ASTExpression value;
+
+        key = (ASTExpression) parserASTMap.get(ctx.key);
+        value = (ASTExpression) parserASTMap.get(ctx.value);
+        entry = new ASTEntry(key, value);
+
+        entry.setDepth(ctx.depth());
+
+        parserASTMap.put(ctx, entry);
     }
 
     public ASTProgram getAST() {

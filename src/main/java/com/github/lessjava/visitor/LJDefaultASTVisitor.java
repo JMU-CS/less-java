@@ -7,6 +7,7 @@ import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
+import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
@@ -202,6 +203,14 @@ public class LJDefaultASTVisitor implements ASTVisitor {
     }
 
     public void postVisit(ASTLiteral node) {
+        defaultPostVisit(node);
+    }
+
+    public void preVisit(ASTEntry node) {
+        defaultPreVisit(node);
+    }
+
+    public void postVisit(ASTEntry node) {
         defaultPostVisit(node);
     }
 

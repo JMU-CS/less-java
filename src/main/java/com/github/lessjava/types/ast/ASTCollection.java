@@ -1,7 +1,9 @@
-public abstract class ASTCollection {
-    public ASTArgList argList;
+package com.github.lessjava.types.ast;
 
-    public ASTCollection(ASTArgList argList) {
-        this.argList = argList;
+public abstract class ASTCollection extends ASTExpression {
+    protected ASTArgList initialElements;
+
+    public ASTCollection(ASTArgList initialElements) {
+        this.initialElements = initialElements;
     }
 }

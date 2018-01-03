@@ -4,6 +4,7 @@ import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTConditional;
+import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
@@ -133,6 +134,12 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
         for (ASTExpression expr : node.arguments) {
             expr.setParent(node);
         }
+    }
+
+    @Override
+    public void preVisit(ASTEntry node) {
+        node.key.setParent(node);
+        node.value.setParent(node);
     }
 
     // no need for ASTLocation handler (no children)

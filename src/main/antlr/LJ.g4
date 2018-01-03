@@ -5,21 +5,18 @@ grammar LJ;
 program:        (statement | function | test)*;
 
 function:       ID (LP paramList RP )? block;
-paramList:      ID (',' ID)*;
-argList:        expr (','expr)*
-                | expr ':' expr (',' expr ':' expr)*
-                ;
+paramList:      ID (','ID)*;
 block:          (EOL)? '{' (EOL)? statement* '}' (EOL)?;
 
-statement:      IF LP  expr RP  block (ELSE block)?             #Conditional
-                | WHILE LP  expr RP  block                      #While
-                | FOR LP  var ':' (expr '->')? expr RP  block   #For
-                | RETURN expr EOL                               #Return
-                | BREAK EOL                                     #Break
-                | CONTINUE EOL                                  #Continue
-                | funcCall EOL                                  #VoidFunctionCall
-                | assignment EOL                                #VoidAssignment
-                | EOL                                           #Terminator
+statement:      IF LP expr RP block (ELSE block)?           #Conditional
+                | WHILE LP expr RP block                    #While
+                | FOR LP var ':' (expr '->')? expr RP block #For
+                | RETURN expr EOL                           #Return
+                | BREAK EOL                                 #Break
+                | CONTINUE EOL                              #Continue
+                | funcCall EOL                              #VoidFunctionCall
+                | assignment EOL                            #VoidAssignment
+                | EOL                                       #Terminator
                 ;
 
 test:           TEST expr EOL;
@@ -41,21 +38,24 @@ exprUn:         op=UNOP expression=exprUn
                 ;
 
 exprBase:       funcCall
+                | collection
                 | var
                 | lit
-                | collection
-                | LP  expr RP
+                | LP expr RP
                 ;
 
-collection:     LSB  (argList)? RSB     #List
-                | LCB  (argList)? RCB   #Set
-                | LAB  (argList)? RAB #Map;
+funcCall:       ID LP (argList)? RP;
 
-entryList:      ;
+collection:     LSB (argList)? RSB         #List
+                | LCB (argList)? RCB       #Set
+                | PREC3 (argList)? PREC3   #Map;
 
 assignment:     var PREC7 expr;
 
-funcCall:       ID LP (argList)? RP;
+argList:        entry (',' entry)*
+                | expr (',' expr)*;
+
+entry:          key=expr ':' value=expr;
 
 var:            ID (LSB (expr)? RSB )?;
 lit:            INT | REAL | BOOL | STR;
@@ -123,10 +123,8 @@ LSB:         '[';
 RSB:         ']';
 LCB:         '{';
 RCB:         '}';
-LAB:         '<';
-RAB:         '>';
-LP:         '(';
-RP:         ')';
+LP:          '(';
+RP:          ')';
 
 
 // Literals
