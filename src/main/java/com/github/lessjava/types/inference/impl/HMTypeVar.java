@@ -21,4 +21,9 @@ public class HMTypeVar extends HMType {
         return String.format("T%s", this.uniqueVarId);
 
     }
+
+    @Override
+    public HMTypeVar clone() {
+        return new HMTypeVar();
+    }
 }

@@ -40,4 +40,9 @@ public class HMTypeBase extends HMType {
                 return "???";
         }
     }
+
+    @Override
+    public HMTypeBase clone() {
+        return new HMTypeBase(this.baseType);
+    }
 }

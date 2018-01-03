@@ -85,9 +85,21 @@ public interface ASTVisitor {
 
     public void postVisit(ASTLiteral node);
 
-    public void preVisit(ASTArgList astArgList);
+    public void preVisit(ASTList node);
 
-    public void postVisit(ASTArgList astArgList);
+    public void postVisit(ASTList node);
+
+    public void preVisit(ASTSet node);
+
+    public void postVisit(ASTSet node);
+
+    public void preVisit(ASTMap node);
+
+    public void postVisit(ASTMap node);
+
+    public void preVisit(ASTArgList node);
+
+    public void postVisit(ASTArgList node);
 
     void preVisit(ASTForLoop node);
 

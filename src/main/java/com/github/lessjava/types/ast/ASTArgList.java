@@ -2,20 +2,16 @@ package com.github.lessjava.types.ast;
 
 import java.util.List;
 
-import com.github.lessjava.types.inference.HMType;
-import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public class ASTArgList extends ASTExpression {
     public List<ASTExpression> arguments;
     public boolean isConcrete;
-    public HMType collectionType;
 
     public ASTArgList(List<ASTExpression> arguments) {
         this.arguments = arguments;
-        this.collectionType = arguments.isEmpty() ? new HMTypeVar() : arguments.get(0).type;
+        this.type = arguments.isEmpty() ? new HMTypeVar() : arguments.get(0).type;
         this.isCollection = true;
-        this.type = new HMTypeCollection(this.collectionType);
     }
 
     @Override

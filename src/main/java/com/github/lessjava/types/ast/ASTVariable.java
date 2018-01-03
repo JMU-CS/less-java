@@ -18,6 +18,10 @@ public class ASTVariable extends ASTExpression {
     public ASTVariable(String name, ASTExpression index) {
         this.name = name;
         this.index = index;
+
+        if (this.index != null || this.type instanceof HMTypeCollection) {
+            this.isCollection = true;
+        }
     }
 
     @Override
@@ -27,15 +31,20 @@ public class ASTVariable extends ASTExpression {
         ASTNode n = this;
         boolean inTest = false;
 
-        //TODO: Better way to handle this??
+        // TODO: Better way to handle this??
         while (n != null && !((n = n.getParent()) instanceof ASTProgram)) {
             inTest = n instanceof ASTTest;
         }
 
         sb.append(inTest ? String.format("__test%s", this.name) : name);
 
-        if (this.type instanceof HMTypeCollection && this.index != null) {
-            HMType eType = ((HMTypeCollection) type).getCollectionType();
+        if (this.isCollection && this.index != null) {
+            HMType eType;
+            if (this.type instanceof HMTypeCollection) {
+                eType = ((HMTypeCollection) type).elementType;
+            } else {
+                eType = this.type;
+            }
             return String.format("((%s[])%s", eType,
                     sb.append(String.format(".toArray(new %s[0]))[%s]", eType, index)));
         } else {

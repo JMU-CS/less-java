@@ -302,7 +302,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTForLoop node) {
         if (node.lowerBound == null) {
-            HMType cType = ((HMTypeCollection) node.upperBound.type).getCollectionType();
+            HMType cType = ((HMTypeCollection) node.upperBound.type).elementType;
             String line = String.format("for (%s i : %s)", cType, node.upperBound);
             addLine(node, line);
         } else {
@@ -353,7 +353,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
             if (expr.leftChild.type.equals(HMTypeBase.INT)) {
                 line = String.format("%4sassertEquals(%s, %s);", "", expr.rightChild, expr.leftChild);
-            } else if(expr.leftChild.type.equals(HMTypeBase.REAL)) {
+            } else if (expr.leftChild.type.equals(HMTypeBase.REAL)) {
                 line = String.format("%4sassertEquals(%s, %s, 0.0000001);", "", expr.rightChild, expr.leftChild);
             } else {
                 line = String.format("%4sassertTrue(%s);", "", node.expr);

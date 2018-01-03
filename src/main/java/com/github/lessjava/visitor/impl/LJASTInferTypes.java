@@ -13,6 +13,7 @@ import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTVariable;
@@ -21,6 +22,7 @@ import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
+import com.github.lessjava.types.inference.impl.HMTypeList;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
@@ -64,7 +66,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void preVisit(ASTForLoop node) {
         if (node.lowerBound == null) {
-            node.var.type = ((HMTypeCollection) node.upperBound.type).getCollectionType();
+            node.var.type = ((HMTypeCollection) node.upperBound.type).elementType;
         } else {
             node.var.type = new HMTypeBase(BaseDataType.INT);
         }
@@ -80,7 +82,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             ASTVariable var = (ASTVariable) node.value;
 
             if (var.index != null && var.type instanceof HMTypeCollection) {
-                this.returnType = ((HMTypeCollection) var.type).getCollectionType();
+                this.returnType = ((HMTypeCollection) var.type).elementType;
             } else {
                 this.returnType = node.value.type;
             }
@@ -95,7 +97,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         switch (node.operator) {
             case INDEX:
-                node.type = ((HMTypeCollection) node.leftChild.type).getCollectionType();
+                node.type = ((HMTypeCollection) node.leftChild.type).elementType;
                 break;
             case ASGN:
             case ADD:
@@ -167,10 +169,17 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     @Override
+    public void preVisit(ASTList node) {
+        super.preVisit(node);
+
+        node.type = new HMTypeList(node.initialElements.type);
+    }
+
+    @Override
     public void preVisit(ASTArgList node) {
         super.preVisit(node);
 
-        node.isConcrete = node.isConcrete || node.collectionType instanceof HMTypeBase;
+        node.isConcrete = node.isConcrete || node.type instanceof HMTypeBase;
     }
 
     @Override
@@ -178,7 +187,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.postVisit(node);
 
         if (!node.arguments.isEmpty()) {
-            node.type = node.arguments.get(0).type = unify(node.type, node.arguments.get(0).type);
             node.type.isCollection = true;
             // TODO: actually determine if concrete..
             node.type.isConcrete = true;
@@ -195,7 +203,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             ASTVariable var = (ASTVariable) node.value;
 
             if (var.index != null && var.type instanceof HMTypeCollection) {
-                node.variable.type = ((HMTypeCollection) var.type).getCollectionType();
+                node.variable.type = ((HMTypeCollection) var.type).elementType;
             }
         }
     }
@@ -209,8 +217,8 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         if (node.value instanceof ASTVariable) {
             ASTVariable var = (ASTVariable) node.value;
 
-            if (var.index != null && var.type instanceof HMTypeCollection) {
-                node.variable.type = ((HMTypeCollection) var.type).getCollectionType();
+            if (var.index != null) {
+                node.variable.type = ((HMTypeCollection) var.type).elementType;
             }
         }
 
@@ -225,34 +233,55 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     private HMType unify(HMType left, HMType right) {
-        HMType unifiedType = left;
-
         boolean leftIsBase = left instanceof HMTypeBase;
-        boolean rightIsBase = right instanceof HMTypeBase;
         boolean leftIsVar = left instanceof HMTypeVar;
-        boolean rightIsVar = right instanceof HMTypeVar;
         boolean leftIsCollection = left instanceof HMTypeCollection;
+
+        boolean rightIsBase = right instanceof HMTypeBase;
+        boolean rightIsVar = right instanceof HMTypeVar;
         boolean rightIsCollection = right instanceof HMTypeCollection;
 
-        if (leftIsCollection && !rightIsCollection) {
-            HMTypeCollection cleft = (HMTypeCollection) left;
-            unifiedType = new HMTypeCollection(unify(cleft.getCollectionType(), right));
-        } else if (!leftIsCollection && rightIsCollection) {
-            HMTypeCollection cright = (HMTypeCollection) right;
-            unifiedType = new HMTypeCollection(unify(cright.getCollectionType(), left));
+        if (leftIsBase && rightIsBase) {
+            return unify((HMTypeBase) left, (HMTypeBase) right);
+        } else if (leftIsVar && rightIsVar) {
+            return unify((HMTypeVar) left, (HMTypeVar) right);
         } else if (leftIsCollection && rightIsCollection) {
-            HMTypeCollection cleft = (HMTypeCollection) left;
-            HMTypeCollection cright = (HMTypeCollection) left;
-            unifiedType = new HMTypeCollection(unify(cleft.getCollectionType(), cright.getCollectionType()));
-        } else if (!leftIsBase && rightIsVar) {
-            unifiedType = left;
-        } else if (leftIsVar && rightIsBase) {
-            unifiedType = right;
-        } else if (leftIsBase && rightIsBase) {
-            unifiedType = unify((HMTypeBase) left, (HMTypeBase) right);
+            return unify((HMTypeCollection) left, (HMTypeCollection) right);
+        }
+
+        if (leftIsVar && !rightIsVar) {
+            return right;
+        } else if (!leftIsVar && rightIsVar) {
+            return left;
+        }
+
+        return left;
+    }
+
+    private HMType unify(HMTypeCollection left, HMTypeCollection right) {
+        HMType unifiedType = left;
+
+        if (left.collectionType.equals(right.collectionType)) {
+            left.elementType = right.elementType = unify(left.elementType, right.elementType);
         }
 
         return unifiedType;
+    }
+
+    private HMType unify(HMTypeVar left, HMTypeVar right) {
+        return left;
+    }
+
+    private HMTypeBase unify(HMTypeBase left, HMTypeBase right) {
+        if (left.getBaseType().equals(right.getBaseType())) {
+            return left;
+        } else if (left.getBaseType().equals(BaseDataType.REAL) && right.getBaseType().equals(BaseDataType.INT)) {
+            return left;
+        } else if (right.getBaseType().equals(BaseDataType.REAL) && left.getBaseType().equals(BaseDataType.INT)) {
+            return right;
+        }
+
+        return left;
     }
 
     private HMType unify(HMType left, HMType right, BinOp op) {
@@ -284,17 +313,4 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         return unifiedType;
     }
 
-    private HMTypeBase unify(HMTypeBase left, HMTypeBase right) {
-        if (left.getBaseType().equals(right.getBaseType())) {
-            return left;
-        } else if (left.getBaseType().equals(BaseDataType.REAL) && right.getBaseType().equals(BaseDataType.INT)) {
-            return left;
-        } else if (right.getBaseType().equals(BaseDataType.REAL) && left.getBaseType().equals(BaseDataType.INT)) {
-            return right;
-        } else if (left.getBaseType().equals(right.getBaseType())) {
-            return left;
-        }
-
-        return left;
-    }
 }

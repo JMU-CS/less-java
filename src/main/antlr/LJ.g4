@@ -46,9 +46,9 @@ exprBase:       funcCall
 
 funcCall:       ID LP (argList)? RP;
 
-collection:     LSB (argList)? RSB         #List
-                | LCB (argList)? RCB       #Set
-                | PREC3 (argList)? PREC3   #Map;
+collection:     LSB (argList)? RSB       #List
+                | LCB (argList)? RCB     #Set
+                | PREC3 (argList)? PREC3 #Map;
 
 assignment:     var PREC7 expr;
 

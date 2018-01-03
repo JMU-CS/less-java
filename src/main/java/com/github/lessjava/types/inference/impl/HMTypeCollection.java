@@ -3,31 +3,29 @@ package com.github.lessjava.types.inference.impl;
 import com.github.lessjava.types.inference.HMType;
 
 public class HMTypeCollection extends HMType {
-    private HMType collectionType;
+    public HMType elementType;
+    public String collectionType;
 
-    public HMTypeCollection(HMType collectionType) {
-        this.collectionType = collectionType;
-    }
-
-    /**
-     * @return the collectionType
-     */
-    public HMType getCollectionType() {
-        return collectionType;
-    }
-
-    /**
-     * @param collectionType
-     *            the collectionType to set
-     */
-    public void setCollectionType(HMType collectionType) {
-        this.isConcrete = collectionType.isConcrete;
-        this.collectionType = collectionType;
+    public HMTypeCollection(HMType elementType) {
+        this.elementType = elementType;
     }
 
     @Override
     public String toString() {
-        // TODO: REVISIT
-        return "";
+        return String.format("Collection: %s", this.elementType.toString());
+    }
+
+    @Override
+    public HMTypeCollection clone() {
+        switch (collectionType) {
+            case "List":
+                return new HMTypeList(this.elementType);
+            //case "Set":
+                //return new HMTypeSet(this.elementType);
+            //case "Map":
+                //return new HMTypeMap(this.elementType);
+        }
+
+        return null;
     }
 }

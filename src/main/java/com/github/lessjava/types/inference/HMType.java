@@ -12,4 +12,6 @@ public abstract class HMType {
     public boolean equals(Object other) {
         return other != null && other instanceof HMType && (this.toString()).equals(((HMType) other).toString());
     }
+
+    public abstract HMType clone();
 }

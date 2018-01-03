@@ -9,8 +9,11 @@ import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTList;
+import com.github.lessjava.types.ast.ASTMap;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
+import com.github.lessjava.types.ast.ASTSet;
 import com.github.lessjava.types.ast.ASTStatement;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
@@ -134,6 +137,21 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
         for (ASTExpression expr : node.arguments) {
             expr.setParent(node);
         }
+    }
+
+    @Override
+    public void preVisit(ASTList node) {
+        node.initialElements.setParent(node);
+    }
+
+    @Override
+    public void preVisit(ASTSet node) {
+        node.initialElements.setParent(node);
+    }
+
+    @Override
+    public void preVisit(ASTMap node) {
+        node.initialElements.setParent(node);
     }
 
     @Override

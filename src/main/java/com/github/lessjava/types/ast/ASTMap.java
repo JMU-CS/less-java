@@ -24,4 +24,10 @@ public class ASTMap extends ASTCollection {
         return initialization.toString();
     }
 
+    @Override
+    public void traverse(ASTVisitor visitor) {
+        visitor.preVisit(this);
+        initialElements.traverse(visitor);
+        visitor.postVisit(this);
+    }
 }

@@ -14,7 +14,7 @@ public class ASTFunction extends ASTNode {
     /**
      * Decaf formal parameter (name and data type).
      */
-    public static class Parameter implements Cloneable {
+    public static class Parameter {
         public String name;
         public HMType type;
 
@@ -58,9 +58,8 @@ public class ASTFunction extends ASTNode {
             return true;
         }
 
-        @Override
-        public Object clone() {
-            return new Parameter(this.name, this.type);
+        public Parameter clone() {
+            return new Parameter(this.name, this.type.clone());
         }
 
         @Override

@@ -168,8 +168,6 @@ public class LJASTConverter extends LJBaseListener {
 
         argList = new ASTArgList(args);
 
-        System.err.println(argList);
-
         parserASTMap.put(ctx, argList);
     }
 
