@@ -5,6 +5,7 @@ import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
+import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTCollection;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
@@ -16,6 +17,7 @@ import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTLiteral;
 import com.github.lessjava.types.ast.ASTLocation;
 import com.github.lessjava.types.ast.ASTMap;
+import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -26,6 +28,7 @@ import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVisitor;
 import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
+import com.github.lessjava.types.ast.ASTVoidMethodCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 
 /**
@@ -59,6 +62,14 @@ public class LJDefaultASTVisitor implements ASTVisitor {
     }
 
     public void postVisit(ASTFunction node) {
+        defaultPostVisit(node);
+    }
+
+    public void preVisit(ASTClass node) {
+        defaultPreVisit(node);
+    }
+
+    public void postVisit(ASTClass node) {
         defaultPostVisit(node);
     }
 
@@ -99,6 +110,14 @@ public class LJDefaultASTVisitor implements ASTVisitor {
     }
 
     public void postVisit(ASTVoidFunctionCall node) {
+        defaultPostVisit(node);
+    }
+
+    public void preVisit(ASTVoidMethodCall node) {
+        defaultPreVisit(node);
+    }
+
+    public void postVisit(ASTVoidMethodCall node) {
         defaultPostVisit(node);
     }
 
@@ -191,6 +210,14 @@ public class LJDefaultASTVisitor implements ASTVisitor {
     }
 
     public void postVisit(ASTFunctionCall node) {
+        defaultPostVisit(node);
+    }
+
+    public void preVisit(ASTMethodCall node) {
+        defaultPreVisit(node);
+    }
+
+    public void postVisit(ASTMethodCall node) {
         defaultPostVisit(node);
     }
 

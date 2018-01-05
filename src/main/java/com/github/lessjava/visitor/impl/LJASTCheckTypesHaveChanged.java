@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.github.lessjava.types.ast.ASTBinaryExpr;
+import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTNode;
@@ -11,7 +12,6 @@ import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
-import com.github.lessjava.types.inference.impl.HMTypeBase;
 
 public class LJASTCheckTypesHaveChanged extends StaticAnalysis {
     private static Map<ASTNode, HMType> exprTypeMap = new HashMap<>();
@@ -54,11 +54,21 @@ public class LJASTCheckTypesHaveChanged extends StaticAnalysis {
         boolean inMap = type != null && exprTypeMap.containsKey(node);
         boolean equalToMapValue = inMap && exprTypeMap.get(node).equals(type);
 
+
         if (!equalToMapValue) {
             exprTypeMap.put(node, type);
 
             typeChanged = true;
         }
+
+        if (typeChanged) {
+            System.err.println(node);
+            System.err.println(node.getClass());
+            if (node instanceof ASTExpression) {
+                System.err.println(((ASTExpression) node).type);
+            }
+        }
+
 
         return typesChanged || typeChanged;
     }

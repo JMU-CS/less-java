@@ -6,10 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,6 +29,7 @@ import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
+import com.github.lessjava.types.ast.ASTVoidMethodCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
@@ -46,20 +45,6 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static Map<String, String> libraryFunctions = new HashMap<>();
-
-    static {
-        libraryFunctions.put("size", "");
-        libraryFunctions.put("print", "System.out.print(%s);");
-        libraryFunctions.put("printf", "System.out.printf(%s);");
-        libraryFunctions.put("println", "System.out.println(%s);");
-        libraryFunctions.put("readInt", "scn.nextInt");
-        libraryFunctions.put("readDouble", "scn.nextDouble");
-        libraryFunctions.put("readChar", "scn.useDelimiter(\"\").next");
-        libraryFunctions.put("readWord", "scn.useDelimiter(\"\\\\s+\").next");
-        libraryFunctions.put("readLine", "scn.nextLine");
     }
 
     public Path mainFile = Paths.get("generated/Main.java");
@@ -214,8 +199,30 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
             functionVariables.add(node.variable.name);
             functionDeclarationLines.add(declaration);
         }
+        String line;
 
-        String line = String.format("%s = %s;", node.variable.name, node.value);
+        if (node.op.equals(BinOp.ASGN)) {
+            if (node.variable.isCollection && node.variable.index != null) {
+                line = String.format("%s.set(%s, %s);", node.variable.name, node.variable.index, node.value);
+            } else {
+                line = String.format("%s = %s;", node.variable.name, node.value);
+            }
+        } else if (node.op.equals(BinOp.ADDASGN)) {
+            if (node.variable.isCollection && node.variable.index == null) {
+                line = String.format("%s.add(%s);", node.variable.name, node.value);
+            } else {
+                line = String.format("%s += %s;", node.variable.name, node.value);
+            }
+        } else if (node.op.equals(BinOp.SUBASGN)) {
+            if (node.variable.isCollection && node.variable.index == null) {
+                line = String.format("%s.remove(%s);", node.variable.name, node.value);
+            } else {
+                line = String.format("%s -= %s;", node.variable.name, node.value);
+            }
+        } else {
+            line = "---Assignment Error---";
+        }
+
         addLine(node, line);
     }
 
@@ -380,7 +387,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
                 .replaceAll("\\\\\"", "");
 
         List<String> printArgs = new ArrayList<>();
-        if (libraryFunctions.containsKey(node.name)) {
+        if (ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
             switch (node.name) {
                 case "print":
                 case "println":
@@ -390,14 +397,23 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
                     }
 
                     arguments = String.join(",", printArgs).replaceAll("\\\\\"", "");
-                    line = String.format(libraryFunctions.get(node.name), arguments);
+                    line = String.format(ASTFunction.libraryFunctionStrings.get(node.name), arguments);
                     break;
                 default:
-                    line = String.format("%s;", libraryFunctions.get(node.name));
+                    line = String.format("%s;", ASTFunction.libraryFunctionStrings.get(node.name));
             }
         } else {
             line = String.format("%s(%s);", node.name, arguments);
         }
+
+        addLine(node, line);
+    }
+
+    @Override
+    public void preVisit(ASTVoidMethodCall node) {
+        String line;
+
+        line = String.format("%s.%s;", node.var, node.funcCall);
 
         addLine(node, line);
     }

@@ -1,9 +1,5 @@
 package com.github.lessjava.types.ast;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 
@@ -34,20 +30,19 @@ public class ASTBinaryExpr extends ASTExpression {
      * </ul>
      */
     public enum BinOp {
-        ASGN, INDEX, OR, AND, EQ, NE, LT, GT, LE, GE, ADD, SUB, MUL, DIV, MOD
+        INVOKE, ASGN, ADDASGN, SUBASGN, INDEX, OR, AND, EQ, NE, LT, GT, LE, GE, ADD, SUB, MUL, DIV, MOD
     }
-
-    public static Set<BinOp> flexibleOperators = new HashSet<>(Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE }));
-
-    public static Set<BinOp> arithmeticOperators = new HashSet<>(
-            Arrays.asList(new BinOp[] { BinOp.ADD, BinOp.SUB, BinOp.MUL, BinOp.DIV, BinOp.MOD, BinOp.LT, BinOp.GT }));
-
-    public static Set<BinOp> booleanOperators = new HashSet<>(Arrays.asList(new BinOp[] { BinOp.OR, BinOp.AND }));
 
     public static String opToString(BinOp op) {
         switch (op) {
+            case INVOKE:
+                return ".";
             case ASGN:
                 return "=";
+            case ADDASGN:
+                return "+=";
+            case SUBASGN:
+                return "-=";
             case OR:
                 return "||";
             case AND:
@@ -77,6 +72,88 @@ public class ASTBinaryExpr extends ASTExpression {
             default:
                 return "???";
         }
+    }
+
+    public static BinOp stringToOp(String s) {
+        BinOp op;
+
+        switch (s) {
+            case "[":
+                op = BinOp.INDEX;
+                break;
+
+            case "+":
+                op = BinOp.ADD;
+                break;
+
+            case "*":
+                op = BinOp.MUL;
+                break;
+
+            case "%":
+                op = BinOp.MOD;
+                break;
+
+            case "/":
+                op = BinOp.DIV;
+                break;
+
+            case "-":
+                op = BinOp.SUB;
+                break;
+
+            case ">":
+                op = BinOp.GT;
+                break;
+
+            case ">=":
+                op = BinOp.GE;
+                break;
+
+            case "<":
+                op = BinOp.LT;
+                break;
+
+            case "<=":
+                op = BinOp.LE;
+                break;
+
+            case "==":
+                op = BinOp.EQ;
+                break;
+
+            case "!=":
+                op = BinOp.NE;
+                break;
+
+            case "||":
+                op = BinOp.OR;
+                break;
+
+            case "&&":
+                op = BinOp.AND;
+                break;
+            case "=":
+                op = BinOp.ASGN;
+                break;
+
+            case "+=":
+                op = BinOp.ADDASGN;
+                break;
+
+            case "-=":
+                op = BinOp.SUBASGN;
+                break;
+
+            case ".":
+                op = BinOp.INVOKE;
+                break;
+
+            default:
+                op = null;
+        }
+
+        return op;
     }
 
     public BinOp operator;

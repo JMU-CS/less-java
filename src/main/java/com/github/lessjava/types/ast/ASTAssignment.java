@@ -5,10 +5,11 @@ package com.github.lessjava.types.ast;
  * the value expression and store the result in the given memory location.
  */
 public class ASTAssignment extends ASTBinaryExpr {
+    public BinOp op;
     public ASTVariable variable;
     public ASTExpression value;
 
-    public ASTAssignment(ASTVariable variable, ASTExpression value) {
+    public ASTAssignment(BinOp op, ASTVariable variable, ASTExpression value) {
         super(BinOp.ASGN, variable, value);
         this.variable = (ASTVariable) super.leftChild;
         this.value = super.rightChild;

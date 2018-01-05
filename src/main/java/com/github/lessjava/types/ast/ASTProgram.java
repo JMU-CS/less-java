@@ -10,13 +10,15 @@ import java.util.List;
 public class ASTProgram extends ASTNode {
     public List<ASTStatement> statements;
     public List<ASTFunction> functions;
+    public List<ASTClass> classes;
     public List<ASTTest> tests;
 
     public ASTProgram() {
         super();
         this.statements = new ArrayList<ASTStatement>();
         this.functions = new ArrayList<ASTFunction>();
-        this.tests = new ArrayList<ASTTest>();
+        this.tests = new ArrayList<>();
+        this.classes = new ArrayList<>();
     }
 
     @Override
@@ -29,9 +31,13 @@ public class ASTProgram extends ASTNode {
         for (ASTStatement s : statements) {
             s.traverse(visitor);
         }
+        for (ASTClass c : classes) {
+            c.traverse(visitor);
+        }
         for (ASTTest t : tests) {
             t.traverse(visitor);
         }
+
         visitor.postVisit(this);
     }
 }

@@ -26,6 +26,7 @@ import com.github.lessjava.generated.LJParser.FunctionContext;
 import com.github.lessjava.generated.LJParser.ListContext;
 import com.github.lessjava.generated.LJParser.LitContext;
 import com.github.lessjava.generated.LJParser.MapContext;
+import com.github.lessjava.generated.LJParser.MethodCallContext;
 import com.github.lessjava.generated.LJParser.ProgramContext;
 import com.github.lessjava.generated.LJParser.ReturnContext;
 import com.github.lessjava.generated.LJParser.SetContext;
@@ -34,6 +35,7 @@ import com.github.lessjava.generated.LJParser.TestContext;
 import com.github.lessjava.generated.LJParser.VarContext;
 import com.github.lessjava.generated.LJParser.VoidAssignmentContext;
 import com.github.lessjava.generated.LJParser.VoidFunctionCallContext;
+import com.github.lessjava.generated.LJParser.VoidMethodCallContext;
 import com.github.lessjava.generated.LJParser.WhileContext;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
@@ -41,6 +43,7 @@ import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
+import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTCollection;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
@@ -52,6 +55,8 @@ import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTLiteral;
 import com.github.lessjava.types.ast.ASTMap;
+import com.github.lessjava.types.ast.ASTMethod;
+import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -62,10 +67,9 @@ import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
+import com.github.lessjava.types.ast.ASTVoidMethodCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.types.inference.HMType;
-import com.github.lessjava.types.inference.HMType.BaseDataType;
-import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public class LJASTConverter extends LJBaseListener {
@@ -84,9 +88,10 @@ public class LJASTConverter extends LJBaseListener {
         ast = new ASTProgram();
 
         for (StatementContext s : ctx.statement()) {
-            if (!s.getText().equals("\n")) {
-                ast.statements.add((ASTStatement) parserASTMap.get(s));
+            if (!parserASTMap.containsKey(s)) {
+                continue;
             }
+            ast.statements.add((ASTStatement) parserASTMap.get(s));
         }
 
         for (FunctionContext f : ctx.function()) {
@@ -158,6 +163,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTArgList argList;
 
         List<ASTExpression> args = new ArrayList<>();
+
         for (ExprContext e : ctx.expr()) {
             args.add((ASTExpression) parserASTMap.get(e));
         }
@@ -174,9 +180,11 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitVoidAssignment(VoidAssignmentContext ctx) {
         ASTVoidAssignment voidAssignment;
+        BinOp op;
         ASTVariable variable;
         ASTExpression expression;
 
+        op = ASTBinaryExpr.stringToOp(ctx.assignment().op.getText());
         variable = (ASTVariable) parserASTMap.get(ctx.assignment().var());
         expression = (ASTExpression) parserASTMap.get(ctx.assignment().expr());
 
@@ -184,7 +192,7 @@ public class LJASTConverter extends LJBaseListener {
             variable.isCollection = true;
         }
 
-        voidAssignment = new ASTVoidAssignment(variable, expression);
+        voidAssignment = new ASTVoidAssignment(op, variable, expression);
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(voidAssignment);
@@ -342,6 +350,24 @@ public class LJASTConverter extends LJBaseListener {
     }
 
     @Override
+    public void exitVoidMethodCall(VoidMethodCallContext ctx) {
+        ASTVoidMethodCall voidMethodCall;
+
+
+        ASTVariable var = (ASTVariable) parserASTMap.get(ctx.methodCall().var());
+        ASTFunctionCall funcCall = (ASTFunctionCall) parserASTMap.get(ctx.methodCall().funcCall());
+
+        voidMethodCall = new ASTVoidMethodCall(var, funcCall);
+        voidMethodCall.setDepth(ctx.depth());
+
+        parserASTMap.put(ctx, voidMethodCall);
+
+        if (!blocks.empty()) {
+            blocks.peek().statements.add(voidMethodCall);
+        }
+    }
+
+    @Override
     public void exitExpr(ExprContext ctx) {
         ASTExpression expr;
 
@@ -358,20 +384,26 @@ public class LJASTConverter extends LJBaseListener {
         ASTExpression left, right;
         BinOp binOp;
 
-        if (ctx.op == null && ctx.assignment() == null) {
+        if (ctx.op == null && ctx.assignment() == null && ctx.methodCall() == null) {
             expr = (ASTExpression) parserASTMap.get(ctx.exprUn());
 
             expr.setDepth(ctx.depth());
         } else if (ctx.assignment() != null) {
             left = (ASTExpression) parserASTMap.get(ctx.assignment().var());
             right = (ASTExpression) parserASTMap.get(ctx.assignment().expr());
-            binOp = findBinOp(ctx.assignment().PREC7().getText());
+            binOp = ASTBinaryExpr.stringToOp(ctx.assignment().op.getText());
+
+            expr = new ASTBinaryExpr(binOp, left, right);
+        } else if (ctx.methodCall() != null) {
+            left = (ASTExpression) parserASTMap.get(ctx.methodCall().var());
+            right = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall());
+            binOp = ASTBinaryExpr.stringToOp(ctx.methodCall().op.getText());
 
             expr = new ASTBinaryExpr(binOp, left, right);
         } else {
             left = (ASTExpression) parserASTMap.get(ctx.left);
             right = (ASTExpression) parserASTMap.get(ctx.right);
-            binOp = findBinOp(ctx.op.getText());
+            binOp = ASTBinaryExpr.stringToOp(ctx.op.getText());
 
             expr = new ASTBinaryExpr(binOp, left, right);
         }
@@ -428,10 +460,12 @@ public class LJASTConverter extends LJBaseListener {
 
     @Override
     public void exitAssignment(AssignmentContext ctx) {
+        BinOp op;
         ASTAssignment assignment;
         ASTVariable variable;
         ASTExpression expression;
 
+        op = ASTBinaryExpr.stringToOp(ctx.op.getText());
         variable = (ASTVariable) parserASTMap.get(ctx.var());
         expression = (ASTExpression) parserASTMap.get(ctx.expr());
 
@@ -439,7 +473,7 @@ public class LJASTConverter extends LJBaseListener {
             variable.isCollection = true;
         }
 
-        assignment = new ASTAssignment(variable, expression);
+        assignment = new ASTAssignment(op, variable, expression);
 
         assignment.setDepth(ctx.depth());
 
@@ -463,6 +497,20 @@ public class LJASTConverter extends LJBaseListener {
         for (ExprContext expr : ctx.argList().expr()) {
             funcCall.arguments.add((ASTExpression) parserASTMap.get(expr));
         }
+    }
+
+    @Override
+    public void exitMethodCall(MethodCallContext ctx) {
+        ASTMethodCall methodCall;
+
+        ASTVariable var = (ASTVariable) parserASTMap.get(ctx.var());
+        ASTFunctionCall funcCall = (ASTFunctionCall) parserASTMap.get(ctx.funcCall());
+
+        methodCall = new ASTMethodCall(var, funcCall);
+
+        methodCall.setDepth(ctx.depth());
+
+        parserASTMap.put(ctx, methodCall);
     }
 
     @Override
@@ -568,105 +616,22 @@ public class LJASTConverter extends LJBaseListener {
         }
     }
 
-    private ASTBinaryExpr.BinOp findBinOp(String s) {
-        ASTBinaryExpr.BinOp op;
-
-        switch (s) {
-            case "[":
-                op = ASTBinaryExpr.BinOp.INDEX;
-                break;
-
-            case "+":
-                op = ASTBinaryExpr.BinOp.ADD;
-                break;
-
-            case "*":
-                op = ASTBinaryExpr.BinOp.MUL;
-                break;
-
-            case "%":
-                op = ASTBinaryExpr.BinOp.MOD;
-                break;
-
-            case "/":
-                op = ASTBinaryExpr.BinOp.DIV;
-                break;
-
-            case "-":
-                op = ASTBinaryExpr.BinOp.SUB;
-                break;
-
-            case ">":
-                op = ASTBinaryExpr.BinOp.GT;
-                break;
-
-            case ">=":
-                op = ASTBinaryExpr.BinOp.GE;
-                break;
-
-            case "<":
-                op = ASTBinaryExpr.BinOp.LT;
-                break;
-
-            case "<=":
-                op = ASTBinaryExpr.BinOp.LE;
-                break;
-
-            case "==":
-                op = ASTBinaryExpr.BinOp.EQ;
-                break;
-
-            case "!=":
-                op = ASTBinaryExpr.BinOp.NE;
-                break;
-
-            case "||":
-                op = ASTBinaryExpr.BinOp.OR;
-                break;
-
-            case "&&":
-                op = ASTBinaryExpr.BinOp.AND;
-                break;
-            case "=":
-                op = ASTBinaryExpr.BinOp.ASGN;
-                break;
-
-            default:
-                op = null;
-        }
-
-        return op;
-    }
-
     /**
      * Add Library functions
      */
     private void addLibraryFunctions() {
-        // TODO: MAKE STATIC; duplicate code in build symbol tables
-        List<ASTFunction> libraryFunctions = new ArrayList<>();
-
-        // Output
-        ASTFunction print = new ASTFunction("print", new HMTypeBase(BaseDataType.VOID), null);
-        ASTFunction println = new ASTFunction("println", new HMTypeBase(BaseDataType.VOID), null);
-
-        print.parameters.add(new ASTFunction.Parameter("args", new HMTypeBase(BaseDataType.STR)));
-        println.parameters.add(new ASTFunction.Parameter("args", new HMTypeBase(BaseDataType.STR)));
-
-        libraryFunctions.add(print);
-        libraryFunctions.add(println);
-
-        // Input
-        libraryFunctions.add(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));
-        libraryFunctions.add(new ASTFunction("readReal", new HMTypeBase(BaseDataType.REAL), null));
-        libraryFunctions.add(new ASTFunction("readChar", new HMTypeBase(BaseDataType.STR), null));
-        libraryFunctions.add(new ASTFunction("readWord", new HMTypeBase(BaseDataType.STR), null));
-        libraryFunctions.add(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));
-
-        for (ASTFunction f : libraryFunctions) {
+        for (ASTFunction f : ASTFunction.functions) {
             f.setDepth(2);
             f.setParent(ast);
         }
 
-        ast.functions.addAll(libraryFunctions);
+        for (ASTClass c: ASTClass.classes) {
+            for (ASTMethod m: c.methods) {
+                m.setDepth(3);
+                m.setParent(c);
+            }
+        }
+
+        ast.functions.addAll(ASTFunction.functions);
     }
 }

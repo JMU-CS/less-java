@@ -15,6 +15,7 @@ statement:      IF LP expr RP block (ELSE block)?           #Conditional
                 | BREAK EOL                                 #Break
                 | CONTINUE EOL                              #Continue
                 | funcCall EOL                              #VoidFunctionCall
+                | methodCall EOL                            #VoidMethodCall
                 | assignment EOL                            #VoidAssignment
                 | EOL                                       #Terminator
                 ;
@@ -29,6 +30,7 @@ exprBin:        left=exprBin op=PREC1 right=exprBin
                 | left=exprBin op=PREC4 right=exprBin
                 | left=exprBin op=PREC5 right=exprBin
                 | left=exprBin op=PREC6 right=exprBin
+                | methodCall
                 | assignment
                 | exprUn
                 ;
@@ -38,6 +40,7 @@ exprUn:         op=UNOP expression=exprUn
                 ;
 
 exprBase:       funcCall
+                | methodCall
                 | collection
                 | var
                 | lit
@@ -46,11 +49,13 @@ exprBase:       funcCall
 
 funcCall:       ID LP (argList)? RP;
 
+methodCall:     var op=INVOKE funcCall;
+
 collection:     LSB (argList)? RSB       #List
                 | LCB (argList)? RCB     #Set
                 | PREC3 (argList)? PREC3 #Map;
 
-assignment:     var PREC7 expr;
+assignment:     var op=PREC7 expr;
 
 argList:        entry (',' entry)*
                 | expr (',' expr)*;
@@ -97,34 +102,43 @@ PREC5:      AND;
 
 PREC6:      OR;
 
-PREC7:      ASGN;
+PREC7:      ASGN
+            | ADDASGN
+            | SUBASGN
+            ;
 
 UNOP:       NOT
             | SUB
             ;
 
-NOT:        '!';
-ADD:        '+';
-SUB:        '-';
-MULT:       '*';
-DIV:        '/';
-MOD:        '%';
-GT:         '>';
-GTE:       '>=';
-LT:         '<';
-LTE:       '<=';
-ET:        '==';
-NET:       '!=';
-OR:        '||';
-AND:       '&&';
-ASGN:       '=';
+NOT:     '!';
+ADD:     '+';
+SUB:     '-';
+MULT:    '*';
+DIV:     '/';
+MOD:     '%';
+GT:      '>';
+GTE:     '>=';
+LT:      '<';
+LTE:     '<=';
+ET:      '==';
+NET:     '!=';
+OR:      '||';
+AND:     '&&';
+ASGN:    '=';
+ADDASGN: '+=';
+SUBASGN: '-=';
+INCR:    '++';
+DECR:    '--';
 
-LSB:         '[';
-RSB:         ']';
-LCB:         '{';
-RCB:         '}';
-LP:          '(';
-RP:          ')';
+LSB: '[';
+RSB: ']';
+LCB: '{';
+RCB: '}';
+LP:  '(';
+RP:  ')';
+
+INVOKE: '.';
 
 
 // Literals

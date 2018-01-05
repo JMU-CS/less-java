@@ -1,5 +1,7 @@
 package com.github.lessjava.visitor.impl;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import com.github.lessjava.types.Symbol;
@@ -14,15 +16,19 @@ import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTList;
+import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
+import com.github.lessjava.types.ast.ASTSet;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidAssignment;
+import com.github.lessjava.types.ast.ASTVoidMethodCall;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.types.inference.impl.HMTypeList;
+import com.github.lessjava.types.inference.impl.HMTypeSet;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
@@ -96,10 +102,14 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.preVisit(node);
 
         switch (node.operator) {
+            case INVOKE:
+                break;
             case INDEX:
                 node.type = ((HMTypeCollection) node.leftChild.type).elementType;
                 break;
             case ASGN:
+            case ADDASGN:
+            case SUBASGN:
             case ADD:
             case SUB:
             case MUL:
@@ -166,6 +176,8 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         if (symbols != null && !symbols.isEmpty()) {
             symbols.forEach(s -> node.type = unify(node.type, s.type));
         }
+
+        node.isCollection = node.isCollection || node.type instanceof HMTypeCollection;
     }
 
     @Override
@@ -173,6 +185,13 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.preVisit(node);
 
         node.type = new HMTypeList(node.initialElements.type);
+    }
+
+    @Override
+    public void preVisit(ASTSet node) {
+        super.preVisit(node);
+
+        node.type = new HMTypeSet(node.initialElements.type);
     }
 
     @Override
@@ -187,8 +206,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.postVisit(node);
 
         if (!node.arguments.isEmpty()) {
-            node.type.isCollection = true;
-            // TODO: actually determine if concrete..
             node.type.isConcrete = true;
         }
     }
@@ -197,7 +214,11 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTVoidAssignment node) {
         super.postVisit(node);
 
-        node.variable.type = unify(node.variable.type, node.value.type);
+        node.variable.type = unify(node.variable.type, node.value.type, node.op);
+
+        if (node.variable.isCollection && !(node.variable.type instanceof HMTypeCollection)) {
+            node.variable.type = new HMTypeList(node.variable.type);
+        }
 
         if (node.value instanceof ASTVariable) {
             ASTVariable var = (ASTVariable) node.value;
@@ -226,6 +247,18 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     @Override
+    public void postVisit(ASTVoidMethodCall node) {
+        super.postVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTMethodCall node) {
+        super.postVisit(node);
+
+        System.err.println(node);
+    }
+
+    @Override
     public void preVisit(ASTConditional node) {
         super.preVisit(node);
 
@@ -247,6 +280,14 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             return unify((HMTypeVar) left, (HMTypeVar) right);
         } else if (leftIsCollection && rightIsCollection) {
             return unify((HMTypeCollection) left, (HMTypeCollection) right);
+        }
+
+        // TODO: This can't be right...
+        // Promote to collection
+        if (leftIsCollection && !rightIsCollection) {
+            return left;
+        } else if(!leftIsCollection && rightIsCollection) {
+            return right;
         }
 
         if (leftIsVar && !rightIsVar) {
@@ -284,10 +325,13 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         return left;
     }
 
+    private static HashSet<BinOp> ignoreOps = new HashSet<BinOp>(
+            Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE, BinOp.ADDASGN, BinOp.SUBASGN }));
+
     private HMType unify(HMType left, HMType right, BinOp op) {
         HMType unifiedType = unify(left, right);
 
-        if (op != BinOp.EQ && op != BinOp.NE) {
+        if (!ignoreOps.contains(op)) {
             switch (op) {
                 case ADD:
                 case SUB:

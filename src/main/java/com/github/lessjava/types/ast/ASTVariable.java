@@ -1,6 +1,5 @@
 package com.github.lessjava.types.ast;
 
-import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
 
 /**
@@ -32,21 +31,14 @@ public class ASTVariable extends ASTExpression {
         boolean inTest = false;
 
         // TODO: Better way to handle this??
-        while (n != null && !((n = n.getParent()) instanceof ASTProgram)) {
+        while (!((n = n.getParent()) instanceof ASTProgram) && n != null) {
             inTest = n instanceof ASTTest;
         }
 
         sb.append(inTest ? String.format("__test%s", this.name) : name);
 
         if (this.isCollection && this.index != null) {
-            HMType eType;
-            if (this.type instanceof HMTypeCollection) {
-                eType = ((HMTypeCollection) type).elementType;
-            } else {
-                eType = this.type;
-            }
-            return String.format("((%s[])%s", eType,
-                    sb.append(String.format(".toArray(new %s[0]))[%s]", eType, index)));
+            return String.format("%s.get(%s)", name, index);
         } else {
             return sb.toString();
         }

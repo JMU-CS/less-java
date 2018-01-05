@@ -1,5 +1,19 @@
-list = ["a", "a", "b", "c"]
-//set = {"a", "a", "b", "c"}
 //map = <"a": "x", "b": "y", "c": "z">
 
-list[0] = "b"
+list = []
+list.add("b")
+test list.size() == 1
+
+/*list.get(0) = "b"*/
+
+/*list.add("d")*/
+/*test list.size() == 5*/
+/*test list[list.size() - 1] == "d"*/
+
+/*list.remove("d")*/
+/*test list.size() == 4*/
+
+/*println("Set")*/
+/*set = {"a", "a", "b", "c"}*/
+
+/*test set.size() == 3*/

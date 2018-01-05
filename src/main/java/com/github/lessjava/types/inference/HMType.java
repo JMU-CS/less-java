@@ -2,7 +2,6 @@ package com.github.lessjava.types.inference;
 
 public abstract class HMType {
     public boolean isConcrete;
-    public boolean isCollection;
 
     public static enum BaseDataType {
         INT, REAL, BOOL, VOID, STR

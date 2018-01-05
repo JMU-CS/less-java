@@ -1,5 +1,8 @@
 package com.github.lessjava.visitor.impl;
 
+import java.util.HashSet;
+
+import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTVariable;
@@ -7,6 +10,8 @@ import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJAssignTestVariables extends LJDefaultASTVisitor {
+    private static HashSet<String> emittedVariables = new HashSet<>();
+
     public ASTProgram program;
 
     public boolean inTest;
@@ -34,7 +39,7 @@ public class LJAssignTestVariables extends LJDefaultASTVisitor {
     public void preVisit(ASTVariable node) {
         super.preVisit(node);
 
-        if (!inTest) {
+        if (!inTest || emittedVariables.contains(node.name)) {
             return;
         }
 
@@ -52,6 +57,8 @@ public class LJAssignTestVariables extends LJDefaultASTVisitor {
         testVar.setParent(program);
         testVar.setParentScope(program);
 
-        this.program.statements.add(new ASTVoidAssignment(testVar, testVal));
+        this.program.statements.add(new ASTVoidAssignment(BinOp.ASGN, testVar, testVal));
+
+        emittedVariables.add(node.name);
     }
 }

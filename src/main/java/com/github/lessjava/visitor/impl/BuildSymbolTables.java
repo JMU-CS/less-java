@@ -20,8 +20,6 @@ import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
-import com.github.lessjava.types.inference.HMType.BaseDataType;
-import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 /**
@@ -135,20 +133,6 @@ public class BuildSymbolTables extends StaticAnalysis {
         } catch (InvalidProgramException ex) {
             addError(ex);
         }
-    }
-
-    protected void insertLibrarySymbols() {
-        // Output
-        ASTFunction print = new ASTFunction("print", new HMTypeBase(BaseDataType.VOID), null);
-        print.parameters.add(new ASTFunction.Parameter("args", new HMTypeBase(BaseDataType.STR)));
-        insertFunctionSymbol(print);
-
-        // Input
-        insertFunctionSymbol(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));
-        insertFunctionSymbol(new ASTFunction("readReal", new HMTypeBase(BaseDataType.REAL), null));
-        insertFunctionSymbol(new ASTFunction("readChar", new HMTypeBase(BaseDataType.STR), null));
-        insertFunctionSymbol(new ASTFunction("readWord", new HMTypeBase(BaseDataType.STR), null));
-        insertFunctionSymbol(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));
     }
 
     protected void insertVariableSymbol(ASTVariable node) {

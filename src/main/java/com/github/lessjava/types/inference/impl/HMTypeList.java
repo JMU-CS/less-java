@@ -6,10 +6,7 @@ public class HMTypeList extends HMTypeCollection {
     public HMTypeList(HMType elementType) {
         super(elementType);
         super.collectionType = "List";
+        super.toString = String.format("ArrayList<%s>", elementType instanceof HMTypeVar ? "Object" : elementType);
     }
 
-    @Override
-    public String toString() {
-        return String.format("ArrayDeque<%s>", elementType);
-    }
 }

@@ -7,6 +7,7 @@ public class HMTypeBase extends HMType {
     public static final HMTypeBase REAL = new HMTypeBase(BaseDataType.REAL);
     public static final HMTypeBase BOOL = new HMTypeBase(BaseDataType.BOOL);
     public static final HMTypeBase STR = new HMTypeBase(BaseDataType.STR);
+    public static final HMTypeBase VOID = new HMTypeBase(BaseDataType.VOID);
 
     private BaseDataType baseType;
 

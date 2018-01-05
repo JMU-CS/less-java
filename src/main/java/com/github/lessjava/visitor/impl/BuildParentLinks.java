@@ -11,6 +11,7 @@ import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTMap;
+import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTSet;
@@ -137,6 +138,12 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
         for (ASTExpression expr : node.arguments) {
             expr.setParent(node);
         }
+    }
+
+    @Override
+    public void preVisit(ASTMethodCall node) {
+        node.var.setParent(node);
+        node.funcCall.setParent(node);
     }
 
     @Override

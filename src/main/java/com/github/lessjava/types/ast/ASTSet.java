@@ -10,7 +10,7 @@ public class ASTSet extends ASTCollection {
         StringBuilder initialization = new StringBuilder();
         String argString = initialElements.toString();
 
-        initialization.append(String.format("new HashSet(Arrays.asList(new %s[] %s))", initialElements.type,
+        initialization.append(String.format("new HashSet<%s>(Arrays.asList(new %s[] %s))", initialElements.type, initialElements.type,
                 argString));
 
         return initialization.toString();

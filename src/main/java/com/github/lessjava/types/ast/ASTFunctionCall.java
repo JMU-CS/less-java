@@ -3,11 +3,6 @@ package com.github.lessjava.types.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.lessjava.visitor.impl.LJGenerateJava;
-
-/**
- * Decaf function call that is intended to return a value at runtime.
- */
 public class ASTFunctionCall extends ASTExpression {
     public String name;
     public List<ASTExpression> arguments;
@@ -48,12 +43,8 @@ public class ASTFunctionCall extends ASTExpression {
         }
         argString.append(")");
 
-        if (name.equals("size")) {
-            return String.format("%s.size()", this.arguments.get(0));
-        }
-
-        if (LJGenerateJava.libraryFunctions.containsKey(name)) {
-            return LJGenerateJava.libraryFunctions.get(name) + argString;
+        if (ASTFunction.libraryFunctionStrings.containsKey(name)) {
+            return ASTFunction.libraryFunctionStrings.get(name) + argString;
         }
 
         return name + argString;
