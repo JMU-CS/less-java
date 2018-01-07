@@ -46,12 +46,16 @@ public class ASTClass extends ASTNode {
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
 
-        for (ASTVariable attribute : attributes) {
-            attribute.traverse(visitor);
+        if (attributes != null) {
+            for (ASTVariable attribute : attributes) {
+                attribute.traverse(visitor);
+            }
         }
 
-        for (ASTMethod method : methods) {
-            method.traverse(visitor);
+        if (methods != null) {
+            for (ASTMethod method : methods) {
+                method.traverse(visitor);
+            }
         }
 
         visitor.postVisit(this);

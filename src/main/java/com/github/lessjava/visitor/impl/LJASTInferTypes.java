@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.github.lessjava.types.Symbol;
+import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
@@ -13,7 +14,6 @@ import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
-import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTMethodCall;
@@ -214,19 +214,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTVoidAssignment node) {
         super.postVisit(node);
 
-        node.variable.type = unify(node.variable.type, node.value.type, node.op);
-
-        if (node.variable.isCollection && !(node.variable.type instanceof HMTypeCollection)) {
-            node.variable.type = new HMTypeList(node.variable.type);
-        }
-
-        if (node.value instanceof ASTVariable) {
-            ASTVariable var = (ASTVariable) node.value;
-
-            if (var.index != null && var.type instanceof HMTypeCollection) {
-                node.variable.type = ((HMTypeCollection) var.type).elementType;
-            }
-        }
+        node.variable.type = unify(node.variable.type, node.value.type);
     }
 
     @Override
@@ -254,8 +242,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void postVisit(ASTMethodCall node) {
         super.postVisit(node);
-
-        System.err.println(node);
     }
 
     @Override
@@ -326,7 +312,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     private static HashSet<BinOp> ignoreOps = new HashSet<BinOp>(
-            Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE, BinOp.ADDASGN, BinOp.SUBASGN }));
+            Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE, BinOp.ADDASGN, BinOp.SUBASGN, BinOp.INVOKE }));
 
     private HMType unify(HMType left, HMType right, BinOp op) {
         HMType unifiedType = unify(left, right);

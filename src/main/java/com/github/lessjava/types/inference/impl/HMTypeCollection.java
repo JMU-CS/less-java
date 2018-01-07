@@ -2,18 +2,14 @@ package com.github.lessjava.types.inference.impl;
 
 import com.github.lessjava.types.inference.HMType;
 
-public abstract class HMTypeCollection extends HMType {
+public abstract class HMTypeCollection extends HMTypeObject {
     public HMType elementType;
     public String collectionType;
     public String toString;
 
-    public HMTypeCollection(HMType elementType) {
+    public HMTypeCollection(String className, HMType elementType) {
+        super(className);
         this.elementType = elementType;
-    }
-
-    @Override
-    public String toString() {
-        return toString;
     }
 
     @Override

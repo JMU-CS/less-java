@@ -2,11 +2,14 @@ grammar LJ;
 
 /* Parser Grammar */
 
-program:        (statement | function | test)*;
+program:        (class_ | statement | function | test)*;
+
+class_:          ID classBlock;
+classBlock:     (EOL)? LCB (EOL)? (attributes=var EOL)* methods=function* RCB (EOL)?;
 
 function:       ID (LP paramList RP )? block;
 paramList:      ID (','ID)*;
-block:          (EOL)? '{' (EOL)? statement* '}' (EOL)?;
+block:          (EOL)? LCB (EOL)? statement* RCB (EOL)?;
 
 statement:      IF LP expr RP block (ELSE block)?           #Conditional
                 | WHILE LP expr RP block                    #While

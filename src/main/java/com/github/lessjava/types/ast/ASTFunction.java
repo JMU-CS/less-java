@@ -14,4 +14,14 @@ public class ASTFunction extends ASTAbstractFunction {
     public ASTFunction(String name, ASTBlock body) {
         super(name, body);
     }
+
+    @Override
+    public void traverse(ASTVisitor visitor) {
+        visitor.preVisit(this);
+        // Library functions have null bodies
+        if (body != null) {
+            body.traverse(visitor);
+        }
+        visitor.postVisit(this);
+    }
 }

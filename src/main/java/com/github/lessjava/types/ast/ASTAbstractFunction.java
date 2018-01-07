@@ -9,7 +9,8 @@ import java.util.Map;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
-import com.github.lessjava.types.inference.impl.HMTypeClass;
+import com.github.lessjava.types.inference.impl.HMTypeList;
+import com.github.lessjava.types.inference.impl.HMTypeSet;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public abstract class ASTAbstractFunction extends ASTNode {
@@ -50,11 +51,11 @@ public abstract class ASTAbstractFunction extends ASTNode {
         functions.add(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));
 
         // Constructors (Library Data Structures)
-        functions.add(new ASTFunction("List", new HMTypeClass("List", new HashSet<>()), null));
-        functions.add(new ASTFunction("Stack", new HMTypeClass("Stack", new HashSet<>()), null));
-        functions.add(new ASTFunction("Queue", new HMTypeClass("Queue", new HashSet<>()), null));
-        functions.add(new ASTFunction("Set", new HMTypeClass("Set", new HashSet<>()), null));
-        functions.add(new ASTFunction("Map", new HMTypeClass("Map", new HashSet<>()), null));
+        functions.add(new ASTFunction("List", new HMTypeList(null), null));
+        //functions.add(new ASTFunction("Stack", new HMTypeObject("Stack", new HashSet<>()), null));
+        //functions.add(new ASTFunction("Queue", new HMTypeObject("Queue", new HashSet<>()), null));
+        functions.add(new ASTFunction("Set", new HMTypeSet(null), null));
+        //functions.add(new ASTFunction("Map", new HMTypeObject("Map", new HashSet<>()), null));
     }
 
     public static class Parameter {
@@ -145,7 +146,7 @@ public abstract class ASTAbstractFunction extends ASTNode {
         return params.toString();
     }
 
-    public String getNameParamString() {
+    public String getIdentifyingString() {
         StringBuilder sb = new StringBuilder(name);
         for (Parameter e : parameters) {
             sb.append(e.type.toString() + ",");
@@ -167,7 +168,7 @@ public abstract class ASTAbstractFunction extends ASTNode {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ASTFunction other = (ASTFunction) obj;
+        ASTAbstractFunction other = (ASTFunction) obj;
         if (name == null) {
             if (other.name != null)
                 return false;
@@ -189,15 +190,5 @@ public abstract class ASTAbstractFunction extends ASTNode {
     @Override
     public String toString() {
         return String.format("Function: %s, %s", this.name, this.returnType);
-    }
-
-    @Override
-    public void traverse(ASTVisitor visitor) {
-        visitor.preVisit(this);
-        // Library functions have null bodies
-        if (body != null) {
-            body.traverse(visitor);
-        }
-        visitor.postVisit(this);
     }
 }

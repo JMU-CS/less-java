@@ -1,5 +1,6 @@
 package com.github.lessjava.visitor.impl;
 
+import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
@@ -38,8 +39,8 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
                 statement.setParent(node);
             }
         }
-        for (ASTFunction func : node.functions) {
-            func.setParent(node);
+        for (ASTAbstractFunction function : node.functions) {
+            function.setParent(node);
         }
         for (ASTTest test : node.tests) {
             test.setParent(node);

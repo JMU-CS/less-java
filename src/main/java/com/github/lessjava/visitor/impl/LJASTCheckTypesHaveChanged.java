@@ -61,15 +61,6 @@ public class LJASTCheckTypesHaveChanged extends StaticAnalysis {
             typeChanged = true;
         }
 
-        if (typeChanged) {
-            System.err.println(node);
-            System.err.println(node.getClass());
-            if (node instanceof ASTExpression) {
-                System.err.println(((ASTExpression) node).type);
-            }
-        }
-
-
         return typesChanged || typeChanged;
     }
 

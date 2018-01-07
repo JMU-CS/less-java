@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.github.lessjava.types.ast.ASTAbstractFunction;
+import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
-import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
@@ -35,7 +36,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         super.postVisit(node);
 
 
-        ASTFunction f = nameparamFunctionMap.get(node.getNameArgString());
+        ASTAbstractFunction f = nameparamFunctionMap.get(node.getNameArgString());
 
         if (f != null && f.concrete) {
             return;
@@ -58,7 +59,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
     public void postVisit(ASTVoidFunctionCall node) {
         super.postVisit(node);
 
-        ASTFunction f = nameparamFunctionMap.get(node.getNameArgString());
+        ASTAbstractFunction f = nameparamFunctionMap.get(node.getNameArgString());
 
         if (f != null && f.concrete) {
             return;
@@ -83,10 +84,10 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             return null;
         }
 
-        List<ASTFunction> functions = program.functions.stream().filter(func -> func.name.equals(name))
+        List<ASTAbstractFunction> functions = program.functions.stream().filter(func -> func.name.equals(name))
                 .collect(Collectors.toList());
 
-        Optional<ASTFunction> prototype = functions.stream().filter(func -> !func.concrete).findFirst();
+        Optional<ASTAbstractFunction> prototype = functions.stream().filter(func -> !func.concrete).findFirst();
 
         if (!prototype.isPresent() || prototype.get().body == null) {
             // Can't instantiate
@@ -110,7 +111,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             functionInstance.parameters.add(parameter);
         }
 
-        for (ASTFunction f : program.functions) {
+        for (ASTAbstractFunction f : program.functions) {
             if (functionInstance.equals(f)) {
                 return null;
             }

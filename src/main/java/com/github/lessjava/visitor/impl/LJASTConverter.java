@@ -37,6 +37,7 @@ import com.github.lessjava.generated.LJParser.VoidAssignmentContext;
 import com.github.lessjava.generated.LJParser.VoidFunctionCallContext;
 import com.github.lessjava.generated.LJParser.VoidMethodCallContext;
 import com.github.lessjava.generated.LJParser.WhileContext;
+import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
@@ -95,7 +96,7 @@ public class LJASTConverter extends LJBaseListener {
         }
 
         for (FunctionContext f : ctx.function()) {
-            ast.functions.add((ASTFunction) parserASTMap.get(f));
+            ast.functions.add((ASTAbstractFunction) parserASTMap.get(f));
         }
 
         for (TestContext t : ctx.test()) {
@@ -627,11 +628,12 @@ public class LJASTConverter extends LJBaseListener {
 
         for (ASTClass c: ASTClass.classes) {
             for (ASTMethod m: c.methods) {
-                m.setDepth(3);
+                //m.setDepth(3);
                 m.setParent(c);
             }
         }
 
         ast.functions.addAll(ASTFunction.functions);
+        ast.classes.addAll(ASTClass.classes);
     }
 }

@@ -17,6 +17,10 @@ public interface ASTVisitor {
 
     public void postVisit(ASTFunction node);
 
+    public void preVisit(ASTMethod node);
+
+    public void postVisit(ASTMethod node);
+
     public void preVisit(ASTClass node);
 
     public void postVisit(ASTClass node);
@@ -113,7 +117,7 @@ public interface ASTVisitor {
 
     public void postVisit(ASTArgList node);
 
-    void preVisit(ASTForLoop node);
+    public void preVisit(ASTForLoop node);
 
     public void postVisit(ASTForLoop astForLoop);
 }

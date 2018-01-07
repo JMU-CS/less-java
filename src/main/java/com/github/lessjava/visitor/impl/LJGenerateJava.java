@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
@@ -21,7 +22,6 @@ import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
-import com.github.lessjava.types.ast.ASTFunction.Parameter;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
