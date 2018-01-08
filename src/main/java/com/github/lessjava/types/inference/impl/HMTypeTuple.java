@@ -16,4 +16,21 @@ public class HMTypeTuple extends HMType {
     public HMType clone() {
         return new HMTypeTuple(new ArrayList<>(this.types));
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<");
+        if (!types.isEmpty()) {
+            sb.append(String.format("%s", types.get(0).toString()));
+
+            for (int i = 1; i < types.size(); i++) {
+                sb.append(String.format(" : %s", types.get(i).toString()));
+            }
+        }
+        sb.append(" >");
+
+        return sb.toString();
+    }
 }

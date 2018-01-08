@@ -20,6 +20,9 @@ test set.size() == 4
 test set.contains("a")
 test !set.contains("e")
 
-map = <"a":"x">
-
-test map.containsKey("a")
+map = <"x" : 10>
+map.put("y", 100)
+test map.containsKey("x")
+test map.containsKey("y")
+test map.get("x") == 10
+test map.get("y") == 100

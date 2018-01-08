@@ -212,8 +212,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         List<HMType> types = Arrays.asList(new HMType[] { node.key.type, node.value.type });
 
         node.type = new HMTypeTuple(types);
-
-        System.err.println(node);
     }
 
     @Override
@@ -229,6 +227,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         if (!node.arguments.isEmpty()) {
             node.type.isConcrete = true;
+            node.type = unify(node.type, node.arguments.get(0).type);
         }
     }
 
@@ -277,7 +276,15 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             if (node.funcCall.name.equals("remove")) {
                 HMTypeCollection t = (HMTypeCollection) node.var.type;
 
-                if (node.funcCall.arguments.size() == 1) {
+                if (!node.funcCall.arguments.isEmpty()) {
+                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
+                }
+            }
+
+            if (node.funcCall.name.equals("put")) {
+                HMTypeCollection t = (HMTypeCollection) node.var.type;
+
+                if (!node.funcCall.arguments.isEmpty()) {
                     t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
                 }
             }
@@ -304,10 +311,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         boolean rightIsBase = right instanceof HMTypeBase;
         boolean rightIsVar = right instanceof HMTypeVar;
         boolean rightIsCollection = right instanceof HMTypeCollection;
-
-        if (left instanceof HMTypeTuple) {
-            System.err.println(left);
-        }
 
         if (leftIsBase && rightIsBase) {
             return unify((HMTypeBase) left, (HMTypeBase) right);
