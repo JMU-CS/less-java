@@ -1,7 +1,6 @@
 package com.github.lessjava.types.ast;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.github.lessjava.types.inference.impl.HMTypeBase;
@@ -33,13 +32,13 @@ public class ASTClass extends ASTNode {
     }
 
     public String name;
-    public List<ASTVariable> attributes;
+    public Set<ASTVariable> attributes;
     public Set<ASTMethod> methods;
 
-    public ASTClass(String name, List<ASTVariable> attributes, Set<ASTMethod> methods) {
+    public ASTClass(String name, Set<ASTVariable> attributes, Set<ASTMethod> methods) {
         this.name = name;
-        this.attributes = attributes;
-        this.methods = methods;
+        this.attributes = attributes == null ? new HashSet<>() : attributes;
+        this.methods = methods == null ? new HashSet<>() : methods;
     }
 
     @Override

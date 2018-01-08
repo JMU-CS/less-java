@@ -4,6 +4,7 @@ import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
+import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTExpression;
@@ -12,6 +13,7 @@ import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTMap;
+import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -22,6 +24,7 @@ import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
+import com.github.lessjava.types.ast.ASTVoidMethodCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
@@ -39,17 +42,42 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
                 statement.setParent(node);
             }
         }
+
+        for (ASTClass c : node.classes) {
+            c.setParent(node);
+        }
+
         for (ASTAbstractFunction function : node.functions) {
             function.setParent(node);
         }
+
         for (ASTTest test : node.tests) {
             test.setParent(node);
         }
     }
 
     @Override
+    public void preVisit(ASTClass node) {
+        for (ASTVariable attribute: node.attributes) {
+            attribute.setParent(node);
+        }
+
+        for (ASTMethod method: node.methods) {
+            method.setParent(node);
+        }
+    }
+
+    @Override
     public void preVisit(ASTFunction node) {
         // Library functions have null bodies
+        if (node.body != null) {
+            node.body.setParent(node);
+        }
+    }
+
+    @Override
+    public void preVisit(ASTMethod node) {
+        // Library methods don't have null bodies
         if (node.body != null) {
             node.body.setParent(node);
         }
@@ -82,6 +110,12 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
         for (ASTExpression expr : node.arguments) {
             expr.setParent(node);
         }
+    }
+
+    @Override
+    public void preVisit(ASTVoidMethodCall node) {
+        node.var.setParent(node);
+        node.funcCall.setParent(node);
     }
 
     @Override

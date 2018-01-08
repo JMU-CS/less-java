@@ -32,16 +32,14 @@ public class ASTVariable extends ASTExpression {
 
         // TODO: Better way to handle this??
         while (!((n = n.getParent()) instanceof ASTProgram) && n != null) {
-            inTest = n instanceof ASTTest;
+            if (inTest = n instanceof ASTTest) {
+                break;
+            }
         }
 
         sb.append(inTest ? String.format("__test%s", this.name) : name);
 
-        if (this.isCollection && this.index != null) {
-            return String.format("%s.get(%s)", name, index);
-        } else {
-            return sb.toString();
-        }
+        return sb.toString();
     }
 
     @Override
