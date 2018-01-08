@@ -1,6 +1,6 @@
 package com.github.lessjava.types.ast;
 
-import com.github.lessjava.types.inference.impl.HMTypeVar;
+import com.github.lessjava.types.inference.impl.HMTypeList;
 
 public class ASTList extends ASTCollection {
     public ASTList(ASTArgList initialElements) {
@@ -12,9 +12,9 @@ public class ASTList extends ASTCollection {
         StringBuilder initialization = new StringBuilder();
         String argString = initialElements.toString();
 
-        String collectionType = initialElements.type instanceof HMTypeVar ? "Object" : initialElements.type.toString();
-        initialization.append(String.format("new ArrayList<%s>(Arrays.asList(new %s[] %s))", collectionType,
-                collectionType, argString));
+        HMTypeList t = (HMTypeList) type;
+
+        initialization.append(String.format("new %s(Arrays.asList(new %s[] %s))", t, t.elementType, argString));
 
         return initialization.toString();
     }

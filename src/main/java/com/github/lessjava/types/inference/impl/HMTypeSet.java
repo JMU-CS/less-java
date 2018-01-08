@@ -7,7 +7,7 @@ public class HMTypeSet extends HMTypeCollection {
 
     public HMTypeSet(HMType elementType) {
         super(SET, elementType);
-        super.collectionType = SET;
+        super.collectionName = SET;
     }
 
     @Override

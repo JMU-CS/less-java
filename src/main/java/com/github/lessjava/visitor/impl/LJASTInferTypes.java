@@ -11,11 +11,13 @@ import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTConditional;
+import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTList;
+import com.github.lessjava.types.ast.ASTMap;
 import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -28,7 +30,9 @@ import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.types.inference.impl.HMTypeList;
+import com.github.lessjava.types.inference.impl.HMTypeMap;
 import com.github.lessjava.types.inference.impl.HMTypeSet;
+import com.github.lessjava.types.inference.impl.HMTypeTuple;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
@@ -195,6 +199,24 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     @Override
+    public void preVisit(ASTMap node) {
+        super.preVisit(node);
+
+        if (node.initialElements.type instanceof HMTypeTuple) {
+            node.type = new HMTypeMap((HMTypeTuple) node.initialElements.type);
+        }
+    }
+
+    @Override
+    public void preVisit(ASTEntry node) {
+        List<HMType> types = Arrays.asList(new HMType[] { node.key.type, node.value.type });
+
+        node.type = new HMTypeTuple(types);
+
+        System.err.println(node);
+    }
+
+    @Override
     public void preVisit(ASTArgList node) {
         super.preVisit(node);
 
@@ -237,6 +259,29 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void postVisit(ASTVoidMethodCall node) {
         super.postVisit(node);
+
+        // TODO: Better way??
+        if (node.var.type instanceof HMTypeCollection) {
+            if (node.funcCall.name.equals("add")) {
+                HMTypeCollection t = (HMTypeCollection) node.var.type;
+
+                if (node.funcCall.arguments.size() == 1) {
+                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
+                }
+
+                if (node.funcCall.arguments.size() == 2) {
+                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(1).type);
+                }
+            }
+
+            if (node.funcCall.name.equals("remove")) {
+                HMTypeCollection t = (HMTypeCollection) node.var.type;
+
+                if (node.funcCall.arguments.size() == 1) {
+                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
+                }
+            }
+        }
     }
 
     @Override
@@ -260,6 +305,10 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         boolean rightIsVar = right instanceof HMTypeVar;
         boolean rightIsCollection = right instanceof HMTypeCollection;
 
+        if (left instanceof HMTypeTuple) {
+            System.err.println(left);
+        }
+
         if (leftIsBase && rightIsBase) {
             return unify((HMTypeBase) left, (HMTypeBase) right);
         } else if (leftIsVar && rightIsVar) {
@@ -272,7 +321,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         // Promote to collection
         if (leftIsCollection && !rightIsCollection) {
             return left;
-        } else if(!leftIsCollection && rightIsCollection) {
+        } else if (!leftIsCollection && rightIsCollection) {
             return right;
         }
 
@@ -288,7 +337,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     private HMType unify(HMTypeCollection left, HMTypeCollection right) {
         HMType unifiedType = left;
 
-        if (left.collectionType.equals(right.collectionType)) {
+        if (left.collectionName.equals(right.collectionName)) {
             left.elementType = right.elementType = unify(left.elementType, right.elementType);
         }
 

@@ -7,7 +7,7 @@ public class HMTypeList extends HMTypeCollection {
 
     public HMTypeList(HMType elementType) {
         super(LIST, elementType);
-        super.collectionType = LIST;
+        super.collectionName = LIST;
     }
 
     @Override

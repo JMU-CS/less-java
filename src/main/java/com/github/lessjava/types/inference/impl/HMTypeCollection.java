@@ -4,7 +4,7 @@ import com.github.lessjava.types.inference.HMType;
 
 public abstract class HMTypeCollection extends HMTypeObject {
     public HMType elementType;
-    public String collectionType;
+    public String collectionName;
     public String toString;
 
     public HMTypeCollection(String className, HMType elementType) {
@@ -14,7 +14,7 @@ public abstract class HMTypeCollection extends HMTypeObject {
 
     @Override
     public HMTypeCollection clone() {
-        switch (collectionType) {
+        switch (collectionName) {
             case "List":
                 return new HMTypeList(this.elementType);
             case "Set":

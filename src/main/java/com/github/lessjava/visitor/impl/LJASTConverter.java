@@ -444,12 +444,14 @@ public class LJASTConverter extends LJBaseListener {
 
         if (ctx.funcCall() != null) {
             expr = (ASTFunctionCall) parserASTMap.get(ctx.funcCall());
-        } else if (ctx.lit() != null) {
-            expr = (ASTLiteral) parserASTMap.get(ctx.lit());
-        } else if (ctx.var() != null) {
-            expr = (ASTVariable) parserASTMap.get(ctx.var());
+        } else if (ctx.methodCall() != null) {
+            expr = (ASTMethodCall) parserASTMap.get(ctx.methodCall());
         } else if (ctx.collection() != null) {
             expr = (ASTCollection) parserASTMap.get(ctx.collection());
+        } else if (ctx.var() != null) {
+            expr = (ASTVariable) parserASTMap.get(ctx.var());
+        } else if (ctx.lit() != null) {
+            expr = (ASTLiteral) parserASTMap.get(ctx.lit());
         } else {
             expr = (ASTExpression) parserASTMap.get(ctx.expr());
         }

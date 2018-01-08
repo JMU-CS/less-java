@@ -7,9 +7,19 @@ test list.size() == 4
 test list.get(0) == "a"
 test list.get(list.size() - 1) == "d"
 
+emptyList = []
+emptyList.add("a")
+test emptyList.size() == 1
+test emptyList.get(0) == "a"
+test emptyList.get(emptyList.size() - 1) == "a"
+
 set = {"a", "a", "b", "c"}
 set.add("d")
 
 test set.size() == 4
 test set.contains("a")
-/*test !set.contains("e")*/
+test !set.contains("e")
+
+map = <"a":"x">
+
+test map.containsKey("a")
