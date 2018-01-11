@@ -2,11 +2,8 @@ package com.github.lessjava.visitor.impl;
 
 import java.util.HashSet;
 
-import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTTest;
-import com.github.lessjava.types.ast.ASTVariable;
-import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJAssignTestVariables extends LJDefaultASTVisitor {
@@ -35,30 +32,30 @@ public class LJAssignTestVariables extends LJDefaultASTVisitor {
         this.inTest = false;
     }
 
-    @Override
-    public void preVisit(ASTVariable node) {
-        super.preVisit(node);
+    //@Override
+    //public void preVisit(ASTVariable node) {
+        //super.preVisit(node);
 
-        if (!inTest || emittedVariables.contains(node.name)) {
-            return;
-        }
+        //if (!inTest || emittedVariables.contains(node.name)) {
+            //return;
+        //}
 
-        ASTVariable testVar = new ASTVariable(node.toString());
-        testVar.type = node.type;
-        testVar.isCollection = node.isCollection;
-        testVar.setDepth(node.getDepth());
-        testVar.setParent(node.getParent());
-        testVar.setParentScope(node.getParentScope());
+        //ASTVariable testVar = new ASTVariable(node.toString());
+        //testVar.type = node.type;
+        //testVar.isCollection = node.isCollection;
+        //testVar.setDepth(node.getDepth());
+        //testVar.setParent(node.getParent());
+        //testVar.setParentScope(node.getParentScope());
 
-        ASTVariable testVal = new ASTVariable(node.toString().substring(6));
-        testVar.type = node.type;
-        testVar.isCollection = node.isCollection;
-        testVar.setDepth(node.getDepth());
-        testVar.setParent(program);
-        testVar.setParentScope(program);
+        //ASTVariable testVal = new ASTVariable(node.toString().substring(6));
+        //testVar.type = node.type;
+        //testVar.isCollection = node.isCollection;
+        //testVar.setDepth(node.getDepth());
+        //testVar.setParent(program);
+        //testVar.setParentScope(program);
 
-        this.program.statements.add(new ASTVoidAssignment(BinOp.ASGN, testVar, testVal));
+        //this.program.statements.add(new ASTVoidAssignment(BinOp.ASGN, testVar, testVal));
 
-        emittedVariables.add(node.name);
-    }
+        //emittedVariables.add(node.name);
+    //}
 }

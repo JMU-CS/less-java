@@ -1,22 +1,22 @@
 package com.github.lessjava.types.ast;
 
 public class ASTVoidMethodCall extends ASTStatement {
-    public ASTVariable var;
+    public ASTExpression invoker;
     public ASTFunctionCall funcCall;
 
     /**
-     * @param var
+     * @param expr
      * @param funcCall
      */
-    public ASTVoidMethodCall(ASTVariable var, ASTFunctionCall funcCall) {
-        this.var = var;
+    public ASTVoidMethodCall(ASTExpression invoker, ASTFunctionCall funcCall) {
+        this.invoker = invoker;
         this.funcCall = funcCall;
     }
 
     @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
-        var.traverse(visitor);
+        invoker.traverse(visitor);
         funcCall.traverse(visitor);
         visitor.postVisit(this);
     }

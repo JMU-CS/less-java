@@ -58,6 +58,8 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         this.returnType = null;
         this.parameters = node.parameters;
+
+        node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
     }
 
     @Override
@@ -70,7 +72,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             return;
         }
 
-        node.returnType = unify(node.returnType, this.returnType);
+        node.returnType = this.returnType == null ? HMTypeBase.VOID : unify(node.returnType, this.returnType);
     }
 
     @Override
@@ -260,9 +262,9 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.postVisit(node);
 
         // TODO: Better way??
-        if (node.var.type instanceof HMTypeCollection) {
+        if (node.invoker.type instanceof HMTypeCollection) {
             if (node.funcCall.name.equals("add")) {
-                HMTypeCollection t = (HMTypeCollection) node.var.type;
+                HMTypeCollection t = (HMTypeCollection) node.invoker.type;
 
                 if (node.funcCall.arguments.size() == 1) {
                     t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
@@ -274,7 +276,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             }
 
             if (node.funcCall.name.equals("remove")) {
-                HMTypeCollection t = (HMTypeCollection) node.var.type;
+                HMTypeCollection t = (HMTypeCollection) node.invoker.type;
 
                 if (!node.funcCall.arguments.isEmpty()) {
                     t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
@@ -282,7 +284,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             }
 
             if (node.funcCall.name.equals("put")) {
-                HMTypeCollection t = (HMTypeCollection) node.var.type;
+                HMTypeCollection t = (HMTypeCollection) node.invoker.type;
 
                 if (!node.funcCall.arguments.isEmpty()) {
                     t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);

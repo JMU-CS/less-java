@@ -2,14 +2,18 @@ grammar LJ;
 
 /* Parser Grammar */
 
-program:        (class_ | statement | function | test)*;
+program:        (class_ | function | global | test | statement)*;
 
 class_:          ID classBlock;
 classBlock:     (EOL)? LCB (EOL)? (attributes=var EOL)* methods=function* RCB (EOL)?;
 
-function:       ID (LP paramList RP )? block;
+function:       ID LP (paramList)? RP block;
 paramList:      ID (','ID)*;
 block:          (EOL)? LCB (EOL)? statement* RCB (EOL)?;
+
+global:         'global' assignment;
+
+test:           TEST expr EOL;
 
 statement:      IF LP expr RP block (ELSE block)?           #Conditional
                 | WHILE LP expr RP block                    #While
@@ -22,8 +26,6 @@ statement:      IF LP expr RP block (ELSE block)?           #Conditional
                 | assignment EOL                            #VoidAssignment
                 | EOL                                       #Terminator
                 ;
-
-test:           TEST expr EOL;
 
 expr:           exprBin;
 
@@ -52,7 +54,7 @@ exprBase:       funcCall
 
 funcCall:       ID LP (argList)? RP;
 
-methodCall:     var op=INVOKE funcCall;
+methodCall:     (var | funcCall) op=INVOKE funcCall;
 
 collection:     LSB (argList)? RSB       #List
                 | LCB (argList)? RCB     #Set

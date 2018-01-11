@@ -8,17 +8,19 @@ import java.util.List;
  * {@link ASTFunction} declarations.
  */
 public class ASTProgram extends ASTNode {
-    public List<ASTStatement> statements;
+    public List<ASTVoidAssignment> globals;
     public List<ASTAbstractFunction> functions;
     public List<ASTClass> classes;
     public List<ASTTest> tests;
+    public List<ASTStatement> statements;
 
     public ASTProgram() {
         super();
-        this.statements = new ArrayList<>();
+        this.globals = new ArrayList<>();
         this.functions = new ArrayList<>();
         this.tests = new ArrayList<>();
         this.classes = new ArrayList<>();
+        this.statements = new ArrayList<>();
     }
 
     @Override
@@ -28,8 +30,9 @@ public class ASTProgram extends ASTNode {
         for (int i = 0; i < functions.size(); i++) {
             functions.get(i).traverse(visitor);
         }
-        for (ASTStatement s : statements) {
-            s.traverse(visitor);
+
+        for (ASTVoidAssignment g : globals) {
+            g.traverse(visitor);
         }
         for (ASTClass c : classes) {
             c.traverse(visitor);

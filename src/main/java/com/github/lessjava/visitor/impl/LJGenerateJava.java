@@ -109,6 +109,11 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         this.functionVariables.clear();
         this.functionDeclarationLines.clear();
 
+        // Skip main
+        if (node.name.equals("main")) {
+            return;
+        }
+
         // Library function
         if (node.body == null) {
             return;
@@ -166,7 +171,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         String line = String.format("}");
         addLine(node, line);
 
-        if (node.getParent() instanceof ASTFunction) {
+        if (parent != null && !parent.name.equals("main")) {
             functionLines.addAll(2, functionDeclarationLines);
             lines.addAll(functionLines);
         }
@@ -175,7 +180,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTVoidAssignment node) {
         // Emit declarations
-        if (this.currentFunction == null) {
+        if (this.currentFunction == null || this.currentFunction.name.equals("main")) {
             if (node.variable.name.startsWith("__")) {
                 String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
                 String declaration = String.format("%sprivate static %s %s;", spaces, node.variable.type,
@@ -413,7 +418,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public void preVisit(ASTVoidMethodCall node) {
         String line;
 
-        line = String.format("%s.%s;", node.var, node.funcCall);
+        line = String.format("%s.%s;", node.invoker, node.funcCall);
 
         addLine(node, line);
     }
@@ -428,7 +433,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
         if (node instanceof ASTTest) {
             testLines.add(String.format("%s%s", spaces, line));
-        } else if (currentFunction == null) {
+        } else if (currentFunction == null || currentFunction.name.equals("main")) {
             mainLines.add(String.format("%s%s%s", spaces, spaces, line));
         } else {
             functionLines.add(String.format("%s%s", spaces, line));

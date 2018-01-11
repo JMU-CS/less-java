@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -13,6 +14,7 @@ import com.github.lessjava.generated.LJParser.ArgListContext;
 import com.github.lessjava.generated.LJParser.AssignmentContext;
 import com.github.lessjava.generated.LJParser.BlockContext;
 import com.github.lessjava.generated.LJParser.BreakContext;
+import com.github.lessjava.generated.LJParser.Class_Context;
 import com.github.lessjava.generated.LJParser.ConditionalContext;
 import com.github.lessjava.generated.LJParser.ContinueContext;
 import com.github.lessjava.generated.LJParser.EntryContext;
@@ -23,6 +25,7 @@ import com.github.lessjava.generated.LJParser.ExprUnContext;
 import com.github.lessjava.generated.LJParser.ForContext;
 import com.github.lessjava.generated.LJParser.FuncCallContext;
 import com.github.lessjava.generated.LJParser.FunctionContext;
+import com.github.lessjava.generated.LJParser.GlobalContext;
 import com.github.lessjava.generated.LJParser.ListContext;
 import com.github.lessjava.generated.LJParser.LitContext;
 import com.github.lessjava.generated.LJParser.MapContext;
@@ -88,15 +91,24 @@ public class LJASTConverter extends LJBaseListener {
     public void exitProgram(ProgramContext ctx) {
         ast = new ASTProgram();
 
-        for (StatementContext s : ctx.statement()) {
-            if (!parserASTMap.containsKey(s)) {
+        for (StatementContext s: ctx.statement()) {
+            if (parserASTMap.get(s) == null) {
                 continue;
             }
+
             ast.statements.add((ASTStatement) parserASTMap.get(s));
+        }
+
+        for (Class_Context c : ctx.class_()) {
+            ast.classes.add((ASTClass) parserASTMap.get(c));
         }
 
         for (FunctionContext f : ctx.function()) {
             ast.functions.add((ASTAbstractFunction) parserASTMap.get(f));
+        }
+
+        for (GlobalContext g : ctx.global()) {
+            ast.globals.add((ASTVoidAssignment) parserASTMap.get(g));
         }
 
         for (TestContext t : ctx.test()) {
@@ -354,11 +366,19 @@ public class LJASTConverter extends LJBaseListener {
     public void exitVoidMethodCall(VoidMethodCallContext ctx) {
         ASTVoidMethodCall voidMethodCall;
 
+        ASTExpression invoker;
 
-        ASTVariable var = (ASTVariable) parserASTMap.get(ctx.methodCall().var());
-        ASTFunctionCall funcCall = (ASTFunctionCall) parserASTMap.get(ctx.methodCall().funcCall());
+        if (ctx.methodCall().var() != null) {
+            invoker = (ASTVariable) parserASTMap.get(ctx.methodCall().var());
+        } else {
+            invoker = (ASTFunctionCall) parserASTMap.get(ctx.methodCall().funcCall().get(0));
+        }
 
-        voidMethodCall = new ASTVoidMethodCall(var, funcCall);
+        List<ASTFunctionCall> calls = ctx.methodCall().funcCall().stream().map(c -> parserASTMap.get(c)).map(c -> (ASTFunctionCall) c).collect(Collectors.toList());
+
+        ASTFunctionCall funcCall = calls.get(calls.size()-1);
+
+        voidMethodCall = new ASTVoidMethodCall(invoker, funcCall);
         voidMethodCall.setDepth(ctx.depth());
 
         parserASTMap.put(ctx, voidMethodCall);
@@ -396,8 +416,12 @@ public class LJASTConverter extends LJBaseListener {
 
             expr = new ASTBinaryExpr(binOp, left, right);
         } else if (ctx.methodCall() != null) {
-            left = (ASTExpression) parserASTMap.get(ctx.methodCall().var());
-            right = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall());
+            if (ctx.methodCall().var() != null) {
+                left = (ASTExpression) parserASTMap.get(ctx.methodCall().var());
+            } else {
+                left = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall(0));
+            }
+            right = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall(1));
             binOp = ASTBinaryExpr.stringToOp(ctx.methodCall().op.getText());
 
             expr = new ASTBinaryExpr(binOp, left, right);
@@ -506,10 +530,19 @@ public class LJASTConverter extends LJBaseListener {
     public void exitMethodCall(MethodCallContext ctx) {
         ASTMethodCall methodCall;
 
-        ASTVariable var = (ASTVariable) parserASTMap.get(ctx.var());
-        ASTFunctionCall funcCall = (ASTFunctionCall) parserASTMap.get(ctx.funcCall());
+        ASTExpression invoker;
 
-        methodCall = new ASTMethodCall(var, funcCall);
+        if (ctx.var() != null) {
+            invoker = (ASTVariable) parserASTMap.get(ctx.var());
+        } else {
+            invoker = (ASTFunctionCall) parserASTMap.get(ctx.funcCall().get(0));
+        }
+
+        List<ASTFunctionCall> calls = ctx.funcCall().stream().map(c -> parserASTMap.get(c)).map(c -> (ASTFunctionCall) c).collect(Collectors.toList());
+
+        ASTFunctionCall funcCall = calls.get(calls.size()-1);
+
+        methodCall = new ASTMethodCall(invoker, funcCall);
 
         methodCall.setDepth(ctx.depth());
 

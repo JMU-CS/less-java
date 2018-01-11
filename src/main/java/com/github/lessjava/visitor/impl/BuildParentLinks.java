@@ -36,11 +36,8 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
 public class BuildParentLinks extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTProgram node) {
-        for (ASTStatement statement : node.statements) {
-            // TODO: why is it null???
-            if (statement != null) {
-                statement.setParent(node);
-            }
+        for (ASTStatement s: node.statements) {
+            s.setParent(node);
         }
 
         for (ASTClass c : node.classes) {
@@ -114,7 +111,7 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTVoidMethodCall node) {
-        node.var.setParent(node);
+        node.invoker.setParent(node);
         node.funcCall.setParent(node);
     }
 
@@ -177,7 +174,7 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTMethodCall node) {
-        node.var.setParent(node);
+        node.invoker.setParent(node);
         node.funcCall.setParent(node);
     }
 

@@ -98,11 +98,14 @@ public class LJCompiler {
 
         program.traverse(assignTestVariables);
 
+        program.traverse(new LJStaticAnalysis());
+
         // program.traverse(printTree);
         program.traverse(generateJava);
 
         if (!StaticAnalysis.getErrors().isEmpty()) {
-            // System.out.printf("%n%s%n", StaticAnalysis.getErrorString());
+            System.out.printf("%n%s%n", StaticAnalysis.getErrorString());
+            System.exit(1);
         }
 
         // Compile java source file
