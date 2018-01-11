@@ -13,9 +13,9 @@ Get gradle aliases from my .dotfiles repo: [Gradle Aliases](https://github.com/Z
     * With gradle aliases: gr <file-name>
 
 3. How to run the most recently compiled file:
-    * ./go.sh
+    * ./run.sh
 
 4. How to run the tests in the most recently compiled file:
-    * ./ljtest.sh
+    * ./test.sh
 
 5. If you would like to use eclipse, then run `gradle eclipse` to generate project files.

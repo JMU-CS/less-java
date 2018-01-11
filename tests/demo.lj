@@ -1,0 +1,55 @@
+function(p1, p2) {
+    i = 0
+    while (i < 10) {
+        // don't like negatives
+        if (p1 < 0) {
+            break
+        }
+
+        println(i)
+        i = i + 1
+    }
+
+    for (j : 0 -> p2) {
+        // don't like 5
+        if (j == 5) {
+            continue
+        }
+
+        println(j)
+    }
+
+    if (p1 < p2) {
+        printf("p1 (%d) is less than p2 (%d)\n", p1, p2)
+        return "yay"
+    } else {
+        printf("p2 (%d) is less than p1 (%d)\n", p2, p1)
+        return "nay"
+    }
+}
+
+function(0, 10)
+
+test function(0, 10) == "yay"
+test function(10, 0) == "nay"
+
+list = ["a", "b", "c"]
+list.add("d")
+
+test list.size() == 4
+test list.get(0) == "a"
+test list.get(list.size() - 1) == "d"
+
+set = {"a", "a", "b", "c"}
+set.add("d")
+
+test set.size() == 4
+test set.contains("a")
+test !set.contains("e")
+
+map = <"x" : 10>
+map.put("y", 100)
+test map.containsKey("x")
+test map.containsKey("y")
+test map.get("x") == 10
+test map.get("y") == 100

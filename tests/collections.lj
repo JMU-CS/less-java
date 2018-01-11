@@ -1,28 +1,45 @@
-//map = <"a": "x", "b": "y", "c": "z">
+list() {
+    list = ["a", "b", "c"]
+    list.add("d")
 
-list = ["a", "b", "c"]
-list.add("d")
+    return list
+}
 
-test list.size() == 4
-test list.get(0) == "a"
-test list.get(list.size() - 1) == "d"
 
-emptyList = []
-emptyList.add("a")
-test emptyList.size() == 1
-test emptyList.get(0) == "a"
-test emptyList.get(emptyList.size() - 1) == "a"
+test list().size() == 4
+test list().get(0) == "a"
+test list().get(list().size() - 1) == "d"
 
-set = {"a", "a", "b", "c"}
-set.add("d")
+list2() {
+    list = []
+    list.add("a")
 
-test set.size() == 4
-test set.contains("a")
-test !set.contains("e")
+    return list
+}
 
-map = <"x" : 10>
-map.put("y", 100)
-test map.containsKey("x")
-test map.containsKey("y")
-test map.get("x") == 10
-test map.get("y") == 100
+test list2().size() == 1
+test list2().get(0) == "a"
+test list2().get(list2().size() - 1) == "a"
+
+set() {
+    set = {"a", "a", "b", "c"}
+    set.add("d")
+
+    return set
+}
+
+test set().size() == 4
+test set().contains("a")
+test !set().contains("e")
+
+map() {
+    map = <"x" : 10>
+    map.put("y", 100)
+
+    return map
+}
+
+test map().containsKey("x")
+test map().containsKey("y")
+test map().get("x") == 10
+test map().get("y") == 100
