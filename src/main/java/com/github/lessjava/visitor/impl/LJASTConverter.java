@@ -55,6 +55,7 @@ import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTGlobalAssignment;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTLiteral;
 import com.github.lessjava.types.ast.ASTMap;
@@ -98,7 +99,7 @@ public class LJASTConverter extends LJBaseListener {
         }
 
         for (GlobalContext g : ctx.global()) {
-            ast.globals.add((ASTVoidAssignment) parserASTMap.get(g));
+            ast.globals.add((ASTGlobalAssignment) parserASTMap.get(g));
         }
 
         for (TestContext t : ctx.test()) {
@@ -141,6 +142,30 @@ public class LJASTConverter extends LJBaseListener {
         test.setDepth(ctx.depth());
 
         parserASTMap.put(ctx, test);
+    }
+
+    @Override
+    public void exitGlobal(GlobalContext ctx) {
+        ASTGlobalAssignment globalAssignment;
+        BinOp op;
+        ASTVariable variable;
+        ASTExpression expression;
+
+        op = ASTBinaryExpr.stringToOp(ctx.assignment().op.getText());
+        variable = (ASTVariable) parserASTMap.get(ctx.assignment().var());
+        expression = (ASTExpression) parserASTMap.get(ctx.assignment().expr());
+
+        if (expression instanceof ASTArgList) {
+            variable.isCollection = true;
+        }
+
+        globalAssignment = new ASTGlobalAssignment(op, variable, expression);
+
+        globalAssignment.setDepth(ctx.depth());
+
+        globalAssignment.variable.attributes.put("assignment", ctx.getText());
+
+        parserASTMap.put(ctx, globalAssignment);
     }
 
     @Override

@@ -17,6 +17,10 @@ public interface ASTVisitor {
 
     public void postVisit(ASTFunction node);
 
+    public void preVisit(ASTGlobalAssignment node);
+
+    public void postVisit(ASTGlobalAssignment node);
+
     public void preVisit(ASTMethod node);
 
     public void postVisit(ASTMethod node);

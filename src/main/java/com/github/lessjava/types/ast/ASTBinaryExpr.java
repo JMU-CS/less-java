@@ -2,6 +2,9 @@ package com.github.lessjava.types.ast;
 
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeList;
+import com.github.lessjava.types.inference.impl.HMTypeMap;
+import com.github.lessjava.types.inference.impl.HMTypeSet;
 
 /**
  * Decaf binary operation with an operation tag and two child sub-expressions.
@@ -178,17 +181,40 @@ public class ASTBinaryExpr extends ASTExpression {
 
     @Override
     public String toString() {
-        String right = opToString(operator) + rightChild.toString();
-        if (operator.equals(BinOp.EQ)) {
-            right = ".equals(" + rightChild.toString() + ")";
+        StringBuilder s = new StringBuilder();
+        StringBuilder op = new StringBuilder(opToString(operator));
+        String right = null;
+
+        if (rightChild instanceof ASTFunctionCall) {
+            ASTFunctionCall m = (ASTFunctionCall) rightChild;
+
+            if (leftChild.type instanceof HMTypeList) {
+            }
+            if (leftChild.type instanceof HMTypeSet) {
+            }
+            if (leftChild.type instanceof HMTypeMap) {
+                String translation = ASTClass.methodTranslations.get(String.format("Map%s", m.name));
+                if (translation != null) {
+                    right = translation;
+                }
+            }
         }
 
-        String s = ("(" + leftChild.toString() + right + ")");
+        if (right == null) {
+            right = rightChild.toString();
+        }
+
+        if (operator.equals(BinOp.EQ)) {
+            right = String.format(".equals(%s)", rightChild);
+            op = new StringBuilder("");
+        }
+
+        s = new StringBuilder(String.format("(%s%s%s)", leftChild.toString(), op, right));
 
         HMTypeBase t = this.type instanceof HMTypeBase ? (HMTypeBase) this.type : null;
 
         if (t == null) {
-            return s;
+            return s.toString();
         }
 
         if (t.getBaseType() == BaseDataType.BOOL) {

@@ -13,6 +13,7 @@ import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTGlobalAssignment;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTLiteral;
 import com.github.lessjava.types.ast.ASTLocation;
@@ -63,6 +64,14 @@ public class LJDefaultASTVisitor implements ASTVisitor {
     }
 
     public void postVisit(ASTFunction node) {
+        defaultPostVisit(node);
+    }
+
+    public void preVisit(ASTGlobalAssignment node) {
+        defaultPreVisit(node);
+    }
+
+    public void postVisit(ASTGlobalAssignment node) {
         defaultPostVisit(node);
     }
 

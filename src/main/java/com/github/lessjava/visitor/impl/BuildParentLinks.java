@@ -11,6 +11,7 @@ import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTGlobalAssignment;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTMap;
 import com.github.lessjava.types.ast.ASTMethod;
@@ -40,6 +41,10 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
             c.setParent(node);
         }
 
+        for (ASTGlobalAssignment g : node.globals) {
+            g.setParent(node);
+        }
+
         for (ASTAbstractFunction function : node.functions) {
             function.setParent(node);
         }
@@ -66,6 +71,12 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
         if (node.body != null) {
             node.body.setParent(node);
         }
+    }
+
+    @Override
+    public void preVisit(ASTGlobalAssignment node) {
+        node.variable.setParent(node);
+        node.value.setParent(node);
     }
 
     @Override

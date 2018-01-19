@@ -11,7 +11,7 @@ function:       ID LP (paramList)? RP block;
 paramList:      ID (','ID)*;
 block:          (EOL)? LCB (EOL)? statement* RCB (EOL)?;
 
-global:         'global' assignment;
+global:         GLOBAL assignment EOL;
 
 test:           TEST expr EOL;
 
@@ -82,6 +82,7 @@ RETURN:     'return';
 BREAK:      'break';
 CONTINUE:   'continue';
 TEST:       'test';
+GLOBAL:     'global';
 
 PREC1:      MULT
             | DIV

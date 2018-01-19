@@ -4,10 +4,6 @@ public class ASTMethodCall extends ASTBinaryExpr {
     public ASTExpression invoker;
     public ASTFunctionCall funcCall;
 
-    /**
-     * @param var
-     * @param funcCall
-     */
     public ASTMethodCall(ASTExpression invoker, ASTFunctionCall funcCall) {
         super(BinOp.INVOKE, invoker, funcCall);
         this.invoker = invoker;

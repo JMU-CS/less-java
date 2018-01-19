@@ -19,8 +19,8 @@ public abstract class HMTypeCollection extends HMTypeObject {
                 return new HMTypeList(this.elementType);
             case "Set":
                 return new HMTypeSet(this.elementType);
-            //case "Map":
-                //return new HMTypeMap(this.elementType);
+            case "Map":
+                return new HMTypeMap((HMTypeTuple)this.elementType);
         }
 
         return null;

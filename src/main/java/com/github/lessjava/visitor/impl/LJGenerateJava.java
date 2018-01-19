@@ -94,8 +94,8 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         lines.addAll(testDeclarationLines);
         mainLines.add(String.format("%s}", spaces));
         mainLines.addAll(2, mainDeclarationLines);
-        lines.addAll(testLines);
         lines.addAll(mainLines);
+        lines.addAll(testLines);
         lines.add("}");
 
         try {

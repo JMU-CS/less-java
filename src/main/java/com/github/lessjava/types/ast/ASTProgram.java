@@ -8,7 +8,7 @@ import java.util.List;
  * {@link ASTFunction} declarations.
  */
 public class ASTProgram extends ASTNode {
-    public List<ASTVoidAssignment> globals;
+    public List<ASTGlobalAssignment> globals;
     public List<ASTAbstractFunction> functions;
     public List<ASTClass> classes;
     public List<ASTTest> tests;
@@ -29,7 +29,7 @@ public class ASTProgram extends ASTNode {
             functions.get(i).traverse(visitor);
         }
 
-        for (ASTVoidAssignment g : globals) {
+        for (ASTGlobalAssignment g : globals) {
             g.traverse(visitor);
         }
         for (ASTClass c : classes) {

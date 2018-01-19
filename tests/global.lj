@@ -1,0 +1,17 @@
+global a = 10
+global b = "foo"
+global c = false
+global d = [1,2,3]
+global e = {1,2,3}
+global f = <"a" : "b">
+
+main() {
+    foo()
+}
+
+foo() {
+    f = 10
+    if (f.containsKey("a")) {
+        println(f.get("a"))
+    }
+}

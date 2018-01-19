@@ -16,6 +16,7 @@ import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTGlobalAssignment;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTMap;
 import com.github.lessjava.types.ast.ASTMethodCall;
@@ -72,6 +73,13 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         node.returnType = this.returnType == null ? HMTypeBase.VOID : unify(node.returnType, this.returnType);
         node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
+    }
+
+    @Override
+    public void postVisit(ASTGlobalAssignment node) {
+        super.postVisit(node);
+
+        node.variable.type = unify(node.variable.type, node.value.type);
     }
 
     @Override
@@ -144,6 +152,16 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         leftChild = node.leftChild;
         rightChild = node.rightChild;
+
+        if (node.leftChild instanceof ASTVariable) {
+            if (((ASTVariable)node.leftChild).name.equals("f")){
+                //System.err.println(node.leftChild.type);
+            }
+        }
+
+        if (node.operator.equals(ASTBinaryExpr.BinOp.INVOKE)) {
+            return;
+        }
 
         leftChild.type = rightChild.type = unify(leftChild.type, rightChild.type, node.operator);
     }

@@ -1,6 +1,8 @@
 package com.github.lessjava.types.ast;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.github.lessjava.types.inference.impl.HMTypeBase;
@@ -8,6 +10,7 @@ import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public class ASTClass extends ASTNode {
     public static Set<ASTClass> classes = new HashSet<>();
+    public static Map<String, String> methodTranslations = new HashMap<>();
 
     static {
         ASTMethod size = new ASTMethod("size", HMTypeBase.INT, null);
@@ -29,6 +32,8 @@ public class ASTClass extends ASTNode {
         classes.add(list);
         classes.add(set);
         classes.add(map);
+
+        methodTranslations.put(String.format("%scontains", map.name), "containsKey");
     }
 
     public String name;
