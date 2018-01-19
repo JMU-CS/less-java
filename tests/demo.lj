@@ -1,3 +1,7 @@
+main() {
+    function(0, 10)
+}
+
 function(p1, p2) {
     i = 0
     while (i < 10) {
@@ -28,28 +32,5 @@ function(p1, p2) {
     }
 }
 
-function(0, 10)
-
 test function(0, 10) == "yay"
 test function(10, 0) == "nay"
-
-list = ["a", "b", "c"]
-list.add("d")
-
-test list.size() == 4
-test list.get(0) == "a"
-test list.get(list.size() - 1) == "d"
-
-set = {"a", "a", "b", "c"}
-set.add("d")
-
-test set.size() == 4
-test set.contains("a")
-test !set.contains("e")
-
-map = <"x" : 10>
-map.put("y", 100)
-test map.containsKey("x")
-test map.containsKey("y")
-test map.get("x") == 10
-test map.get("y") == 100

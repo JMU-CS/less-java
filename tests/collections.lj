@@ -1,4 +1,4 @@
-list() {
+nonEmptyListAdd() {
     list = ["a", "b", "c"]
     list.add("d")
 
@@ -6,40 +6,40 @@ list() {
 }
 
 
-test list().size() == 4
-test list().get(0) == "a"
-test list().get(list().size() - 1) == "d"
+test nonEmptyListAdd().size() == 4
+test nonEmptyListAdd().get(0) == "a"
+test nonEmptyListAdd().get(nonEmptyListAdd().size() - 1) == "d"
 
-list2() {
+emptyListAdd() {
     list = []
     list.add("a")
 
     return list
 }
 
-test list2().size() == 1
-test list2().get(0) == "a"
-test list2().get(list2().size() - 1) == "a"
+test emptyListAdd().size() == 1
+test emptyListAdd().get(0) == "a"
+test emptyListAdd().get(emptyListAdd().size() - 1) == "a"
 
-set() {
+nonEmptySetAdd() {
     set = {"a", "a", "b", "c"}
     set.add("d")
 
     return set
 }
 
-test set().size() == 4
-test set().contains("a")
-test !set().contains("e")
+test nonEmptySetAdd().size() == 4
+test nonEmptySetAdd().contains("a")
+test !nonEmptySetAdd().contains("e")
 
-map() {
+nonEmptyMapPut() {
     map = <"x" : 10>
     map.put("y", 100)
 
     return map
 }
 
-test map().containsKey("x")
-test map().containsKey("y")
-test map().get("x") == 10
-test map().get("y") == 100
+test nonEmptyMapPut().containsKey("x")
+test nonEmptyMapPut().containsKey("y")
+test nonEmptyMapPut().get("x") == 10
+test nonEmptyMapPut().get("y") == 100

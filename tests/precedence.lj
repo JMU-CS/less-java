@@ -1,5 +1,10 @@
-a = (1 + 2) * 3 / 4
+main() {
+    a = a()
+    print(a)
+}
 
-print(a)
+a() {
+    return a = (1 + 2) * 3 / 4
+}
 
-test a == 2
+test a() == 2
