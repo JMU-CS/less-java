@@ -35,7 +35,6 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
-
         ASTAbstractFunction f = nameparamFunctionMap.get(node.getNameArgString());
 
         if (f != null && f.concrete) {
@@ -83,6 +82,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             // Can't instantiate; arg isn't concrete
             return null;
         }
+
 
         List<ASTAbstractFunction> functions = program.functions.stream().filter(func -> func.name.equals(name))
                 .collect(Collectors.toList());

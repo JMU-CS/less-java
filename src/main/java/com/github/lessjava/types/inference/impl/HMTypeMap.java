@@ -13,6 +13,7 @@ public class HMTypeMap extends HMTypeCollection {
         this.key = entry.types.get(0);
         this.value = entry.types.get(1);
         super.collectionName = MAP;
+        super.isConcrete = true;
     }
 
     @Override

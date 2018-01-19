@@ -33,7 +33,6 @@ import com.github.lessjava.generated.LJParser.MethodCallContext;
 import com.github.lessjava.generated.LJParser.ProgramContext;
 import com.github.lessjava.generated.LJParser.ReturnContext;
 import com.github.lessjava.generated.LJParser.SetContext;
-import com.github.lessjava.generated.LJParser.StatementContext;
 import com.github.lessjava.generated.LJParser.TestContext;
 import com.github.lessjava.generated.LJParser.VarContext;
 import com.github.lessjava.generated.LJParser.VoidAssignmentContext;
@@ -65,7 +64,6 @@ import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTSet;
-import com.github.lessjava.types.ast.ASTStatement;
 import com.github.lessjava.types.ast.ASTTest;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
@@ -90,14 +88,6 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitProgram(ProgramContext ctx) {
         ast = new ASTProgram();
-
-        for (StatementContext s: ctx.statement()) {
-            if (parserASTMap.get(s) == null) {
-                continue;
-            }
-
-            ast.statements.add((ASTStatement) parserASTMap.get(s));
-        }
 
         for (Class_Context c : ctx.class_()) {
             ast.classes.add((ASTClass) parserASTMap.get(c));
@@ -407,8 +397,6 @@ public class LJASTConverter extends LJBaseListener {
 
         if (ctx.op == null && ctx.assignment() == null && ctx.methodCall() == null) {
             expr = (ASTExpression) parserASTMap.get(ctx.exprUn());
-
-            expr.setDepth(ctx.depth());
         } else if (ctx.assignment() != null) {
             left = (ASTExpression) parserASTMap.get(ctx.assignment().var());
             right = (ASTExpression) parserASTMap.get(ctx.assignment().expr());
@@ -418,10 +406,11 @@ public class LJASTConverter extends LJBaseListener {
         } else if (ctx.methodCall() != null) {
             if (ctx.methodCall().var() != null) {
                 left = (ASTExpression) parserASTMap.get(ctx.methodCall().var());
+                right = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall(0));
             } else {
                 left = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall(0));
+                right = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall(1));
             }
-            right = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall(1));
             binOp = ASTBinaryExpr.stringToOp(ctx.methodCall().op.getText());
 
             expr = new ASTBinaryExpr(binOp, left, right);
@@ -434,6 +423,7 @@ public class LJASTConverter extends LJBaseListener {
         }
 
         expr.setDepth(ctx.depth());
+
         parserASTMap.put(ctx, expr);
     }
 
@@ -571,9 +561,9 @@ public class LJASTConverter extends LJBaseListener {
         if (ctx.BOOL() != null) {
             lit = new ASTLiteral(HMType.BaseDataType.BOOL, Boolean.parseBoolean(ctx.BOOL().getText()));
         } else if (ctx.INT() != null) {
-            lit = new ASTLiteral(HMType.BaseDataType.INT, Integer.parseInt(ctx.INT().getText()));
+            lit = new ASTLiteral(HMType.BaseDataType.INT, Integer.parseInt(ctx.INT().getText().trim()));
         } else if (ctx.REAL() != null) {
-            lit = new ASTLiteral(HMType.BaseDataType.REAL, Double.parseDouble(ctx.REAL().getText()));
+            lit = new ASTLiteral(HMType.BaseDataType.REAL, Double.parseDouble(ctx.REAL().getText().trim()));
         } else {
             assert (ctx.STR() != null);
             lit = new ASTLiteral(HMType.BaseDataType.STR,

@@ -2,7 +2,7 @@ grammar LJ;
 
 /* Parser Grammar */
 
-program:        (class_ | function | global | test | statement)*;
+program:        (class_ | function | global | test | EOL)*;
 
 class_:          ID classBlock;
 classBlock:     (EOL)? LCB (EOL)? (attributes=var EOL)* methods=function* RCB (EOL)?;
@@ -113,7 +113,6 @@ PREC7:      ASGN
             ;
 
 UNOP:       NOT
-            | SUB
             ;
 
 NOT:     '!';
@@ -147,8 +146,8 @@ INVOKE: '.';
 
 
 // Literals
-INT:        (SUB)?[0-9]+;
-REAL:       (SUB)?[0-9]*'.'[0-9]+;
+INT:        (' 'SUB)?[0-9]+;
+REAL:       (' 'SUB)?[0-9]*'.'[0-9]+;
 BOOL:       'true'|'false';
 STR:        '\"'.*?'\"';
 

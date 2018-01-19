@@ -13,7 +13,7 @@ public class ASTClass extends ASTNode {
         ASTMethod size = new ASTMethod("size", HMTypeBase.INT, null);
 
         ASTMethod add = new ASTMethod("add", HMTypeBase.VOID, null);
-        ASTMethod remove = new ASTMethod("remove", HMTypeBase.VOID, null);
+        ASTMethod remove = new ASTMethod("remove", new HMTypeVar(), null);
         ASTMethod get = new ASTMethod("get", new HMTypeVar(), null);
         ASTMethod contains = new ASTMethod("contains", HMTypeBase.BOOL, null);
         ASTMethod put = new ASTMethod("put", HMTypeBase.BOOL, null);

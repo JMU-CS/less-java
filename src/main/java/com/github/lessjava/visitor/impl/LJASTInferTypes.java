@@ -58,8 +58,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         this.returnType = null;
         this.parameters = node.parameters;
-
-        node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
     }
 
     @Override
@@ -73,6 +71,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         }
 
         node.returnType = this.returnType == null ? HMTypeBase.VOID : unify(node.returnType, this.returnType);
+        node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
     }
 
     @Override

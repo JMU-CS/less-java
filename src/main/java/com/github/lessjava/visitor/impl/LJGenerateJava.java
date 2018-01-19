@@ -196,7 +196,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
                 mainDeclarationLines.add(declaration);
                 mainVariables.add(node.variable.name);
             }
-        } else if (!functionVariables.contains(node.variable.name)) {
+        } else if (!functionVariables.contains(node.variable.name) && node.variable.type.isConcrete) {
             String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
 
             String declaration = String.format("%s%s %s;", spaces, node.variable.type, node.variable.name);

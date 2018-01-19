@@ -7,11 +7,11 @@ public abstract class HMTypeObject extends HMType {
 
     public HMTypeObject(String className) {
         this.className = className;
+        super.isConcrete = false;
     }
 
     @Override
     public String toString() {
-        //return String.format("T%s", this.uniqueVarId);
         return String.format("Object: %s", className);
 
     }

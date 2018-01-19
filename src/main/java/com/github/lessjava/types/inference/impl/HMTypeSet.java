@@ -8,6 +8,7 @@ public class HMTypeSet extends HMTypeCollection {
     public HMTypeSet(HMType elementType) {
         super(SET, elementType);
         super.collectionName = SET;
+        super.isConcrete = true;
     }
 
     @Override

@@ -21,9 +21,6 @@ import com.github.lessjava.types.ast.ASTWhileLoop;
 public class LJStaticAnalysis extends StaticAnalysis {
     @Override
     public void preVisit(ASTProgram node) {
-        if (node.functions.stream().anyMatch(f -> f.name.equals("main")) && !node.statements.isEmpty()) {
-            addError("Remove main function, or move statements into your main function");
-        }
     }
 
     @Override

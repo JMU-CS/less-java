@@ -36,10 +36,6 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
 public class BuildParentLinks extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTProgram node) {
-        for (ASTStatement s: node.statements) {
-            s.setParent(node);
-        }
-
         for (ASTClass c : node.classes) {
             c.setParent(node);
         }

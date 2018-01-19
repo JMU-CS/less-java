@@ -12,7 +12,6 @@ public class ASTProgram extends ASTNode {
     public List<ASTAbstractFunction> functions;
     public List<ASTClass> classes;
     public List<ASTTest> tests;
-    public List<ASTStatement> statements;
 
     public ASTProgram() {
         super();
@@ -20,7 +19,6 @@ public class ASTProgram extends ASTNode {
         this.functions = new ArrayList<>();
         this.tests = new ArrayList<>();
         this.classes = new ArrayList<>();
-        this.statements = new ArrayList<>();
     }
 
     @Override

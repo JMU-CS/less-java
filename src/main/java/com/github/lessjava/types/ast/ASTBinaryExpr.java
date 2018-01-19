@@ -70,6 +70,7 @@ public class ASTBinaryExpr extends ASTExpression {
             case MOD:
                 return "%";
             default:
+                System.err.println(op);
                 return "???";
         }
     }
