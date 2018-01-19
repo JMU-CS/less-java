@@ -22,6 +22,7 @@ import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTGlobalAssignment;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -50,6 +51,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public Path mainFile = Paths.get("generated/Main.java");
 
     private List<String> lines = new ArrayList<>();
+    private List<String> globalLines = new ArrayList<>();
     private List<String> testLines = new ArrayList<>();
     private List<String> mainLines = new ArrayList<>();
     private List<String> functionLines = new ArrayList<>();
@@ -87,12 +89,14 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public void postVisit(ASTProgram node) {
         String spaces = String.format("%" + (indent * 4) + "s", "");
 
+
+        lines.addAll(globalLines);
         lines.addAll(testDeclarationLines);
         mainLines.add(String.format("%s}", spaces));
         mainLines.addAll(2, mainDeclarationLines);
         lines.addAll(testLines);
+        lines.addAll(mainLines);
         lines.add("}");
-        lines.addAll(3, mainLines);
 
         try {
             Files.write(mainFile, lines, Charset.forName("UTF-8"));
@@ -141,6 +145,16 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void postVisit(ASTFunction node) {
         this.currentFunction = null;
+    }
+
+    @Override
+    public void preVisit(ASTGlobalAssignment node) {
+        String line = String.format("public static final %s %s = %s;", node.variable.type, node.variable, node.value);
+        addLine(node, line);
+    }
+
+    @Override
+    public void postVisit(ASTGlobalAssignment node) {
     }
 
     @Override
@@ -363,10 +377,8 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         if (node.expr instanceof ASTBinaryExpr) {
             ASTBinaryExpr expr = (ASTBinaryExpr) node.expr;
 
-            if (expr.leftChild.type.equals(HMTypeBase.INT)) {
+            if (expr.leftChild.type.equals(HMTypeBase.INT) ||  expr.leftChild.type.equals(HMTypeBase.REAL)) {
                 line = String.format("%4sassertEquals(%s, %s);", "", expr.rightChild, expr.leftChild);
-            } else if (expr.leftChild.type.equals(HMTypeBase.REAL)) {
-                line = String.format("%4sassertEquals(%s, %s, 0.0000001);", "", expr.rightChild, expr.leftChild);
             } else {
                 line = String.format("%4sassertTrue(%s);", "", node.expr);
             }
@@ -433,6 +445,8 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
         if (node instanceof ASTTest) {
             testLines.add(String.format("%s%s", spaces, line));
+        } else if (node instanceof ASTGlobalAssignment) {
+            globalLines.add(String.format("%s%s", spaces, line));
         } else if (currentFunction == null || currentFunction.name.equals("main")) {
             mainLines.add(String.format("%s%s%s", spaces, spaces, line));
         } else {
