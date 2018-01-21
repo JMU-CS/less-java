@@ -14,7 +14,7 @@ public class ASTVoidFunctionCall extends ASTStatement {
         this.arguments = new ArrayList<ASTExpression>();
     }
 
-    public String getNameArgString() {
+    public String getIdentifyingString() {
         StringBuilder sb = new StringBuilder(name);
         for (ASTExpression e : arguments) {
             sb.append(e.type.toString() + ",");

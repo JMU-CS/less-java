@@ -423,22 +423,9 @@ public class LJASTConverter extends LJBaseListener {
         if (ctx.op == null && ctx.assignment() == null && ctx.methodCall() == null) {
             expr = (ASTExpression) parserASTMap.get(ctx.exprUn());
         } else if (ctx.assignment() != null) {
-            left = (ASTExpression) parserASTMap.get(ctx.assignment().var());
-            right = (ASTExpression) parserASTMap.get(ctx.assignment().expr());
-            binOp = ASTBinaryExpr.stringToOp(ctx.assignment().op.getText());
-
-            expr = new ASTBinaryExpr(binOp, left, right);
+            expr = (ASTAssignment) parserASTMap.get(ctx.assignment());
         } else if (ctx.methodCall() != null) {
-            if (ctx.methodCall().var() != null) {
-                left = (ASTExpression) parserASTMap.get(ctx.methodCall().var());
-                right = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall(0));
-            } else {
-                left = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall(0));
-                right = (ASTExpression) parserASTMap.get(ctx.methodCall().funcCall(1));
-            }
-            binOp = ASTBinaryExpr.stringToOp(ctx.methodCall().op.getText());
-
-            expr = new ASTBinaryExpr(binOp, left, right);
+            expr = (ASTMethodCall) parserASTMap.get(ctx.methodCall());
         } else {
             left = (ASTExpression) parserASTMap.get(ctx.left);
             right = (ASTExpression) parserASTMap.get(ctx.right);

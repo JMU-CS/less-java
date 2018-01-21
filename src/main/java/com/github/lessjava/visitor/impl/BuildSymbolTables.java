@@ -54,7 +54,7 @@ public class BuildSymbolTables extends StaticAnalysis {
                 symbols = searchScopesForSymbol(node.getParent(), name);
             }
         } catch (InvalidProgramException ex) {
-            addError(new InvalidProgramException(ex.getMessage()));
+            //addError(new InvalidProgramException(ex.getMessage()));
         }
         return symbols;
     }
@@ -140,10 +140,12 @@ public class BuildSymbolTables extends StaticAnalysis {
             SymbolTable st = getPreviousTable();
 
             // Get names of parent symbols
-            Set<String> varNames = st.getAllSymbols().stream().map(Symbol::getName).collect(Collectors.toSet());
+            //Set<String> varNames = st.getAllSymbols().stream().map(Symbol::getName).collect(Collectors.toSet());
+
+            List<Symbol> symbols = searchScopesForSymbol(node, node.name);
 
             // Don't add the symbol if we've already encountered it
-            if (varNames.contains(node.name)) {
+            if(symbols != null && !symbols.isEmpty()) {
                 return;
             }
 

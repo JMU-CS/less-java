@@ -21,9 +21,9 @@ public class ASTClass extends ASTNode {
         ASTMethod contains = new ASTMethod("contains", HMTypeBase.BOOL, null);
         ASTMethod put = new ASTMethod("put", HMTypeBase.BOOL, null);
 
-        Set<ASTMethod> listMethods = new HashSet<ASTMethod>() {{add(size); add(add); add(remove); add(get);}};
-        Set<ASTMethod> setMethods = new HashSet<ASTMethod>() {{add(size); add(add); add(remove); add(contains);}};
-        Set<ASTMethod> mapMethods = new HashSet<ASTMethod>() {{add(size); add(put); add(get); add(contains);}};
+        Set<ASTMethod> listMethods = new HashSet<ASTMethod>() {{add(size.clone()); add(add.clone()); add(remove.clone()); add(get.clone());}};
+        Set<ASTMethod> setMethods = new HashSet<ASTMethod>() {{add(size.clone()); add(add.clone()); add(remove.clone()); add(contains.clone());}};
+        Set<ASTMethod> mapMethods = new HashSet<ASTMethod>() {{add(size.clone()); add(put.clone()); add(get.clone()); add(contains.clone());}};
 
         ASTClass list = new ASTClass("List", null, listMethods);
         ASTClass set = new ASTClass("Set", null, setMethods);

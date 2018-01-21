@@ -39,7 +39,7 @@ nonEmptyMapPut() {
     return map
 }
 
-test nonEmptyMapPut().containsKey("x")
-test nonEmptyMapPut().containsKey("y")
+test nonEmptyMapPut().contains("x")
+test nonEmptyMapPut().contains("y")
 test nonEmptyMapPut().get("x") == 10
 test nonEmptyMapPut().get("y") == 100

@@ -12,11 +12,21 @@ public class ASTFunctionCall extends ASTExpression {
         this.arguments = new ArrayList<ASTExpression>();
     }
 
-    public String getNameArgString() {
-        StringBuilder sb = new StringBuilder(name);
+    public String getArgString() {
+        StringBuilder sb = new StringBuilder();
+
         for (ASTExpression e : arguments) {
             sb.append(e.type.toString() + ",");
         }
+
+        return sb.toString();
+    }
+
+    public String getIdentifyingString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(name);
+        sb.append(getArgString());
 
         return sb.toString();
     }

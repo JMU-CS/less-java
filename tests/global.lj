@@ -4,14 +4,18 @@ global c = false
 global d = [1,2,3]
 global e = {1,2,3}
 global f = <"a" : "b">
+global g = []
 
 main() {
     foo()
+    println("done")
 }
 
 foo() {
-    f = 10
-    if (f.containsKey("a")) {
+    f = <"a" : "c">
+    if (f.contains("a")) {
         println(f.get("a"))
     }
+
+    g.add("a")
 }

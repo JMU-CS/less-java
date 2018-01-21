@@ -2,9 +2,6 @@ package com.github.lessjava.types.ast;
 
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
-import com.github.lessjava.types.inference.impl.HMTypeList;
-import com.github.lessjava.types.inference.impl.HMTypeMap;
-import com.github.lessjava.types.inference.impl.HMTypeSet;
 
 /**
  * Decaf binary operation with an operation tag and two child sub-expressions.
@@ -183,26 +180,7 @@ public class ASTBinaryExpr extends ASTExpression {
     public String toString() {
         StringBuilder s = new StringBuilder();
         StringBuilder op = new StringBuilder(opToString(operator));
-        String right = null;
-
-        if (rightChild instanceof ASTFunctionCall) {
-            ASTFunctionCall m = (ASTFunctionCall) rightChild;
-
-            if (leftChild.type instanceof HMTypeList) {
-            }
-            if (leftChild.type instanceof HMTypeSet) {
-            }
-            if (leftChild.type instanceof HMTypeMap) {
-                String translation = ASTClass.methodTranslations.get(String.format("Map%s", m.name));
-                if (translation != null) {
-                    right = translation;
-                }
-            }
-        }
-
-        if (right == null) {
-            right = rightChild.toString();
-        }
+        String right = rightChild.toString();
 
         if (operator.equals(BinOp.EQ)) {
             right = String.format(".equals(%s)", rightChild);
@@ -215,8 +193,12 @@ public class ASTBinaryExpr extends ASTExpression {
 
         if (t == null) {
             return s.toString();
+        } else {
+            return wrapPrimitive(t, s.toString());
         }
+    }
 
+    public String wrapPrimitive(HMTypeBase t, String s) {
         if (t.getBaseType() == BaseDataType.BOOL) {
             return String.format("Boolean.valueOf(%s)", s);
         } else if (t.getBaseType() == BaseDataType.INT) {

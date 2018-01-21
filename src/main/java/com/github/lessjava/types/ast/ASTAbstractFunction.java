@@ -132,25 +132,20 @@ public abstract class ASTAbstractFunction extends ASTNode {
     }
 
     public String getParameterStr() {
-        StringBuffer params = new StringBuffer();
-        params.append("(");
+        StringBuilder sb = new StringBuilder();
+
         for (Parameter p : parameters) {
-            if (params.length() > 1) {
-                params.append(", ");
-            }
-            String paramString = (p.type != null) ? String.format("%s:%s", p.name, p.type.toString())
-                    : String.format("%s:unused", p.name);
-            params.append(paramString);
+            sb.append(p.type.toString() + ",");
         }
-        params.append(")");
-        return params.toString();
+
+        return sb.toString();
     }
 
     public String getIdentifyingString() {
-        StringBuilder sb = new StringBuilder(name);
-        for (Parameter e : parameters) {
-            sb.append(e.type.toString() + ",");
-        }
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(name);
+        sb.append(getParameterStr());
 
         return sb.toString();
     }

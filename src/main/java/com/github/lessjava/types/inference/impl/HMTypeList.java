@@ -13,7 +13,7 @@ public class HMTypeList extends HMTypeCollection {
 
     @Override
     public String toString() {
-        return String.format("ArrayList<%s>", elementType instanceof HMTypeVar ? "Object" : elementType);
+        return String.format("ArrayList<%s>", elementType);
     }
 
 }

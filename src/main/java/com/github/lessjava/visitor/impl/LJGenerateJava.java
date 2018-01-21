@@ -161,7 +161,13 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public void preVisit(ASTBlock node) {
         ASTFunction parent = node.getParent() instanceof ASTFunction ? (ASTFunction) node.getParent() : null;
 
+        // Ignore non-concrete function's blocks
         if (parent != null && !parent.concrete) {
+            return;
+        }
+
+        // Skip main
+        if (parent != null && parent.name.equals("main")) {
             return;
         }
 
@@ -181,11 +187,16 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
             return;
         }
 
+        // Skip main
+        if (parent != null && parent.name.equals("main")) {
+            return;
+        }
+
         indent--;
         String line = String.format("}");
         addLine(node, line);
 
-        if (parent != null && !parent.name.equals("main")) {
+        if (parent != null) {
             functionLines.addAll(2, functionDeclarationLines);
             lines.addAll(functionLines);
         }

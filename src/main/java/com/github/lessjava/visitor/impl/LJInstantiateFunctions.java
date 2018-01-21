@@ -35,7 +35,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
-        ASTAbstractFunction f = nameparamFunctionMap.get(node.getNameArgString());
+        ASTAbstractFunction f = idFunctionMap.get(node.getIdentifyingString());
 
         if (f != null && f.concrete) {
             return;
@@ -50,7 +50,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
             program.functions.add(f);
 
-            nameparamFunctionMap.put(node.getNameArgString(), f);
+            idFunctionMap.put(node.getIdentifyingString(), f);
         }
     }
 
@@ -58,7 +58,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
     public void postVisit(ASTVoidFunctionCall node) {
         super.postVisit(node);
 
-        ASTAbstractFunction f = nameparamFunctionMap.get(node.getNameArgString());
+        ASTAbstractFunction f = idFunctionMap.get(node.getIdentifyingString());
 
         if (f != null && f.concrete) {
             return;
@@ -73,7 +73,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
             program.functions.add(f);
 
-            nameparamFunctionMap.put(node.getNameArgString(), f);
+            idFunctionMap.put(node.getIdentifyingString(), f);
         }
     }
 

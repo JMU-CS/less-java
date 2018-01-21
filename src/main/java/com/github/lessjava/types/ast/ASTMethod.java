@@ -15,14 +15,15 @@ public class ASTMethod extends ASTAbstractFunction {
         StringBuilder sb = new StringBuilder();
         ASTClass c = (ASTClass) this.getParent();
 
-        sb.append(name);
         sb.append(c.name);
-
-        for (Parameter e : parameters) {
-            sb.append(e.type.toString() + ",");
-        }
+        sb.append(name);
+        sb.append(getParameterStr());
 
         return sb.toString();
+    }
+
+    public ASTMethod clone() {
+        return new ASTMethod(name, returnType, body);
     }
 
     @Override

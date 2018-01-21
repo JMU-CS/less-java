@@ -24,17 +24,19 @@ public class ASTProgram extends ASTNode {
     @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
+        for (ASTGlobalAssignment g : globals) {
+            g.traverse(visitor);
+        }
+
+        for (ASTClass c : classes) {
+            c.traverse(visitor);
+        }
+
         // Avoid concurrent modification exception
         for (int i = 0; i < functions.size(); i++) {
             functions.get(i).traverse(visitor);
         }
 
-        for (ASTGlobalAssignment g : globals) {
-            g.traverse(visitor);
-        }
-        for (ASTClass c : classes) {
-            c.traverse(visitor);
-        }
         for (ASTTest t : tests) {
             t.traverse(visitor);
         }

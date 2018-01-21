@@ -25,6 +25,7 @@ import com.github.lessjava.visitor.impl.LJAssignTestVariables;
 import com.github.lessjava.visitor.impl.LJGenerateJava;
 import com.github.lessjava.visitor.impl.LJInstantiateFunctions;
 import com.github.lessjava.visitor.impl.LJStaticAnalysis;
+import com.github.lessjava.visitor.impl.LJUnifyVariables;
 import com.github.lessjava.visitor.impl.PrintDebugTree;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
 
@@ -87,12 +88,15 @@ public class LJCompiler {
 
         while (typesHaveChanged) {
             program.traverse(buildSymbolTables);
+            program.traverse(instantiateFunctions);
             program.traverse(inferTypes);
             program.traverse(checkTypesHaveChanged);
-            program.traverse(instantiateFunctions);
 
             typesHaveChanged = LJASTCheckTypesHaveChanged.typesChanged;
         }
+
+        // TODO: Determine if necessary
+        //program.traverse(new LJUnifyVariables());
 
         LJAssignTestVariables assignTestVariables = new LJAssignTestVariables();
 

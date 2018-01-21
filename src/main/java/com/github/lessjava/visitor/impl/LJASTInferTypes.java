@@ -1,7 +1,6 @@
 package com.github.lessjava.visitor.impl;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import com.github.lessjava.types.Symbol;
@@ -9,7 +8,6 @@ import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
-import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTExpression;
@@ -153,16 +151,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         leftChild = node.leftChild;
         rightChild = node.rightChild;
 
-        if (node.leftChild instanceof ASTVariable) {
-            if (((ASTVariable)node.leftChild).name.equals("f")){
-                //System.err.println(node.leftChild.type);
-            }
-        }
-
-        if (node.operator.equals(ASTBinaryExpr.BinOp.INVOKE)) {
-            return;
-        }
-
         leftChild.type = rightChild.type = unify(leftChild.type, rightChild.type, node.operator);
     }
 
@@ -170,8 +158,8 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
-        if (nameparamFunctionMap.containsKey(node.getNameArgString())) {
-            node.type = unify(node.type, nameparamFunctionMap.get(node.getNameArgString()).returnType);
+        if (idFunctionMap.containsKey(node.getIdentifyingString())) {
+            node.type = unify(node.type, idFunctionMap.get(node.getIdentifyingString()).returnType);
         }
     }
 
@@ -280,29 +268,17 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         // TODO: Better way??
         if (node.invoker.type instanceof HMTypeCollection) {
+            HMTypeCollection t = (HMTypeCollection) node.invoker.type;
+
             if (node.funcCall.name.equals("add")) {
-                HMTypeCollection t = (HMTypeCollection) node.invoker.type;
-
-                if (node.funcCall.arguments.size() == 1) {
-                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
-                }
-
-                if (node.funcCall.arguments.size() == 2) {
-                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(1).type);
-                }
-            }
-
-            if (node.funcCall.name.equals("remove")) {
-                HMTypeCollection t = (HMTypeCollection) node.invoker.type;
-
+                t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
+            } else if (node.funcCall.name.equals("insert")) {
+                t.elementType = unify(t.elementType, node.funcCall.arguments.get(1).type);
+            } else if (node.funcCall.name.equals("remove")) {
                 if (!node.funcCall.arguments.isEmpty()) {
                     t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
                 }
-            }
-
-            if (node.funcCall.name.equals("put")) {
-                HMTypeCollection t = (HMTypeCollection) node.invoker.type;
-
+            } else if (node.funcCall.name.equals("put")) {
                 if (!node.funcCall.arguments.isEmpty()) {
                     t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
                 }
@@ -313,6 +289,30 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     @Override
     public void postVisit(ASTMethodCall node) {
         super.postVisit(node);
+
+        // TODO: Better way??
+        if (node.invoker.type instanceof HMTypeCollection) {
+            HMTypeCollection t = (HMTypeCollection) node.invoker.type;
+
+            if (node.funcCall.name.equals("add")) {
+                t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
+            } else if (node.funcCall.name.equals("insert")) {
+                t.elementType = unify(t.elementType, node.funcCall.arguments.get(1).type);
+            } else if (node.funcCall.name.equals("remove")) {
+                if (!node.funcCall.arguments.isEmpty()) {
+                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
+                }
+            } else if (node.funcCall.name.equals("put")) {
+                if (!node.funcCall.arguments.isEmpty()) {
+                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
+                }
+            } else if (node.funcCall.name.equals("contains")) {
+            }
+        }
+
+        if (idFunctionMap.containsKey(node.getIdentifyingString())) {
+            node.type = unify(node.type, idFunctionMap.get(node.getIdentifyingString()).returnType);
+        }
     }
 
     @Override
@@ -320,98 +320,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.preVisit(node);
 
         node.condition.type = unify(node.condition.type, new HMTypeBase(BaseDataType.BOOL));
-    }
-
-    private HMType unify(HMType left, HMType right) {
-        boolean leftIsBase = left instanceof HMTypeBase;
-        boolean leftIsVar = left instanceof HMTypeVar;
-        boolean leftIsCollection = left instanceof HMTypeCollection;
-
-        boolean rightIsBase = right instanceof HMTypeBase;
-        boolean rightIsVar = right instanceof HMTypeVar;
-        boolean rightIsCollection = right instanceof HMTypeCollection;
-
-        if (leftIsBase && rightIsBase) {
-            return unify((HMTypeBase) left, (HMTypeBase) right);
-        } else if (leftIsVar && rightIsVar) {
-            return unify((HMTypeVar) left, (HMTypeVar) right);
-        } else if (leftIsCollection && rightIsCollection) {
-            return unify((HMTypeCollection) left, (HMTypeCollection) right);
-        }
-
-        // TODO: This can't be right...
-        // Promote to collection
-        if (leftIsCollection && !rightIsCollection) {
-            return left;
-        } else if (!leftIsCollection && rightIsCollection) {
-            return right;
-        }
-
-        if (leftIsVar && !rightIsVar) {
-            return right;
-        } else if (!leftIsVar && rightIsVar) {
-            return left;
-        }
-
-        return left;
-    }
-
-    private HMType unify(HMTypeCollection left, HMTypeCollection right) {
-        HMType unifiedType = left;
-
-        if (left.collectionName.equals(right.collectionName)) {
-            left.elementType = right.elementType = unify(left.elementType, right.elementType);
-        }
-
-        return unifiedType;
-    }
-
-    private HMType unify(HMTypeVar left, HMTypeVar right) {
-        return left;
-    }
-
-    private HMTypeBase unify(HMTypeBase left, HMTypeBase right) {
-        if (left.getBaseType().equals(right.getBaseType())) {
-            return left;
-        } else if (left.getBaseType().equals(BaseDataType.REAL) && right.getBaseType().equals(BaseDataType.INT)) {
-            return left;
-        } else if (right.getBaseType().equals(BaseDataType.REAL) && left.getBaseType().equals(BaseDataType.INT)) {
-            return right;
-        }
-
-        return left;
-    }
-
-    private static HashSet<BinOp> ignoreOps = new HashSet<BinOp>(
-            Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE, BinOp.ADDASGN, BinOp.SUBASGN, BinOp.INVOKE }));
-
-    private HMType unify(HMType left, HMType right, BinOp op) {
-        HMType unifiedType = unify(left, right);
-
-        if (!ignoreOps.contains(op)) {
-            switch (op) {
-                case ADD:
-                case SUB:
-                case MUL:
-                case DIV:
-                case MOD:
-                case GT:
-                case LT:
-                case GE:
-                case LE:
-                case ASGN:
-                    unifiedType = unify(left, right);
-                    break;
-                case AND:
-                case OR:
-                    unifiedType = new HMTypeBase(BaseDataType.BOOL);
-                    break;
-                default:
-                    return null;
-            }
-        }
-
-        return unifiedType;
     }
 
 }
