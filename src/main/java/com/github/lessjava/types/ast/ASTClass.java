@@ -33,6 +33,28 @@ public class ASTClass extends ASTNode {
         classes.add(set);
         classes.add(map);
 
+        // List ---
+        //add/push/enqueue
+        methodTranslations.put(String.format("%sadd", list.name), "add");
+        methodTranslations.put(String.format("%spush", list.name), "add");
+        methodTranslations.put(String.format("%senqueue", list.name), "add");
+        //insert
+        methodTranslations.put(String.format("%sinsert", list.name), "add");
+        //remove
+        methodTranslations.put(String.format("%sremove", list.name), "remove");
+        //removeAt
+        methodTranslations.put(String.format("%sremoveAt", list.name), "remove");
+        //pop/dequeue TODO: ADD DEFAULT ARGS TO THESE METHODS
+        methodTranslations.put(String.format("%spop", list.name), "remove(size-1)");
+        methodTranslations.put(String.format("%sdequeue", list.name), "remove(0)");
+        //get
+        methodTranslations.put(String.format("%sget", list.name), "get");
+        //set
+        methodTranslations.put(String.format("%sset", list.name), "set");
+        //size
+        methodTranslations.put(String.format("%ssize", list.name), "size");
+
+        // Map ---
         methodTranslations.put(String.format("%scontains", map.name), "containsKey");
     }
 
