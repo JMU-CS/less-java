@@ -1,6 +1,7 @@
 package com.github.lessjava.types.ast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +11,9 @@ import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeList;
+import com.github.lessjava.types.inference.impl.HMTypeMap;
 import com.github.lessjava.types.inference.impl.HMTypeSet;
+import com.github.lessjava.types.inference.impl.HMTypeTuple;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public abstract class ASTAbstractFunction extends ASTNode {
@@ -18,9 +21,9 @@ public abstract class ASTAbstractFunction extends ASTNode {
 
     static {
         // Output
-        libraryFunctionStrings.put("print", "System.out.print(%s);");
-        libraryFunctionStrings.put("printf", "System.out.printf(%s);");
-        libraryFunctionStrings.put("println", "System.out.println(%s);");
+        libraryFunctionStrings.put("print", "System.out.print");
+        libraryFunctionStrings.put("printf", "System.out.printf");
+        libraryFunctionStrings.put("println", "System.out.println");
 
         // Input
         libraryFunctionStrings.put("readInt", "scn.nextInt");
@@ -28,6 +31,11 @@ public abstract class ASTAbstractFunction extends ASTNode {
         libraryFunctionStrings.put("readChar", "scn.useDelimiter(\"\").next");
         libraryFunctionStrings.put("readWord", "scn.useDelimiter(\"\\\\s+\").next");
         libraryFunctionStrings.put("readLine", "scn.nextLine");
+
+        // Constructors
+        libraryFunctionStrings.put("List", "new ArrayList<>");
+        libraryFunctionStrings.put("Set", "new HashSet<>");
+        libraryFunctionStrings.put("Map", "new HashMap<>");
     }
 
     public static HashSet<ASTFunction> functions = new HashSet<>();
@@ -51,11 +59,15 @@ public abstract class ASTAbstractFunction extends ASTNode {
         functions.add(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));
 
         // Constructors (Library Data Structures)
-        functions.add(new ASTFunction("List", new HMTypeList(null), null));
-        //functions.add(new ASTFunction("Stack", new HMTypeObject("Stack", new HashSet<>()), null));
-        //functions.add(new ASTFunction("Queue", new HMTypeObject("Queue", new HashSet<>()), null));
-        functions.add(new ASTFunction("Set", new HMTypeSet(null), null));
-        //functions.add(new ASTFunction("Map", new HMTypeObject("Map", new HashSet<>()), null));
+        functions.add(new ASTFunction("List", new HMTypeList(new HMTypeVar()), null));
+        // functions.add(new ASTFunction("Stack", new HMTypeObject("Stack", new
+        // HashSet<>()), null));
+        // functions.add(new ASTFunction("Queue", new HMTypeObject("Queue", new
+        // HashSet<>()), null));
+        functions.add(new ASTFunction("Set", new HMTypeSet(new HMTypeVar()), null));
+
+        List<HMType> tuple = Arrays.asList(new HMType[] { new HMTypeVar(), new HMTypeVar() });
+        functions.add(new ASTFunction("Map", new HMTypeMap(new HMTypeTuple(tuple)), null));
     }
 
     public static class Parameter {

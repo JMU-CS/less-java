@@ -27,17 +27,7 @@ public class ASTVariable extends ASTExpression {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        ASTNode n = this;
-        boolean inTest = false;
-
-        // TODO: Better way to handle this??
-        while (!((n = n.getParent()) instanceof ASTProgram) && n != null) {
-            if (inTest = n instanceof ASTTest) {
-                break;
-            }
-        }
-
-        sb.append(inTest ? String.format("__test%s", this.name) : name);
+        sb.append(name);
 
         return sb.toString();
     }

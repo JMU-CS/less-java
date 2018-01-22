@@ -1,6 +1,7 @@
 package com.github.lessjava.types.ast;
 
 import com.github.lessjava.types.inference.impl.HMTypeMap;
+import com.github.lessjava.types.inference.impl.HMTypeTuple;
 
 public class ASTMap extends ASTCollection {
     public ASTMap(ASTArgList initialElements) {
@@ -12,10 +13,10 @@ public class ASTMap extends ASTCollection {
         StringBuilder initialization = new StringBuilder();
         StringBuilder entries = new StringBuilder();
 
-        HMTypeMap t = (HMTypeMap) type;
+        HMTypeTuple t = (HMTypeTuple)((HMTypeMap) type).elementType;
 
-        String keyType = t.key.toString();
-        String valueType = t.value.toString();
+        String keyType = t.types.get(0).toString();
+        String valueType = t.types.get(1).toString();
 
         for (ASTExpression e : initialElements.arguments) {
             ASTEntry entry = (ASTEntry) e;

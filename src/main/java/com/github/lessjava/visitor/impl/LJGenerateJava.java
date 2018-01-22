@@ -14,12 +14,10 @@ import java.util.stream.Collectors;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
-import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
-import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTGlobalAssignment;
@@ -27,7 +25,6 @@ import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTTest;
-import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTVoidMethodCall;
@@ -53,12 +50,10 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     private List<String> lines = new ArrayList<>();
     private List<String> globalLines = new ArrayList<>();
     private List<String> testLines = new ArrayList<>();
-    private List<String> mainLines = new ArrayList<>();
     private List<String> functionLines = new ArrayList<>();
     private List<String> testDeclarationLines = new ArrayList<>();
-    private List<String> mainDeclarationLines = new ArrayList<>();
     private Set<String> functionDeclarationLines = new HashSet<>();
-    private Set<String> mainVariables = new HashSet<>();
+    // private Set<String> mainVariables = new HashSet<>();
     private Set<String> functionVariables = new HashSet<>();
     private int indent = 1;
     private int testIndex = 0;
@@ -76,25 +71,12 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
         lines.add("public class Main");
         lines.add("{");
-
-        String spaces = String.format("%" + (indent * 4) + "s", "");
-        mainLines.add(String.format("\n%spublic static void main(String[] args)", spaces));
-        mainLines.add(String.format("%s{", spaces));
-
-        spaces = String.format("%" + (indent * 8) + "s", "");
-        mainLines.add(String.format("%sScanner scn = new Scanner(System.in);", spaces));
     }
 
     @Override
     public void postVisit(ASTProgram node) {
-        String spaces = String.format("%" + (indent * 4) + "s", "");
-
-
         lines.addAll(globalLines);
         lines.addAll(testDeclarationLines);
-        mainLines.add(String.format("%s}", spaces));
-        mainLines.addAll(2, mainDeclarationLines);
-        lines.addAll(mainLines);
         lines.addAll(testLines);
         lines.add("}");
 
@@ -113,11 +95,6 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         this.functionVariables.clear();
         this.functionDeclarationLines.clear();
 
-        // Skip main
-        if (node.name.equals("main")) {
-            return;
-        }
-
         // Library function
         if (node.body == null) {
             return;
@@ -132,8 +109,17 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         this.functionVariables.addAll(node.parameters.stream().map(Parameter::getName).collect(Collectors.toList()));
 
         String line = "";
-        String parameterString = this.currentFunction.parameters.toString().substring(1,
-                this.currentFunction.parameters.toString().length() - 1);
+
+        String parameterString;
+
+        // Inject main arguments
+        if (node.name.equals("main")) {
+            parameterString = "String[] args";
+        } else {
+            parameterString = this.currentFunction.parameters.toString().substring(1,
+                    this.currentFunction.parameters.toString().length() - 1);
+        }
+
         String functionHeader = String.format("public static %s %s(%s)", this.currentFunction.returnType.toString(),
                 this.currentFunction.name, parameterString);
 
@@ -144,17 +130,27 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     @Override
     public void postVisit(ASTFunction node) {
-        this.currentFunction = null;
+        // Library function
+        if (node.body == null) {
+            this.currentFunction = null;
+            return;
+        }
+
+        // Prototype
+        if (!node.concrete) {
+            this.currentFunction = null;
+            return;
+        }
+
+        functionLines.addAll(2, functionDeclarationLines);
+        lines.addAll(functionLines);
     }
 
     @Override
     public void preVisit(ASTGlobalAssignment node) {
-        String line = String.format("public static final %s %s = %s;", node.variable.type, node.variable, node.value);
-        addLine(node, line);
-    }
+        String line = String.format("public static final %s %s;", node.assignment.type, node.assignment.toString());
 
-    @Override
-    public void postVisit(ASTGlobalAssignment node) {
+        addLine(node, line);
     }
 
     @Override
@@ -166,16 +162,9 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
             return;
         }
 
-        // Skip main
-        if (parent != null && parent.name.equals("main")) {
-            return;
-        }
-
         String line = String.format("{");
-
         addLine(node, line);
         indent++;
-
     }
 
     @Override
@@ -187,133 +176,36 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
             return;
         }
 
-        // Skip main
-        if (parent != null && parent.name.equals("main")) {
-            return;
-        }
-
         indent--;
         String line = String.format("}");
         addLine(node, line);
 
         if (parent != null) {
-            functionLines.addAll(2, functionDeclarationLines);
-            lines.addAll(functionLines);
         }
     }
 
     @Override
     public void preVisit(ASTVoidAssignment node) {
-        // Emit declarations
-        if (this.currentFunction == null || this.currentFunction.name.equals("main")) {
-            if (node.variable.name.startsWith("__")) {
-                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-                String declaration = String.format("%sprivate static %s %s;", spaces, node.variable.type,
-                        node.variable.name);
-
-                testDeclarationLines.add(declaration);
-            } else if (!mainVariables.contains(node.variable.name)) {
-                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-
-                String declaration = String.format("%s%s%s %s;", spaces, spaces, node.variable.type,
-                        node.variable.name);
-
-                mainDeclarationLines.add(declaration);
-                mainVariables.add(node.variable.name);
-            }
-        } else if (!functionVariables.contains(node.variable.name) && node.variable.type.isConcrete) {
-            String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-
-            String declaration = String.format("%s%s %s;", spaces, node.variable.type, node.variable.name);
-
-            functionVariables.add(node.variable.name);
-            functionDeclarationLines.add(declaration);
-        }
         String line;
 
-        if (node.op.equals(BinOp.ASGN)) {
-            if (node.variable.isCollection && node.variable.index != null) {
-                line = String.format("%s.set(%s, %s);", node.variable.name, node.variable.index, node.value);
-            } else {
-                line = String.format("%s = %s;", node.variable.name, node.value);
-            }
-        } else if (node.op.equals(BinOp.ADDASGN)) {
-            if (node.variable.isCollection && node.variable.index == null) {
-                line = String.format("%s.add(%s);", node.variable.name, node.value);
-            } else {
-                line = String.format("%s += %s;", node.variable.name, node.value);
-            }
-        } else if (node.op.equals(BinOp.SUBASGN)) {
-            if (node.variable.isCollection && node.variable.index == null) {
-                line = String.format("%s.remove(%s);", node.variable.name, node.value);
-            } else {
-                line = String.format("%s -= %s;", node.variable.name, node.value);
-            }
-        } else {
-            line = "---Assignment Error---";
-        }
+        line = String.format("%s;", node.assignment.toString());
 
         addLine(node, line);
     }
 
     @Override
     public void preVisit(ASTAssignment node) {
+        if (node.getParent() instanceof ASTGlobalAssignment) {
+            return;
+        }
+
         // Emit declarations
-        if (this.currentFunction == null) {
-            if (node.variable.name.startsWith("__")) {
-                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-                String declaration = String.format("%sprivate static %s %s;", spaces, node.variable.type,
-                        node.variable.name);
-
-                testDeclarationLines.add(declaration);
-            } else if (!mainVariables.contains(node.variable.name)) {
-                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-
-                String declaration = String.format("%s%s%s %s;", spaces, spaces, node.variable.type,
-                        node.variable.name);
-
-                mainDeclarationLines.add(declaration);
-                mainVariables.add(node.variable.name);
-            }
-        } else if (!functionVariables.contains(node.variable.name)) {
+        if (!functionVariables.contains(node.variable.name)) {
             String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
 
             String declaration = String.format("%s%s %s;", spaces, node.variable.type, node.variable.name);
 
             functionVariables.add(node.variable.name);
-            functionDeclarationLines.add(declaration);
-        }
-    }
-
-    @Override
-    public void preVisit(ASTBinaryExpr node) {
-        if (!node.operator.equals(BinOp.ASGN)) {
-            return;
-        }
-
-        ASTVariable var = (ASTVariable) node.leftChild;
-
-        // Emit declarations
-        if (this.currentFunction == null) {
-            if (var.name.startsWith("__")) {
-                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-                String declaration = String.format("%sprivate static %s %s;", spaces, var.type, var.name);
-
-                testDeclarationLines.add(declaration);
-            } else if (!mainVariables.contains(var.name)) {
-                String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-
-                String declaration = String.format("%s%s%s %s;", spaces, spaces, var.type, var.name);
-
-                mainDeclarationLines.add(declaration);
-                mainVariables.add(var.name);
-            }
-        } else if (!functionVariables.contains(var.name)) {
-            String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
-
-            String declaration = String.format("%s%s %s;", spaces, var.type, var.name);
-
-            functionVariables.add(var.name);
             functionDeclarationLines.add(declaration);
         }
     }
@@ -377,18 +269,10 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         line = String.format("public void test%d() {", testIndex++, "", node.expr);
         addLine(node, line);
 
-        line = "    PrintStream originalStream = System.out;";
-        addLine(node, line);
-        line = "    System.setOut(new PrintStream(new OutputStream() { public void write(int i) {} }));";
-        addLine(node, line);
-
-        line = String.format("    main(null);");
-        addLine(node, line);
-
         if (node.expr instanceof ASTBinaryExpr) {
             ASTBinaryExpr expr = (ASTBinaryExpr) node.expr;
 
-            if (expr.leftChild.type.equals(HMTypeBase.INT) ||  expr.leftChild.type.equals(HMTypeBase.REAL)) {
+            if (expr.leftChild.type.equals(HMTypeBase.INT) || expr.leftChild.type.equals(HMTypeBase.REAL)) {
                 line = String.format("%4sassertEquals(%s, %s);", "", expr.rightChild, expr.leftChild);
             } else {
                 line = String.format("%4sassertTrue(%s);", "", node.expr);
@@ -400,9 +284,6 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
         addLine(node, line);
 
-        line = "    System.setOut(originalStream);";
-        addLine(node, line);
-
         line = String.format("}");
         addLine(node, line);
     }
@@ -411,28 +292,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public void preVisit(ASTVoidFunctionCall node) {
         String line;
 
-        String arguments = node.arguments.stream().map(ASTExpression::toString).collect(Collectors.joining(","))
-                .replaceAll("\\\\\"", "");
-
-        List<String> printArgs = new ArrayList<>();
-        if (ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
-            switch (node.name) {
-                case "print":
-                case "println":
-                case "printf":
-                    for (ASTExpression e : node.arguments) {
-                        printArgs.add(e.type instanceof HMTypeCollection ? e.toString() + ".toString()" : e.toString());
-                    }
-
-                    arguments = String.join(",", printArgs).replaceAll("\\\\\"", "");
-                    line = String.format(ASTFunction.libraryFunctionStrings.get(node.name), arguments);
-                    break;
-                default:
-                    line = String.format("%s;", ASTFunction.libraryFunctionStrings.get(node.name));
-            }
-        } else {
-            line = String.format("%s(%s);", node.name, arguments);
-        }
+        line = String.format("%s;", node.functionCall.toString());
 
         addLine(node, line);
     }
@@ -441,7 +301,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public void preVisit(ASTVoidMethodCall node) {
         String line;
 
-        line = String.format("%s.%s;", node.invoker, node.funcCall);
+        line = String.format("%s;", node.methodCall.toString());
 
         addLine(node, line);
     }
@@ -458,8 +318,6 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
             testLines.add(String.format("%s%s", spaces, line));
         } else if (node instanceof ASTGlobalAssignment) {
             globalLines.add(String.format("%s%s", spaces, line));
-        } else if (currentFunction == null || currentFunction.name.equals("main")) {
-            mainLines.add(String.format("%s%s%s", spaces, spaces, line));
         } else {
             functionLines.add(String.format("%s%s", spaces, line));
         }

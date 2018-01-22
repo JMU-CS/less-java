@@ -14,7 +14,6 @@ import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
-import com.github.lessjava.types.ast.ASTGlobalAssignment;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTMap;
 import com.github.lessjava.types.ast.ASTMethodCall;
@@ -22,8 +21,6 @@ import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTSet;
 import com.github.lessjava.types.ast.ASTVariable;
-import com.github.lessjava.types.ast.ASTVoidAssignment;
-import com.github.lessjava.types.ast.ASTVoidMethodCall;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
@@ -71,13 +68,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         node.returnType = this.returnType == null ? HMTypeBase.VOID : unify(node.returnType, this.returnType);
         node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
-    }
-
-    @Override
-    public void postVisit(ASTGlobalAssignment node) {
-        super.postVisit(node);
-
-        node.variable.type = unify(node.variable.type, node.value.type);
     }
 
     @Override
@@ -239,13 +229,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     }
 
     @Override
-    public void postVisit(ASTVoidAssignment node) {
-        super.postVisit(node);
-
-        node.variable.type = unify(node.variable.type, node.value.type);
-    }
-
-    @Override
     public void postVisit(ASTAssignment node) {
         super.postVisit(node);
 
@@ -260,30 +243,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         }
 
         node.type = node.variable.type;
-    }
-
-    @Override
-    public void postVisit(ASTVoidMethodCall node) {
-        super.postVisit(node);
-
-        // TODO: Better way??
-        if (node.invoker.type instanceof HMTypeCollection) {
-            HMTypeCollection t = (HMTypeCollection) node.invoker.type;
-
-            if (node.funcCall.name.equals("add")) {
-                t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
-            } else if (node.funcCall.name.equals("insert")) {
-                t.elementType = unify(t.elementType, node.funcCall.arguments.get(1).type);
-            } else if (node.funcCall.name.equals("remove")) {
-                if (!node.funcCall.arguments.isEmpty()) {
-                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
-                }
-            } else if (node.funcCall.name.equals("put")) {
-                if (!node.funcCall.arguments.isEmpty()) {
-                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
-                }
-            }
-        }
     }
 
     @Override
@@ -304,9 +263,16 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
                 }
             } else if (node.funcCall.name.equals("put")) {
                 if (!node.funcCall.arguments.isEmpty()) {
-                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
+                    HMTypeTuple tuple = (HMTypeTuple) t.elementType;
+
+                    HMType key = tuple.types.get(0);
+                    HMType value = tuple.types.get(1);
+
+                    key = unify(key, node.funcCall.arguments.get(0).type);
+                    value = unify(value, node.funcCall.arguments.get(1).type);
+
+                    t.elementType = new HMTypeTuple(Arrays.asList(new HMType[] {key, value}));
                 }
-            } else if (node.funcCall.name.equals("contains")) {
             }
         }
 

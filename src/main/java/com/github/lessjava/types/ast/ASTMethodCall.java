@@ -45,10 +45,12 @@ public class ASTMethodCall extends ASTBinaryExpr {
         StringBuilder argString;
 
         String collectionName = null;
+
         if (invoker.type instanceof HMTypeCollection) {
             collectionName = ((HMTypeCollection) invoker.type).collectionName;
 
             translation = ASTClass.methodTranslations.get(String.format("%s%s", collectionName, funcCall.name));
+
             if (translation != null) {
                 argString = new StringBuilder();
                 argString.append("(");
@@ -64,11 +66,9 @@ public class ASTMethodCall extends ASTBinaryExpr {
             }
         }
 
-        if (type instanceof HMTypeBase) {
-            return wrapPrimitive((HMTypeBase)type, String.format("%s.%s", invoker, funcCall));
-        } else {
-            return String.format("%s.%s", invoker, funcCall);
-        }
+        String s = String.format("%s.%s", invoker, funcCall);
+
+        return type instanceof HMTypeBase ? wrapPrimitive((HMTypeBase)type, s) : s;
     }
 
     @Override

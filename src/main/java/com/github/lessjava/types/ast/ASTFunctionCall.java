@@ -54,9 +54,9 @@ public class ASTFunctionCall extends ASTExpression {
         argString.append(")");
 
         if (ASTFunction.libraryFunctionStrings.containsKey(name)) {
-            return ASTFunction.libraryFunctionStrings.get(name) + argString;
+            return String.format("%s%s", ASTFunction.libraryFunctionStrings.get(name), argString);
         }
 
-        return name + argString;
+        return String.format("%s%s", name, argString);
     }
 }

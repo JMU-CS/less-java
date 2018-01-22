@@ -1,12 +1,12 @@
 oddGnome(gnomes) {
-    lastGnome = gnomes.get(0)
+    prevGnome = gnomes.get(0)
 
     for (i: 1 -> gnomes.size()) {
-        if (gnomes.get(i) != lastGnome + 1) {
+        if (gnomes.get(i) != prevGnome + 1) {
             return gnomes.get(i)
         }
 
-        lastGnome = gnomes.get(i)
+        prevGnome = gnomes.get(i)
     }
 
     return -1

@@ -11,5 +11,6 @@ a(d) {
 b(i) {
     return i
 }
-
-a(1)
+main() {
+    a(1)
+}

@@ -1,4 +1,4 @@
-nonEmptyListAdd() {
+nonEmptyList() {
     list = ["a", "b", "c"]
     list.add("d")
 
@@ -6,40 +6,80 @@ nonEmptyListAdd() {
 }
 
 
-test nonEmptyListAdd().size() == 4
-test nonEmptyListAdd().get(0) == "a"
-test nonEmptyListAdd().get(nonEmptyListAdd().size() - 1) == "d"
+test nonEmptyList().size() == 4
+test nonEmptyList().get(0) == "a"
+test nonEmptyList().get(nonEmptyList().size() - 1) == "d"
 
-emptyListAdd() {
+emptyList() {
     list = []
     list.add("a")
 
     return list
 }
 
-test emptyListAdd().size() == 1
-test emptyListAdd().get(0) == "a"
-test emptyListAdd().get(emptyListAdd().size() - 1) == "a"
+test emptyList().size() == 1
+test emptyList().get(0) == "a"
+test emptyList().get(emptyList().size() - 1) == "a"
 
-nonEmptySetAdd() {
+nonEmptySet() {
     set = {"a", "a", "b", "c"}
     set.add("d")
+    set.add("e")
+    set.remove("e")
 
     return set
 }
 
-test nonEmptySetAdd().size() == 4
-test nonEmptySetAdd().contains("a")
-test !nonEmptySetAdd().contains("e")
+test nonEmptySet().size() == 4
+test nonEmptySet().contains("a")
+test !nonEmptySet().contains("e")
 
-nonEmptyMapPut() {
+emptySet() {
+    set = Set()
+    set.add("a")
+    set.add("a")
+    set.add("b")
+    set.add("c")
+    set.remove("c")
+
+    return set
+}
+
+test emptySet().size() == 2
+test emptySet().contains("a")
+test emptySet().contains("b")
+test !emptySet().contains("c")
+
+nonEmptyMap() {
     map = <"x" : 10>
     map.put("y", 100)
 
     return map
 }
 
-test nonEmptyMapPut().contains("x")
-test nonEmptyMapPut().contains("y")
-test nonEmptyMapPut().get("x") == 10
-test nonEmptyMapPut().get("y") == 100
+test nonEmptyMap().contains("x")
+test nonEmptyMap().contains("y")
+test nonEmptyMap().get("x") == 10
+test nonEmptyMap().get("y") == 100
+
+emptyMap() {
+    map = Map()
+    map.put("x", 10)
+
+    return map
+}
+
+test emptyMap().size() == 1
+test emptyMap().contains("x")
+test emptyMap().get("x") == 10
+
+nonEmptyQueue() {
+    queue = ["a", "b", "c"]
+    queue.enqueue("d")
+
+    return queue
+}
+
+test nonEmptyQueue().size() == 4
+test nonEmptyQueue().get(nonEmptyQueue().size() - 1) == "d"
+

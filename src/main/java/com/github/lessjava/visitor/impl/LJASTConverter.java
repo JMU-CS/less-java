@@ -147,23 +147,12 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitGlobal(GlobalContext ctx) {
         ASTGlobalAssignment globalAssignment;
-        BinOp op;
-        ASTVariable variable;
-        ASTExpression expression;
+        ASTAssignment assignment;
 
-        op = ASTBinaryExpr.stringToOp(ctx.assignment().op.getText());
-        variable = (ASTVariable) parserASTMap.get(ctx.assignment().var());
-        expression = (ASTExpression) parserASTMap.get(ctx.assignment().expr());
-
-        if (expression instanceof ASTArgList) {
-            variable.isCollection = true;
-        }
-
-        globalAssignment = new ASTGlobalAssignment(op, variable, expression);
+        assignment = (ASTAssignment) parserASTMap.get(ctx.assignment());
+        globalAssignment = new ASTGlobalAssignment(assignment);
 
         globalAssignment.setDepth(ctx.depth());
-
-        globalAssignment.variable.attributes.put("assignment", ctx.getText());
 
         parserASTMap.put(ctx, globalAssignment);
     }
@@ -208,19 +197,10 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitVoidAssignment(VoidAssignmentContext ctx) {
         ASTVoidAssignment voidAssignment;
-        BinOp op;
-        ASTVariable variable;
-        ASTExpression expression;
+        ASTAssignment assignment;
 
-        op = ASTBinaryExpr.stringToOp(ctx.assignment().op.getText());
-        variable = (ASTVariable) parserASTMap.get(ctx.assignment().var());
-        expression = (ASTExpression) parserASTMap.get(ctx.assignment().expr());
-
-        if (expression instanceof ASTArgList) {
-            variable.isCollection = true;
-        }
-
-        voidAssignment = new ASTVoidAssignment(op, variable, expression);
+        assignment = (ASTAssignment) parserASTMap.get(ctx.assignment());
+        voidAssignment = new ASTVoidAssignment(assignment);
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(voidAssignment);
@@ -357,50 +337,36 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitVoidFunctionCall(VoidFunctionCallContext ctx) {
         ASTVoidFunctionCall voidFuncCall;
+        ASTFunctionCall functionCall;
 
-        voidFuncCall = new ASTVoidFunctionCall(ctx.funcCall().ID().getText());
+        functionCall = (ASTFunctionCall) parserASTMap.get(ctx.funcCall());
+
+        voidFuncCall = new ASTVoidFunctionCall(functionCall);
 
         voidFuncCall.setDepth(ctx.depth());
-
-        parserASTMap.put(ctx, voidFuncCall);
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(voidFuncCall);
         }
 
-        if (ctx.funcCall().argList() == null) {
-            return;
-        }
-
-        for (ExprContext expr : ctx.funcCall().argList().expr()) {
-            voidFuncCall.arguments.add((ASTExpression) parserASTMap.get(expr));
-        }
+        parserASTMap.put(ctx, voidFuncCall);
     }
 
     @Override
     public void exitVoidMethodCall(VoidMethodCallContext ctx) {
         ASTVoidMethodCall voidMethodCall;
+        ASTMethodCall methodCall;
 
-        ASTExpression invoker;
+        methodCall = (ASTMethodCall) parserASTMap.get(ctx.methodCall());
+        voidMethodCall = new ASTVoidMethodCall(methodCall);
 
-        if (ctx.methodCall().var() != null) {
-            invoker = (ASTVariable) parserASTMap.get(ctx.methodCall().var());
-        } else {
-            invoker = (ASTFunctionCall) parserASTMap.get(ctx.methodCall().funcCall().get(0));
-        }
-
-        List<ASTFunctionCall> calls = ctx.methodCall().funcCall().stream().map(c -> parserASTMap.get(c)).map(c -> (ASTFunctionCall) c).collect(Collectors.toList());
-
-        ASTFunctionCall funcCall = calls.get(calls.size()-1);
-
-        voidMethodCall = new ASTVoidMethodCall(invoker, funcCall);
         voidMethodCall.setDepth(ctx.depth());
-
-        parserASTMap.put(ctx, voidMethodCall);
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(voidMethodCall);
         }
+
+        parserASTMap.put(ctx, voidMethodCall);
     }
 
     @Override

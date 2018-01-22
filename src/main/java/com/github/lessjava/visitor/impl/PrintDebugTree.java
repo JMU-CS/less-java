@@ -101,7 +101,7 @@ public class PrintDebugTree extends LJDefaultASTVisitor {
     public void preVisit(ASTVoidFunctionCall node) {
         StringBuffer args = new StringBuffer();
         args.append("(");
-        for (ASTExpression e : node.arguments) {
+        for (ASTExpression e : node.functionCall.arguments) {
             if (args.length() > 1) {
                 args.append(", ");
             }
@@ -110,7 +110,7 @@ public class PrintDebugTree extends LJDefaultASTVisitor {
         args.append(")");
 
         indent(node);
-        output.print("VoidFunctionCall: " + node.name + " " + args.toString());
+        output.print("VoidFunctionCall: " + node.functionCall.name + " " + args.toString());
         newline(node);
     }
 

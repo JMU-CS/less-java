@@ -12,7 +12,6 @@ import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTProgram;
-import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 public class LJInstantiateFunctions extends LJAbstractAssignTypes {
@@ -33,29 +32,6 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
     @Override
     public void postVisit(ASTFunctionCall node) {
-        super.postVisit(node);
-
-        ASTAbstractFunction f = idFunctionMap.get(node.getIdentifyingString());
-
-        if (f != null && f.concrete) {
-            return;
-        }
-
-        f = instantiateFunction(node.name, node.arguments);
-
-        if (f != null) {
-            if (program.functions.contains(f)) {
-                return;
-            }
-
-            program.functions.add(f);
-
-            idFunctionMap.put(node.getIdentifyingString(), f);
-        }
-    }
-
-    @Override
-    public void postVisit(ASTVoidFunctionCall node) {
         super.postVisit(node);
 
         ASTAbstractFunction f = idFunctionMap.get(node.getIdentifyingString());

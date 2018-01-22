@@ -75,8 +75,7 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTGlobalAssignment node) {
-        node.variable.setParent(node);
-        node.value.setParent(node);
+        node.assignment.setParent(node);
     }
 
     @Override
@@ -105,21 +104,17 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTVoidAssignment node) {
-        node.variable.setParent(node);
-        node.value.setParent(node);
+        node.assignment.setParent(node);
     }
 
     @Override
     public void preVisit(ASTVoidFunctionCall node) {
-        for (ASTExpression expr : node.arguments) {
-            expr.setParent(node);
-        }
+        node.functionCall.setParent(node);
     }
 
     @Override
     public void preVisit(ASTVoidMethodCall node) {
-        node.invoker.setParent(node);
-        node.funcCall.setParent(node);
+        node.methodCall.setParent(node);
     }
 
     @Override
