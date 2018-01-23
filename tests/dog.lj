@@ -1,0 +1,39 @@
+Dog
+{
+    public name = ""
+    private age = 0
+
+    Foo (name, age) {
+        this.name = name
+        this.age = age
+    }
+
+    bark () {
+        printf("%s says BARK!\n", this.name)
+    }
+
+    run () {
+        printf("%s runs!\n", this.name)
+    }
+}
+
+BullDog extends Dog
+{
+    bark () {
+        printf("%s says BARK BARK!\n", this.name)
+    }
+}
+
+main () {
+    d = Dog("Duke", 10)
+    d.bark()
+    d.run()
+
+    d.name = "Duke Dog"
+    d.bark()
+
+    dd = BullDog("Duke Dog", 20)
+    dd.bark()
+    dd.run()
+}
+

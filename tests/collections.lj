@@ -80,6 +80,17 @@ nonEmptyQueue() {
     return queue
 }
 
+nonEmptyIntQueue() {
+    queue = [1,2,3]
+    queue.enqueue("d")
+
+    return queue
+}
+
+
 test nonEmptyQueue().size() == 4
 test nonEmptyQueue().get(nonEmptyQueue().size() - 1) == "d"
+
+test nonEmptyIntQueue().size() == 4
+test nonEmptyIntQueue().get(nonEmptyIntQueue().size() - 1) == 4
 
