@@ -13,41 +13,26 @@ public class ASTClass extends ASTNode {
     public static Set<ASTClass> classes = new HashSet<>();
     public static Map<String, String> methodTranslations = new HashMap<>();
 
-    private static final String LIST = "List";
-    private static final String SET = "Set";
-    private static final String MAP = "Map";
-
     private static Set<ASTMethod> createListMethods() {
-        ASTMethod add = new ASTMethod("add", HMTypeBase.VOID, null);
-        ASTMethod push = new ASTMethod("push", HMTypeBase.VOID, null);
-        ASTMethod enqueue = new ASTMethod("enqueue", HMTypeBase.VOID, null);
-        ASTMethod remove = new ASTMethod("remove", HMTypeBase.BOOL, null);
-        ASTMethod pop = new ASTMethod("removeAt", new HMTypeVar(), null);
-        ASTMethod dequeue = new ASTMethod("removeAt", new HMTypeVar(), null);
-        // TODO: How do I handle pop??
-        dequeue.internalArguments.add(new ASTLiteral(HMType.BaseDataType.INT, Integer.valueOf(0)));
-
-        ASTMethod insert = new ASTMethod("insert", HMTypeBase.VOID, null);
-        ASTMethod removeAt = new ASTMethod("removeAt", new HMTypeVar(), null);
-        ASTMethod get = new ASTMethod("get", new HMTypeVar(), null);
-        ASTMethod set = new ASTMethod("set", new HMTypeVar(), null);
-        ASTMethod size = new ASTMethod("size", HMTypeBase.INT, null);
-
         Set<ASTMethod> methods = new HashSet<ASTMethod>() {
             private static final long serialVersionUID = 1L;
 
             {
-                add(add);
-                add(push);
-                add(enqueue);
-                add(remove);
-                add(pop);
-                add(dequeue);
-                add(insert);
-                add(removeAt);
-                add(get);
-                add(set);
-                add(size);
+                add("add", HMTypeBase.VOID);
+                add("push", HMTypeBase.VOID);
+                add("enqueue", HMTypeBase.VOID);
+                add("remove", HMTypeBase.BOOL);
+                add("pop", new HMTypeVar());
+                add("dequeue", new HMTypeVar());
+                add("insert", HMTypeBase.VOID);
+                add("removeAt", new HMTypeVar());
+                add("get", new HMTypeVar());
+                add("set", HMTypeBase.VOID);
+                add("size", HMTypeBase.INT);
+            }
+
+            public void add(String name, HMType type) {
+                add(new ASTMethod(name, type, null));
             }
         };
 
@@ -55,19 +40,18 @@ public class ASTClass extends ASTNode {
     }
 
     private static Set<ASTMethod> createSetMethods() {
-        ASTMethod add = new ASTMethod("add", HMTypeBase.VOID, null);
-        ASTMethod remove = new ASTMethod("remove", HMTypeBase.BOOL, null);
-        ASTMethod contains = new ASTMethod("contains", HMTypeBase.BOOL, null);
-        ASTMethod size = new ASTMethod("size", HMTypeBase.INT, null);
-
         Set<ASTMethod> methods = new HashSet<ASTMethod>() {
             private static final long serialVersionUID = 1L;
 
             {
-                add(add);
-                add(remove);
-                add(contains);
-                add(size);
+                add("add", HMTypeBase.VOID);
+                add("remove", HMTypeBase.BOOL);
+                add("contains", HMTypeBase.BOOL);
+                add("size", HMTypeBase.INT);
+            }
+
+            public void add(String name, HMType type) {
+                add(new ASTMethod(name, type, null));
             }
         };
 
@@ -75,39 +59,22 @@ public class ASTClass extends ASTNode {
     }
 
     private static Set<ASTMethod> createMapMethods() {
-        ASTMethod put = new ASTMethod("put", HMTypeBase.VOID, null);
-        ASTMethod get = new ASTMethod("get", new HMTypeVar(), null);
-        ASTMethod contains = new ASTMethod("contains", HMTypeBase.BOOL, null);
-        ASTMethod size = new ASTMethod("size", HMTypeBase.INT, null);
-
         Set<ASTMethod> methods = new HashSet<ASTMethod>() {
             private static final long serialVersionUID = 1L;
 
             {
-                add(put);
-                add(get);
-                add(contains);
-                add(size);
+                add("put", HMTypeBase.VOID);
+                add("get", new HMTypeVar());
+                add("contains", HMTypeBase.BOOL);
+                add("size", HMTypeBase.INT);
+            }
+
+            public void add(String name, HMType type) {
+                add(new ASTMethod(name, type, null));
             }
         };
 
         return methods;
-    }
-
-    private static void addListTranslations() {
-        methodTranslations.put(String.format("%spush", LIST), "add");
-        methodTranslations.put(String.format("%senqueue", LIST), "add");
-        methodTranslations.put(String.format("%sinsert", LIST), "add");
-        methodTranslations.put(String.format("%sremoveAt", LIST), "remove");
-        methodTranslations.put(String.format("%spop", LIST), "remove");
-        methodTranslations.put(String.format("%sdequeue", LIST), "remove");
-    }
-
-    private static void addSetTranslations() {
-    }
-
-    private static void addMapTranslations() {
-        methodTranslations.put(String.format("%scontains", MAP), "containsKey");
     }
 
     static {
@@ -118,10 +85,6 @@ public class ASTClass extends ASTNode {
         classes.add(list);
         classes.add(set);
         classes.add(map);
-
-        addListTranslations();
-        addSetTranslations();
-        addMapTranslations();
     }
 
     public String name;

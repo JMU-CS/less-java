@@ -1,5 +1,7 @@
 package com.github.lessjava.types.ast;
 
+import com.github.lessjava.types.inference.impl.HMTypeBase;
+
 /**
  * Unary operation with an operation tag and a child sub-expression. When
  * executed, the program should fully evaluate the child and then apply the
@@ -15,14 +17,17 @@ public class ASTUnaryExpr extends ASTExpression {
      * </ul>
      */
     public enum UnaryOp {
-        INVALID, NOT
+        INVALID, NOT, NEG
     }
 
     public static String opToString(UnaryOp op) {
         switch (op) {
             case NOT:
                 return "!";
+            case NEG:
+                return "-";
             default:
+                System.err.println(op);
                 return "???";
         }
     }
@@ -44,6 +49,19 @@ public class ASTUnaryExpr extends ASTExpression {
 
     @Override
     public String toString() {
-        return "(" + opToString(operator) + child.toString() + ")";
+        String s = String.format("(%s%s)", opToString(operator), child.toString());
+
+        String t;
+        if (this.type.equals(HMTypeBase.BOOL)) {
+            t = "Boolean.valueOf(%s)";
+        } else if (this.type.equals(HMTypeBase.INT)) {
+            t = "Integer.valueOf(%s)";
+        } else if (this.type.equals(HMTypeBase.REAL)) {
+            t = "Double.valueOf(%s)";
+        } else {
+            t = "%s";
+        }
+
+        return String.format(t,s);
     }
 }

@@ -12,6 +12,6 @@ public class HMTypeMap extends HMTypeCollection {
     @Override
     public String toString() {
         HMTypeTuple t = (HMTypeTuple) elementType;
-        return String.format("HashMap<%s, %s>", t.types.get(0), t.types.get(1));
+        return String.format("LJMap<%s, %s>", t.types.get(0), t.types.get(1));
     }
 }

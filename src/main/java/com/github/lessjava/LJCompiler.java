@@ -1,8 +1,14 @@
 package com.github.lessjava;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
 import javax.tools.ToolProvider;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -25,7 +31,6 @@ import com.github.lessjava.visitor.impl.LJAssignTestVariables;
 import com.github.lessjava.visitor.impl.LJGenerateJava;
 import com.github.lessjava.visitor.impl.LJInstantiateFunctions;
 import com.github.lessjava.visitor.impl.LJStaticAnalysis;
-import com.github.lessjava.visitor.impl.LJUnifyVariables;
 import com.github.lessjava.visitor.impl.PrintDebugTree;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
 
@@ -113,8 +118,18 @@ public class LJCompiler {
         }
 
         // Compile java source file
+        //JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        //compiler.run(null, null, null, generateJava.mainFile.toString());
+
+        List<String> optionList = new ArrayList<>();
+        // set compiler's classpath to be same as the runtime's
+        optionList.addAll(Arrays.asList("-classpath",System.getProperty("java.class.path")));
+
+        List<JavaFileObject> jfos = new ArrayList<>();
+        jfos.add(new FileSimpleJavaFileObject(new File(LJGenerateJava.mainFile.toString())));
+
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        compiler.run(null, null, null, generateJava.mainFile.toString());
+        compiler.getTask(null, null, null, optionList, null, jfos);
 
         // TODO: exec junit
     }
@@ -123,6 +138,12 @@ public class LJCompiler {
         Result result = JUnitCore.runClasses(test);
         for (Failure failure : result.getFailures()) {
             System.out.println(failure.toString());
+        }
+    }
+
+    private static class FileSimpleJavaFileObject extends SimpleJavaFileObject {
+        public FileSimpleJavaFileObject(File file) {
+            super(file.toURI(), JavaFileObject.Kind.SOURCE);
         }
     }
 }

@@ -23,7 +23,7 @@ public class ASTMap extends ASTCollection {
             entries.append(String.format("put(%s, %s);", entry.key, entry.value));
         }
 
-        initialization.append(String.format("new HashMap<%s, %s>() {{%s}}", keyType,
+        initialization.append(String.format("new LJMap<%s, %s>(new HashMap<%s, %s>() {{%s}})", keyType, valueType, keyType,
                 valueType, entries));
 
         return initialization.toString();

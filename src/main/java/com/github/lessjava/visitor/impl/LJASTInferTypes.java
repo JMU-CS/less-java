@@ -20,6 +20,7 @@ import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTSet;
+import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
@@ -142,6 +143,18 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         rightChild = node.rightChild;
 
         leftChild.type = rightChild.type = unify(leftChild.type, rightChild.type, node.operator);
+    }
+
+    @Override
+    public void preVisit(ASTUnaryExpr node) {
+        super.preVisit(node);
+
+        unify(node.type, node.child.type);
+    }
+
+    @Override
+    public void postVisit(ASTUnaryExpr node) {
+        super.postVisit(node);
     }
 
     @Override

@@ -1,16 +1,10 @@
 package com.github.lessjava.types.ast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.github.lessjava.types.inference.HMType;
 
 public class ASTMethod extends ASTAbstractFunction {
-    public List<ASTExpression> internalArguments;
-
     public ASTMethod(String name, HMType returnType, ASTBlock body) {
         super(name, returnType, body);
-        this.internalArguments = new ArrayList<>();
     }
 
     public ASTMethod(String name, ASTBlock body) {

@@ -30,7 +30,7 @@ statement:      IF LP expr RP block (ELSE block)?           #Conditional
 expr:           exprBin;
 
 exprBin:        left=exprBin op=PREC1 right=exprBin
-                | left=exprBin op=PREC2 right=exprBin
+                | left=exprBin op=('+'|'-') right=exprBin
                 | left=exprBin op=PREC3 right=exprBin
                 | left=exprBin op=PREC4 right=exprBin
                 | left=exprBin op=PREC5 right=exprBin
@@ -40,7 +40,7 @@ exprBin:        left=exprBin op=PREC1 right=exprBin
                 | exprUn
                 ;
 
-exprUn:         op=UNOP expression=exprUn
+exprUn:         op=('!'|'-') expression=exprUn
                 | exprBase
                 ;
 
@@ -89,9 +89,10 @@ PREC1:      MULT
             | MOD
             ;
 
-PREC2:      ADD
-            | SUB
-            ;
+// Remove to prevent collisions with unop
+//PREC2:      ADD
+//            | SUB
+//            ;
 
 PREC3:      GT
             | GTE
@@ -111,9 +112,6 @@ PREC6:      OR;
 PREC7:      ASGN
             | ADDASGN
             | SUBASGN
-            ;
-
-UNOP:       NOT
             ;
 
 NOT:     '!';
@@ -147,8 +145,8 @@ INVOKE: '.';
 
 
 // Literals
-INT:        (' 'SUB)?[0-9]+;
-REAL:       (' 'SUB)?[0-9]*'.'[0-9]+;
+INT:        [0-9]+;
+REAL:       [0-9]*'.'[0-9]+;
 BOOL:       'true'|'false';
 STR:        '\"'.*?'\"';
 

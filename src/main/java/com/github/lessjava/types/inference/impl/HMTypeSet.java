@@ -13,6 +13,6 @@ public class HMTypeSet extends HMTypeCollection {
 
     @Override
     public String toString() {
-        return String.format("HashSet<%s>", elementType);
+        return String.format("LJSet<%s>", elementType);
     }
 }

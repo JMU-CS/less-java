@@ -615,6 +615,8 @@ public class LJASTConverter extends LJBaseListener {
         switch (op) {
             case "!":
                 return ASTUnaryExpr.UnaryOp.NOT;
+            case "-":
+                return ASTUnaryExpr.UnaryOp.NEG;
             default:
                 return ASTUnaryExpr.UnaryOp.INVALID;
         }

@@ -45,7 +45,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         }
     }
 
-    public Path mainFile = Paths.get("generated/Main.java");
+    public static Path mainFile = Paths.get("generated/Main.java");
 
     private List<String> lines = new ArrayList<>();
     private List<String> globalLines = new ArrayList<>();

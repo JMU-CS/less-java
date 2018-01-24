@@ -33,9 +33,9 @@ public abstract class ASTAbstractFunction extends ASTNode {
         libraryFunctionStrings.put("readLine", "scn.nextLine");
 
         // Constructors
-        libraryFunctionStrings.put("List", "new ArrayList<>");
-        libraryFunctionStrings.put("Set", "new HashSet<>");
-        libraryFunctionStrings.put("Map", "new HashMap<>");
+        libraryFunctionStrings.put("List", "new LJList<>");
+        libraryFunctionStrings.put("Set", "new LJSet<>");
+        libraryFunctionStrings.put("Map", "new LJMap<>");
     }
 
     public static HashSet<ASTFunction> functions = new HashSet<>();
