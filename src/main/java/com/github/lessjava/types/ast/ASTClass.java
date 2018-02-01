@@ -78,41 +78,32 @@ public class ASTClass extends ASTNode {
     }
 
     static {
-        ASTClass list = new ASTClass("List", null, createListMethods());
-        ASTClass set = new ASTClass("Set", null, createSetMethods());
-        ASTClass map = new ASTClass("Map", null, createMapMethods());
+        ASTClassBlock listBlock = new ASTClassBlock(null, createListMethods());
+        ASTClassBlock setBlock = new ASTClassBlock(null, createSetMethods());
+        ASTClassBlock mapBlock = new ASTClassBlock(null, createMapMethods());
+
+        ASTClass list = new ASTClass(new ASTClassSignature("List"),listBlock);
+        ASTClass set = new ASTClass(new ASTClassSignature("Set"), setBlock);
+        ASTClass map = new ASTClass(new ASTClassSignature("Map"), mapBlock);
 
         classes.add(list);
         classes.add(set);
         classes.add(map);
     }
 
-    public String name;
-    public Set<ASTVariable> attributes;
-    public Set<ASTMethod> methods;
+    public ASTClassSignature signature;
+    public ASTClassBlock block;
 
-    public ASTClass(String name, Set<ASTVariable> attributes, Set<ASTMethod> methods) {
-        this.name = name;
-        this.attributes = attributes == null ? new HashSet<>() : attributes;
-        this.methods = methods == null ? new HashSet<>() : methods;
+    public ASTClass(ASTClassSignature signature, ASTClassBlock block) {
+        this.signature = signature;
+        this.block = block;
     }
 
     @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
-
-        if (attributes != null) {
-            for (ASTVariable attribute : attributes) {
-                attribute.traverse(visitor);
-            }
-        }
-
-        if (methods != null) {
-            for (ASTMethod method : methods) {
-                method.traverse(visitor);
-            }
-        }
-
+        signature.traverse(visitor);
+        block.traverse(visitor);
         visitor.postVisit(this);
     }
 }

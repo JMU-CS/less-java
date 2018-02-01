@@ -29,9 +29,25 @@ public interface ASTVisitor {
 
     public void postVisit(ASTClass node);
 
+    public void preVisit(ASTClassSignature node);
+
+    public void postVisit(ASTClassSignature node);
+
+    public void preVisit(ASTClassBlock node);
+
+    public void postVisit(ASTClassBlock node);
+
+    public void preVisit(ASTAttribute node);
+
+    public void postVisit(ASTAttribute node);
+
     public void preVisit(ASTVariable node);
 
     public void postVisit(ASTVariable node);
+
+    public void preVisit(ASTMemberAccess node);
+
+    public void postVisit(ASTMemberAccess node);
 
     public void preVisit(ASTBlock node);
 

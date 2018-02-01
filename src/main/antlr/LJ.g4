@@ -4,8 +4,11 @@ grammar LJ;
 
 program:        (class_ | function | global | test | EOL)*;
 
-class_:          ID classBlock;
-classBlock:     (EOL)? LCB (EOL)? (attributes=var EOL)* methods=function* RCB (EOL)?;
+class_:          classSignature classBlock;
+
+classSignature: ID (EXTENDS ID)?;
+classBlock:     (EOL)? LCB (EOL)? (attribute | EOL)* (function | EOL)* RCB (EOL)?;
+attribute:      scope=(PUBLIC|PRIVATE) assignment EOL;
 
 function:       ID LP (paramList)? RP block;
 paramList:      ID (','ID)*;
@@ -48,6 +51,7 @@ exprBase:       funcCall
                 | methodCall
                 | collection
                 | var
+                | memberAccess
                 | lit
                 | LP expr RP
                 ;
@@ -58,16 +62,20 @@ methodCall:     (var | funcCall) op=INVOKE funcCall;
 
 collection:     LSB (argList)? RSB       #List
                 | LCB (argList)? RCB     #Set
-                | PREC3 (argList)? PREC3 #Map;
+                | PREC3 (argList)? PREC3 #Map
+                ;
 
-assignment:     var op=PREC7 expr;
+assignment:     (var | memberAccess) op=PREC7 expr;
 
 argList:        entry (',' entry)*
-                | expr (',' expr)*;
+                | expr (',' expr)*
+                ;
 
 entry:          key=expr ':' value=expr;
 
-var:            ID (LSB (expr)? RSB )?;
+var:            name=ID (LSB (index=expr)? RSB )?;
+memberAccess:   instance=ID INVOKE var;
+
 lit:            INT | REAL | BOOL | STR;
 
 
@@ -83,6 +91,9 @@ BREAK:      'break';
 CONTINUE:   'continue';
 TEST:       'test';
 GLOBAL:     'global';
+PUBLIC:     'public';
+PRIVATE:    'private';
+EXTENDS:    'extends';
 
 PREC1:      MULT
             | DIV

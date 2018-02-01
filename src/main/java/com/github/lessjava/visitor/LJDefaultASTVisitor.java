@@ -18,6 +18,7 @@ import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTLiteral;
 import com.github.lessjava.types.ast.ASTLocation;
 import com.github.lessjava.types.ast.ASTMap;
+import com.github.lessjava.types.ast.ASTMemberAccess;
 import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTNode;
@@ -96,6 +97,14 @@ public class LJDefaultASTVisitor implements ASTVisitor {
     }
 
     public void postVisit(ASTVariable node) {
+        defaultPostVisit(node);
+    }
+
+    public void preVisit(ASTMemberAccess node) {
+        defaultPreVisit(node);
+    }
+
+    public void postVisit(ASTMemberAccess node) {
         defaultPostVisit(node);
     }
 

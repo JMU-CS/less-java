@@ -29,6 +29,7 @@ import com.github.lessjava.generated.LJParser.GlobalContext;
 import com.github.lessjava.generated.LJParser.ListContext;
 import com.github.lessjava.generated.LJParser.LitContext;
 import com.github.lessjava.generated.LJParser.MapContext;
+import com.github.lessjava.generated.LJParser.MemberAccessContext;
 import com.github.lessjava.generated.LJParser.MethodCallContext;
 import com.github.lessjava.generated.LJParser.ProgramContext;
 import com.github.lessjava.generated.LJParser.ReturnContext;
@@ -47,6 +48,8 @@ import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
 import com.github.lessjava.types.ast.ASTClass;
+import com.github.lessjava.types.ast.ASTClassBlock;
+import com.github.lessjava.types.ast.ASTClassSignature;
 import com.github.lessjava.types.ast.ASTCollection;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
@@ -59,6 +62,7 @@ import com.github.lessjava.types.ast.ASTGlobalAssignment;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTLiteral;
 import com.github.lessjava.types.ast.ASTMap;
+import com.github.lessjava.types.ast.ASTMemberAccess;
 import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTNode;
@@ -111,6 +115,19 @@ public class LJASTConverter extends LJBaseListener {
         ast.setDepth(ctx.depth());
 
         parserASTMap.put(ctx, ast);
+    }
+
+    @Override
+    public void exitClass_(Class_Context ctx) {
+        ASTClass class_;
+
+        ASTClassSignature classSignature = (ASTClassSignature) parserASTMap.get(ctx.classSignature());
+        ASTClassBlock classBlock = (ASTClassBlock) parserASTMap.get(ctx.classBlock());
+
+        class_ =  new ASTClass(classSignature, classBlock);
+        ast.setDepth(ctx.depth());
+
+        parserASTMap.put(ctx, class_);
     }
 
     @Override
@@ -434,7 +451,9 @@ public class LJASTConverter extends LJBaseListener {
     public void exitExprBase(ExprBaseContext ctx) {
         ASTExpression expr;
 
-        if (ctx.funcCall() != null) {
+        if (ctx.memberAccess() != null) {
+            expr = (ASTMemberAccess) parserASTMap.get(ctx.memberAccess());
+        } else if (ctx.funcCall() != null) {
             expr = (ASTFunctionCall) parserASTMap.get(ctx.funcCall());
         } else if (ctx.methodCall() != null) {
             expr = (ASTMethodCall) parserASTMap.get(ctx.methodCall());
@@ -506,9 +525,10 @@ public class LJASTConverter extends LJBaseListener {
             invoker = (ASTFunctionCall) parserASTMap.get(ctx.funcCall().get(0));
         }
 
-        List<ASTFunctionCall> calls = ctx.funcCall().stream().map(c -> parserASTMap.get(c)).map(c -> (ASTFunctionCall) c).collect(Collectors.toList());
+        List<ASTFunctionCall> calls = ctx.funcCall().stream().map(c -> parserASTMap.get(c))
+                .map(c -> (ASTFunctionCall) c).collect(Collectors.toList());
 
-        ASTFunctionCall funcCall = calls.get(calls.size()-1);
+        ASTFunctionCall funcCall = calls.get(calls.size() - 1);
 
         methodCall = new ASTMethodCall(invoker, funcCall);
 
@@ -522,14 +542,28 @@ public class LJASTConverter extends LJBaseListener {
         ASTVariable var;
 
         if (ctx.expr() == null) {
-            var = new ASTVariable(ctx.ID().getText());
+            var = new ASTVariable(ctx.name.getText());
         } else {
-            var = new ASTVariable(ctx.ID().getText(), (ASTExpression) parserASTMap.get(ctx.expr()));
+            var = new ASTVariable(ctx.name.getText(), (ASTExpression) parserASTMap.get(ctx.expr()));
         }
 
         var.setDepth(ctx.depth());
 
         parserASTMap.put(ctx, var);
+    }
+
+    @Override
+    public void exitMemberAccess(MemberAccessContext ctx) {
+        ASTMemberAccess memberAccess;
+
+        String className = ctx.instance.getText();
+        ASTVariable var = (ASTVariable) parserASTMap.get(ctx.var());
+
+        memberAccess = new ASTMemberAccess(className, var);
+
+        memberAccess.setDepth(ctx.depth());
+
+        parserASTMap.put(ctx, memberAccess);
     }
 
     @Override
@@ -631,10 +665,10 @@ public class LJASTConverter extends LJBaseListener {
             f.setParent(ast);
         }
 
-        for (ASTClass c: ASTClass.classes) {
-            for (ASTMethod m: c.methods) {
-                //m.setDepth(3);
-                m.setParent(c);
+        for (ASTClass c : ASTClass.classes) {
+            for (ASTMethod m : c.block.methods) {
+                // m.setDepth(3);
+                m.setParent(c.block);
             }
         }
 
