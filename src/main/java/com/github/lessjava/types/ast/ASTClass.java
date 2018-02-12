@@ -13,6 +13,9 @@ public class ASTClass extends ASTNode {
     public static Set<ASTClass> classes = new HashSet<>();
     public static Map<String, String> methodTranslations = new HashMap<>();
 
+    public static String PUBLIC = "public";
+    public static String PRIVATE = "private";
+
     private static Set<ASTMethod> createListMethods() {
         Set<ASTMethod> methods = new HashSet<ASTMethod>() {
             private static final long serialVersionUID = 1L;
@@ -32,7 +35,7 @@ public class ASTClass extends ASTNode {
             }
 
             public void add(String name, HMType type) {
-                add(new ASTMethod(name, type, null));
+                add(new ASTMethod(PUBLIC, new ASTFunction(name, type, null), "List"));
             }
         };
 
@@ -51,7 +54,7 @@ public class ASTClass extends ASTNode {
             }
 
             public void add(String name, HMType type) {
-                add(new ASTMethod(name, type, null));
+                add(new ASTMethod(PUBLIC, new ASTFunction(name, type, null), "Set"));
             }
         };
 
@@ -70,7 +73,7 @@ public class ASTClass extends ASTNode {
             }
 
             public void add(String name, HMType type) {
-                add(new ASTMethod(name, type, null));
+                add(new ASTMethod(PUBLIC, new ASTFunction(name, type, null), "Map"));
             }
         };
 

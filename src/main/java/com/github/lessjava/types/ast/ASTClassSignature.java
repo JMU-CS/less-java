@@ -1,16 +1,16 @@
 package com.github.lessjava.types.ast;
 
 public class ASTClassSignature extends ASTNode {
-    String className;
-    String parentClass;
+    public String className;
+    public String superName;
 
     public ASTClassSignature(String className) {
         this(className, null);
     }
 
-    public ASTClassSignature(String className, String parentClass) {
+    public ASTClassSignature(String className, String superName) {
         this.className = className;
-        this.parentClass = parentClass;
+        this.superName = superName;
     }
 
     @Override

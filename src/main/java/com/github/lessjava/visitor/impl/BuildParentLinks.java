@@ -2,9 +2,12 @@ package com.github.lessjava.visitor.impl;
 
 import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTAttribute;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTClass;
+import com.github.lessjava.types.ast.ASTClassBlock;
+import com.github.lessjava.types.ast.ASTClassSignature;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTExpression;
@@ -57,13 +60,29 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTClass node) {
-        for (ASTVariable attribute: node.attributes) {
-            attribute.setParent(node);
+        node.signature.setParent(node);
+        node.block.setParent(node);
+    }
+
+    @Override
+    public void preVisit(ASTClassSignature node) {
+        // None
+    }
+
+    @Override
+    public void preVisit(ASTClassBlock node) {
+        for (ASTAttribute a: node.classAttributes) {
+            a.setParent(node);
         }
 
-        for (ASTMethod method: node.methods) {
-            method.setParent(node);
+        for (ASTMethod m: node.methods) {
+            m.setParent(node);
         }
+    }
+
+    @Override
+    public void preVisit(ASTAttribute node) {
+        node.assignment.setParent(node);
     }
 
     @Override

@@ -8,18 +8,18 @@ Dog
         this.age = age
     }
 
-    bark () {
+    public bark () {
         printf("%s says BARK!\n", this.name)
     }
 
-    run () {
+    public run () {
         printf("%s runs!\n", this.name)
     }
 }
 
 BullDog extends Dog
 {
-    bark () {
+    public bark () {
         printf("%s says BARK BARK!\n", this.name)
     }
 }

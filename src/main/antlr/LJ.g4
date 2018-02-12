@@ -6,9 +6,10 @@ program:        (class_ | function | global | test | EOL)*;
 
 class_:          classSignature classBlock;
 
-classSignature: ID (EXTENDS ID)?;
-classBlock:     (EOL)? LCB (EOL)? (attribute | EOL)* (function | EOL)* RCB (EOL)?;
+classSignature: name=ID (EXTENDS superName=ID)?;
+classBlock:     (EOL)? LCB (EOL)? (attribute | EOL)* (method | EOL)* RCB (EOL)?;
 attribute:      scope=(PUBLIC|PRIVATE) assignment EOL;
+method:         (scope=(PUBLIC|PRIVATE))? function;
 
 function:       ID LP (paramList)? RP block;
 paramList:      ID (','ID)*;

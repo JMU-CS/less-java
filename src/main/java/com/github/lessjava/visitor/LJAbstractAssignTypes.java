@@ -28,7 +28,7 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
         }
 
         for (ASTClass astClass: node.classes) {
-            for (ASTMethod method: astClass.methods) {
+            for (ASTMethod method: astClass.block.methods) {
                 idFunctionMap.put(method.getIdentifyingString(), method);
             }
         }

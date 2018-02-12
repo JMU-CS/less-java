@@ -143,6 +143,11 @@ public abstract class ASTAbstractFunction extends ASTNode {
         this(name, new HMTypeVar(), body);
     }
 
+    public ASTAbstractFunction(ASTAbstractFunction function) {
+        this(function.name, function.returnType, function.body);
+        this.parameters = function.parameters;
+    }
+
     public String getParameterStr() {
         StringBuilder sb = new StringBuilder();
 

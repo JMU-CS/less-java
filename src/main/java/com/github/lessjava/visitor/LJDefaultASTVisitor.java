@@ -2,10 +2,13 @@ package com.github.lessjava.visitor;
 
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTAttribute;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
 import com.github.lessjava.types.ast.ASTClass;
+import com.github.lessjava.types.ast.ASTClassBlock;
+import com.github.lessjava.types.ast.ASTClassSignature;
 import com.github.lessjava.types.ast.ASTCollection;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
@@ -302,5 +305,35 @@ public class LJDefaultASTVisitor implements ASTVisitor {
 
     public void inVisit(ASTConditional node) {
         defaultInVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTClassSignature node) {
+        defaultPreVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTClassSignature node) {
+        defaultPostVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTClassBlock node) {
+        defaultPreVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTClassBlock node) {
+        defaultPostVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTAttribute node) {
+        defaultPreVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTAttribute node) {
+        defaultPostVisit(node);
     }
 }

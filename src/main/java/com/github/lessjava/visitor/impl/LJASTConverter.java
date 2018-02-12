@@ -12,8 +12,11 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import com.github.lessjava.generated.LJBaseListener;
 import com.github.lessjava.generated.LJParser.ArgListContext;
 import com.github.lessjava.generated.LJParser.AssignmentContext;
+import com.github.lessjava.generated.LJParser.AttributeContext;
 import com.github.lessjava.generated.LJParser.BlockContext;
 import com.github.lessjava.generated.LJParser.BreakContext;
+import com.github.lessjava.generated.LJParser.ClassBlockContext;
+import com.github.lessjava.generated.LJParser.ClassSignatureContext;
 import com.github.lessjava.generated.LJParser.Class_Context;
 import com.github.lessjava.generated.LJParser.ConditionalContext;
 import com.github.lessjava.generated.LJParser.ContinueContext;
@@ -31,6 +34,7 @@ import com.github.lessjava.generated.LJParser.LitContext;
 import com.github.lessjava.generated.LJParser.MapContext;
 import com.github.lessjava.generated.LJParser.MemberAccessContext;
 import com.github.lessjava.generated.LJParser.MethodCallContext;
+import com.github.lessjava.generated.LJParser.MethodContext;
 import com.github.lessjava.generated.LJParser.ProgramContext;
 import com.github.lessjava.generated.LJParser.ReturnContext;
 import com.github.lessjava.generated.LJParser.SetContext;
@@ -43,6 +47,7 @@ import com.github.lessjava.generated.LJParser.WhileContext;
 import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTAttribute;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTBlock;
@@ -85,6 +90,9 @@ public class LJASTConverter extends LJBaseListener {
 
     private Stack<ASTBlock> blocks;
 
+    private ASTClassBlock currentClassBlock;
+    private ASTClassSignature currentClassSignature;
+
     public LJASTConverter() {
         parserASTMap = new LinkedHashMap<>();
         blocks = new Stack<ASTBlock>();
@@ -125,10 +133,67 @@ public class LJASTConverter extends LJBaseListener {
         ASTClassBlock classBlock = (ASTClassBlock) parserASTMap.get(ctx.classBlock());
 
         class_ =  new ASTClass(classSignature, classBlock);
-        ast.setDepth(ctx.depth());
+        class_.setDepth(ctx.depth());
 
         parserASTMap.put(ctx, class_);
     }
+
+    @Override
+    public void exitClassSignature(ClassSignatureContext ctx) {
+        ASTClassSignature signature;
+
+        String className = ctx.name.getText();
+        String superName = ctx.superName == null ? null : ctx.superName.getText();
+
+        signature = new ASTClassSignature(className, superName);
+
+        this.currentClassSignature = signature;
+
+        signature.setDepth(ctx.depth());
+        parserASTMap.put(ctx, signature);
+    }
+
+    @Override
+    public void enterClassBlock(ClassBlockContext ctx) {
+        this.currentClassBlock = new ASTClassBlock();
+
+        this.currentClassBlock.setDepth(ctx.depth());
+
+        parserASTMap.put(ctx, this.currentClassBlock);
+    }
+
+    @Override
+    public void exitAttribute(AttributeContext ctx) {
+        ASTAttribute attribute;
+
+        String scope = ctx.scope.getText();
+        ASTAssignment assignment = (ASTAssignment) parserASTMap.get(ctx.assignment());
+
+        attribute = new ASTAttribute(scope, assignment);
+
+        attribute.setDepth(ctx.depth());
+
+        this.currentClassBlock.classAttributes.add(attribute);
+
+        parserASTMap.put(ctx, attribute);
+    }
+
+    @Override
+    public void exitMethod(MethodContext ctx) {
+        ASTMethod method;
+
+        // Null if constructor
+        String scope = ctx.scope != null ? ctx.scope.getText() : "";
+
+        ASTFunction function = (ASTFunction) parserASTMap.get(ctx.function());
+
+        method = new ASTMethod(scope, function, this.currentClassSignature.className);
+
+        method.setDepth(ctx.depth());
+
+        parserASTMap.put(ctx, method);
+    }
+
 
     @Override
     public void exitFunction(FunctionContext ctx) {
@@ -477,17 +542,25 @@ public class LJASTConverter extends LJBaseListener {
         BinOp op;
         ASTAssignment assignment;
         ASTVariable variable;
+        ASTMemberAccess memberAccess;
         ASTExpression expression;
 
         op = ASTBinaryExpr.stringToOp(ctx.op.getText());
         variable = (ASTVariable) parserASTMap.get(ctx.var());
+        memberAccess = (ASTMemberAccess) parserASTMap.get(ctx.memberAccess());
         expression = (ASTExpression) parserASTMap.get(ctx.expr());
+
 
         if (expression instanceof ASTArgList) {
             variable.isCollection = true;
         }
 
-        assignment = new ASTAssignment(op, variable, expression);
+        if (variable != null) {
+            assignment = new ASTAssignment(op, variable, expression);
+        } else {
+            assignment = new ASTAssignment(op, memberAccess, expression);
+        }
+
 
         assignment.setDepth(ctx.depth());
 

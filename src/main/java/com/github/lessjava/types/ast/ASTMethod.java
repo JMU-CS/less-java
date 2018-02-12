@@ -1,21 +1,21 @@
 package com.github.lessjava.types.ast;
 
-import com.github.lessjava.types.inference.HMType;
-
 public class ASTMethod extends ASTAbstractFunction {
-    public ASTMethod(String name, HMType returnType, ASTBlock body) {
-        super(name, returnType, body);
-    }
 
-    public ASTMethod(String name, ASTBlock body) {
-        super(name, body);
+    public String scope;
+    public ASTFunction function;
+    public String containingClassName;
+
+    public ASTMethod(String scope, ASTFunction function, String className) {
+        super(function);
+        this.scope = scope;
+        this.function = function;
     }
 
     public String getIdentifyingString() {
         StringBuilder sb = new StringBuilder();
-        ASTClass c = (ASTClass) this.getParent();
 
-        sb.append(c.name);
+        sb.append(containingClassName);
         sb.append(name);
         sb.append(getParameterStr());
 
@@ -23,12 +23,12 @@ public class ASTMethod extends ASTAbstractFunction {
     }
 
     public ASTMethod clone() {
-        return new ASTMethod(name, returnType, body);
+        return new ASTMethod(scope, function, containingClassName);
     }
 
     @Override
     public String toString() {
-        return String.format("Method: %s.%s, %s", ((ASTClass) this.getParent()).name, this.name, this.returnType);
+        return String.format("Method: %s.%s, %s", ((ASTClassSignature) this.getParent().getParent()).className, this.name, this.returnType);
     }
 
     @Override
