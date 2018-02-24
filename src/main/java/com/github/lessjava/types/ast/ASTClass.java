@@ -2,15 +2,18 @@ package com.github.lessjava.types.ast;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public class ASTClass extends ASTNode {
-    public static Set<ASTClass> classes = new HashSet<>();
+    public static Map<String, ASTClass> nameClassMap = new HashMap<>();
+    public static Set<ASTClass> libraryClasses = new HashSet<>();
     public static Map<String, String> methodTranslations = new HashMap<>();
 
     public static String PUBLIC = "public";
@@ -89,17 +92,37 @@ public class ASTClass extends ASTNode {
         ASTClass set = new ASTClass(new ASTClassSignature("Set"), setBlock);
         ASTClass map = new ASTClass(new ASTClassSignature("Map"), mapBlock);
 
-        classes.add(list);
-        classes.add(set);
-        classes.add(map);
+        libraryClasses.add(list);
+        libraryClasses.add(set);
+        libraryClasses.add(map);
     }
 
     public ASTClassSignature signature;
     public ASTClassBlock block;
+    public ASTClass parent;
 
     public ASTClass(ASTClassSignature signature, ASTClassBlock block) {
         this.signature = signature;
         this.block = block;
+        this.parent = null;
+
+        nameClassMap.put(signature.className, this);
+    }
+
+    public boolean hasExplicitConstructor() {
+        List<String> methodNames = this.block.methods.stream()
+                                                     .map(m -> m.name)
+                                                     .collect(Collectors.toList());
+
+        return methodNames.contains(signature.className);
+    }
+
+    public boolean hasMethod(String name) {
+        List<String> methodNames = this.block.methods.stream()
+                                                     .map(m -> m.name)
+                                                     .collect(Collectors.toList());
+
+        return  methodNames.contains(name) || (this.parent != null && this.parent.hasMethod(name));
     }
 
     @Override

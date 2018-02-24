@@ -13,14 +13,19 @@ import java.util.stream.Collectors;
 
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTAttribute;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
+import com.github.lessjava.types.ast.ASTClass;
+import com.github.lessjava.types.ast.ASTClassBlock;
+import com.github.lessjava.types.ast.ASTClassSignature;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTGlobalAssignment;
+import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -51,6 +56,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     private List<String> globalLines = new ArrayList<>();
     private List<String> testLines = new ArrayList<>();
     private List<String> functionLines = new ArrayList<>();
+    private List<String> classLines = new ArrayList<>();
     private List<String> testDeclarationLines = new ArrayList<>();
     private Set<String> functionDeclarationLines = new HashSet<>();
     // private Set<String> mainVariables = new HashSet<>();
@@ -59,6 +65,9 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     private int testIndex = 0;
 
     private ASTFunction currentFunction;
+    private ASTClass currentClass;
+
+    private ASTMethod currentMethod;
 
     @Override
     public void preVisit(ASTProgram node) {
@@ -78,6 +87,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         lines.addAll(globalLines);
         lines.addAll(testDeclarationLines);
         lines.addAll(testLines);
+        lines.addAll(classLines);
         lines.add("}");
 
         try {
@@ -96,7 +106,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         this.functionDeclarationLines.clear();
 
         // Library function
-        if (node.body == null) {
+        if (inLibrary(node)) {
             return;
         }
 
@@ -106,7 +116,9 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         }
 
         // Add parameters so they don't get declared
-        this.functionVariables.addAll(node.parameters.stream().map(Parameter::getName).collect(Collectors.toList()));
+        this.functionVariables.addAll(node.parameters.stream()
+                                                     .map(Parameter::getName)
+                                                     .collect(Collectors.toList()));
 
         String line = "";
 
@@ -116,14 +128,18 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         if (node.name.equals("main")) {
             parameterString = "String[] args";
         } else {
-            parameterString = this.currentFunction.parameters.toString().substring(1,
-                    this.currentFunction.parameters.toString().length() - 1);
+            parameterString = node.parameters.toString().substring(1,
+                    node.parameters.toString().length() - 1);
         }
 
-        String functionHeader = String.format("public static %s %s(%s)", this.currentFunction.returnType.toString(),
-                this.currentFunction.name, parameterString);
+        String returnType = ASTClass.nameClassMap.containsKey(node.name) ? "" : node.returnType.toString() + " ";
+        String name = node.name;
+        String scope = this.currentMethod == null ? ASTClass.PUBLIC : this.currentMethod.scope;
+        String _static = this.currentMethod == null ? "static" : "";
 
-        line = String.format("%s", functionHeader);
+        String signature = String.format("%s %s %s%s(%s)", scope, _static, returnType, name, parameterString);
+
+        line = String.format("%s", signature);
 
         addLine(node, line);
     }
@@ -131,7 +147,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void postVisit(ASTFunction node) {
         // Library function
-        if (node.body == null) {
+        if (inLibrary(node)) {
             this.currentFunction = null;
             return;
         }
@@ -141,9 +157,96 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
             this.currentFunction = null;
             return;
         }
+        try {
+            functionLines.addAll(2, functionDeclarationLines);
+        } catch(IndexOutOfBoundsException ioobe) {
+            functionLines.addAll(functionDeclarationLines);
+        }
 
-        functionLines.addAll(2, functionDeclarationLines);
         lines.addAll(functionLines);
+    }
+
+    @Override
+    public void preVisit(ASTClass node) {
+        this.currentClass = node;
+
+        // Library class
+        if (inLibrary(node)) {
+            this.currentClass = null;
+            return;
+        }
+
+    }
+
+    @Override
+    public void postVisit(ASTClass node) {
+        this.currentClass = null;
+    }
+
+    @Override
+    public void preVisit(ASTClassSignature node) {
+        // Library class
+        if (this.currentClass == null) {
+            return;
+        }
+
+        String className = node.className;
+        String superName = node.superName;
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(String.format("private static class %s", className));
+        if (superName != null) {
+            sb.append(String.format(" extends %s", superName));
+        }
+
+        String line = sb.toString();
+
+        addLine(node, line);
+    }
+
+    @Override
+    public void preVisit(ASTClassBlock node) {
+        // Library class
+        if (this.currentClass == null) {
+            return;
+        }
+
+        String line = "{";
+
+        addLine(node, line);
+
+        indent++;
+    }
+
+    @Override
+    public void postVisit(ASTClassBlock node) {
+        // Library class
+        if (this.currentClass == null) {
+            return;
+        }
+
+        indent--;
+
+        String line = "}";
+        addLine(node, line);
+    }
+
+    @Override
+    public void preVisit(ASTAttribute node) {
+        String line = String.format("%s", node);
+
+        addLine(node, line);
+    }
+
+    @Override
+    public void preVisit(ASTMethod node) {
+        this.currentMethod = node;
+    }
+
+    @Override
+    public void postVisit(ASTMethod node) {
+        this.currentMethod = null;
     }
 
     @Override
@@ -306,6 +409,10 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         addLine(node, line);
     }
 
+    private boolean inLibrary(ASTNode node) {
+        return ASTClass.libraryClasses.contains(node) || ASTFunction.libraryFunctions.contains(node);
+    }
+
     private void addLine(ASTNode node, String line) {
         // Don't emit prototypes
         if (this.currentFunction != null && !this.currentFunction.concrete) {
@@ -314,10 +421,16 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
         String spaces = (indent == 0) ? "" : String.format("%" + (indent * 4) + "s", "");
 
-        if (node instanceof ASTTest) {
+        boolean inTest = node instanceof ASTTest;
+        boolean inGlobal = node instanceof ASTGlobalAssignment;
+        boolean inClass = this.currentClass != null;
+
+        if (inTest) {
             testLines.add(String.format("%s%s", spaces, line));
-        } else if (node instanceof ASTGlobalAssignment) {
+        } else if (inGlobal) {
             globalLines.add(String.format("%s%s", spaces, line));
+        } else if (inClass) {
+            classLines.add(String.format("%s%s", spaces, line));
         } else {
             functionLines.add(String.format("%s%s", spaces, line));
         }

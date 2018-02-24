@@ -24,7 +24,6 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     public void preVisit(ASTProgram node) {
         for (ASTAbstractFunction function : node.functions) {
             idFunctionMap.put(function.getIdentifyingString(), function);
-
         }
 
         for (ASTClass astClass: node.classes) {

@@ -1,6 +1,7 @@
 package com.github.lessjava.types.ast;
 
 import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeClass;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.types.inference.impl.HMTypeObject;
 
@@ -30,7 +31,7 @@ public class ASTMethodCall extends ASTBinaryExpr {
             return c.collectionName;
         }
 
-        if (invoker.type instanceof HMTypeObject) {
+        if (invoker.type instanceof HMTypeClass) {
             HMTypeObject c = (HMTypeObject) invoker.type;
 
             return c.className;

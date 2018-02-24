@@ -3,7 +3,7 @@ Dog
     public name = ""
     private age = 0
 
-    Foo (name, age) {
+    Dog (name, age) {
         this.name = name
         this.age = age
     }

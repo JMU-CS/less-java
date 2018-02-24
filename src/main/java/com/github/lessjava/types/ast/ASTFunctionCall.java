@@ -57,6 +57,15 @@ public class ASTFunctionCall extends ASTExpression {
             return String.format("%s%s", ASTFunction.libraryFunctionStrings.get(name), argString);
         }
 
-        return String.format("%s%s", name, argString);
+        StringBuilder sb = new StringBuilder();
+
+        // Must be a constructor
+        if (ASTClass.nameClassMap.containsKey(name)) {
+            sb.append("new ");
+        }
+
+        sb.append(String.format("%s%s", name, argString));
+
+        return sb.toString();
     }
 }

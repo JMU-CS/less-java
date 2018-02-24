@@ -173,7 +173,7 @@ public class LJASTConverter extends LJBaseListener {
 
         attribute.setDepth(ctx.depth());
 
-        this.currentClassBlock.classAttributes.add(attribute);
+        this.currentClassBlock.addAttribute(attribute);
 
         parserASTMap.put(ctx, attribute);
     }
@@ -181,13 +181,29 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitMethod(MethodContext ctx) {
         ASTMethod method;
+        String scope;
+
+        boolean isConstructor = false;
 
         // Null if constructor
-        String scope = ctx.scope != null ? ctx.scope.getText() : "";
+        if (ctx.scope == null) {
+            scope = ASTClass.PUBLIC;
+            isConstructor = true;
+        } else {
+            scope = ctx.scope.getText();
+        }
 
         ASTFunction function = (ASTFunction) parserASTMap.get(ctx.function());
 
         method = new ASTMethod(scope, function, this.currentClassSignature.className);
+        method.isConstructor = isConstructor;
+        method.containingClassName = currentClassSignature.className;
+
+        currentClassBlock.methods.add(method);
+
+        if (isConstructor) {
+            currentClassBlock.constructor = method;
+        }
 
         method.setDepth(ctx.depth());
 
@@ -733,19 +749,19 @@ public class LJASTConverter extends LJBaseListener {
      * Add Library functions
      */
     private void addLibraryFunctions() {
-        for (ASTFunction f : ASTFunction.functions) {
+        for (ASTFunction f : ASTFunction.libraryFunctions) {
             f.setDepth(2);
             f.setParent(ast);
         }
 
-        for (ASTClass c : ASTClass.classes) {
+        for (ASTClass c : ASTClass.libraryClasses) {
             for (ASTMethod m : c.block.methods) {
                 // m.setDepth(3);
                 m.setParent(c.block);
             }
         }
 
-        ast.functions.addAll(ASTFunction.functions);
-        ast.classes.addAll(ASTClass.classes);
+        ast.functions.addAll(ASTFunction.libraryFunctions);
+        ast.classes.addAll(ASTClass.libraryClasses);
     }
 }

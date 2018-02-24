@@ -8,6 +8,8 @@ import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
+import com.github.lessjava.types.ast.ASTClass;
+import com.github.lessjava.types.ast.ASTClassBlock;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTExpression;
@@ -16,6 +18,7 @@ import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTMap;
+import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
@@ -25,6 +28,7 @@ import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeClass;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.types.inference.impl.HMTypeList;
 import com.github.lessjava.types.inference.impl.HMTypeMap;
@@ -46,6 +50,22 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         if (LJASTInferTypes.program == null) {
             LJASTInferTypes.program = node;
+        }
+    }
+
+    @Override
+    public void postVisit(ASTMethod node) {
+        super.preVisit(node);
+
+        if (node.isConstructor) {
+            node.returnType = node.function.returnType = new HMTypeClass(node.name);
+            node.concrete = node.function.concrete = true;
+
+            for (Parameter p: node.function.parameters) {
+                p.type = unify(p.type, ASTClassBlock.nameAttributeMap.get(p.name).assignment.type);
+            }
+        } else {
+            node.returnType = node.function.returnType;
         }
     }
 
@@ -161,7 +181,9 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
-        if (idFunctionMap.containsKey(node.getIdentifyingString())) {
+        if (ASTClass.nameClassMap.containsKey(node.name)) {
+            node.type = new HMTypeClass(node.name);
+        } else if (idFunctionMap.containsKey(node.getIdentifyingString())) {
             node.type = unify(node.type, idFunctionMap.get(node.getIdentifyingString()).returnType);
         }
     }
@@ -289,9 +311,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             }
         }
 
-        if (idFunctionMap.containsKey(node.getIdentifyingString())) {
-            node.type = unify(node.type, idFunctionMap.get(node.getIdentifyingString()).returnType);
-        }
+        node.type = node.funcCall.type;
     }
 
     @Override
@@ -300,5 +320,4 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         node.condition.type = unify(node.condition.type, new HMTypeBase(BaseDataType.BOOL));
     }
-
 }

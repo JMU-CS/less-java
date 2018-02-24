@@ -6,6 +6,8 @@ public class ASTMethod extends ASTAbstractFunction {
     public ASTFunction function;
     public String containingClassName;
 
+    public boolean isConstructor;
+
     public ASTMethod(String scope, ASTFunction function, String className) {
         super(function);
         this.scope = scope;
@@ -15,9 +17,11 @@ public class ASTMethod extends ASTAbstractFunction {
     public String getIdentifyingString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(containingClassName);
-        sb.append(name);
-        sb.append(getParameterStr());
+        if (!isConstructor) {
+            sb.append(containingClassName);
+        }
+
+        sb.append(function.getIdentifyingString());
 
         return sb.toString();
     }
@@ -28,16 +32,13 @@ public class ASTMethod extends ASTAbstractFunction {
 
     @Override
     public String toString() {
-        return String.format("Method: %s.%s, %s", ((ASTClassSignature) this.getParent().getParent()).className, this.name, this.returnType);
+        return String.format("Method: %s.%s, %s", containingClassName, this.name, this.returnType);
     }
 
     @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
-        // Library methods have null bodies
-        if (body != null) {
-            body.traverse(visitor);
-        }
+        function.traverse(visitor);
         visitor.postVisit(this);
     }
 }

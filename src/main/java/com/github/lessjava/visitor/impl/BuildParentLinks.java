@@ -101,9 +101,7 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTMethod node) {
         // Library methods don't have null bodies
-        if (node.body != null) {
-            node.body.setParent(node);
-        }
+        node.function.setParent(node);
     }
 
     @Override

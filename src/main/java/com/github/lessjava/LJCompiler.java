@@ -24,14 +24,15 @@ import com.github.lessjava.generated.LJParser;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.visitor.impl.BuildParentLinks;
 import com.github.lessjava.visitor.impl.BuildSymbolTables;
+import com.github.lessjava.visitor.impl.LJASTBuildClassLinks;
 import com.github.lessjava.visitor.impl.LJASTCheckTypesHaveChanged;
 import com.github.lessjava.visitor.impl.LJASTConverter;
+import com.github.lessjava.visitor.impl.LJASTInferConstructors;
 import com.github.lessjava.visitor.impl.LJASTInferTypes;
 import com.github.lessjava.visitor.impl.LJAssignTestVariables;
 import com.github.lessjava.visitor.impl.LJGenerateJava;
 import com.github.lessjava.visitor.impl.LJInstantiateFunctions;
 import com.github.lessjava.visitor.impl.LJStaticAnalysis;
-import com.github.lessjava.visitor.impl.PrintDebugTree;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
 
 public class LJCompiler {
@@ -69,11 +70,15 @@ public class LJCompiler {
         LJASTConverter converter = new LJASTConverter();
 
         BuildParentLinks buildParentLinks = new BuildParentLinks();
+        LJASTBuildClassLinks buildClassLinks = new LJASTBuildClassLinks();
         LJStaticAnalysis staticAnalysis = new LJStaticAnalysis();
         BuildSymbolTables buildSymbolTables = new BuildSymbolTables();
         LJASTInferTypes inferTypes = new LJASTInferTypes();
-        PrintDebugTree printTree = new PrintDebugTree();
+        //PrintDebugTree printTree = new PrintDebugTree();
         LJGenerateJava generateJava = new LJGenerateJava();
+        LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
+        LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
+        LJASTInferConstructors inferConstructors = new LJASTInferConstructors();
 
         // ANTLR Parsing
         ParseTree parseTree = parser.program();
@@ -84,13 +89,11 @@ public class LJCompiler {
 
         // Apply visitors to AST
         program.traverse(buildParentLinks);
+        program.traverse(buildClassLinks);
+        program.traverse(inferConstructors);
         program.traverse(staticAnalysis);
 
         boolean typesHaveChanged = true;
-
-        LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
-        LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
-
         while (typesHaveChanged) {
             program.traverse(buildSymbolTables);
             program.traverse(instantiateFunctions);
@@ -118,8 +121,6 @@ public class LJCompiler {
         }
 
         // Compile java source file
-        //JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        //compiler.run(null, null, null, generateJava.mainFile.toString());
 
         List<String> optionList = new ArrayList<>();
         // set compiler's classpath to be same as the runtime's

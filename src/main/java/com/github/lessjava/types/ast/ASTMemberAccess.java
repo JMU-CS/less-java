@@ -10,6 +10,15 @@ public class ASTMemberAccess extends ASTExpression {
     }
 
     @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(String.format("%s.%s", className, var));
+
+        return sb.toString();
+    }
+
+    @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
         this.var.traverse(visitor);
