@@ -106,7 +106,9 @@ public class ASTClass extends ASTNode {
         this.block = block;
         this.parent = null;
 
-        nameClassMap.put(signature.className, this);
+        if (!libraryClasses.contains(this)) {
+            nameClassMap.put(signature.className, this);
+        }
     }
 
     public boolean hasExplicitConstructor() {

@@ -11,7 +11,7 @@ test nonEmptyList().get(0) == "a"
 test nonEmptyList().get(nonEmptyList().size() - 1) == "d"
 
 emptyList() {
-    list = []
+    list = List()
     list.add("a")
 
     return list

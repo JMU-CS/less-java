@@ -6,8 +6,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.github.lessjava.exceptions.InvalidProgramException;
 import com.github.lessjava.types.Symbol;
@@ -137,17 +135,17 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     protected void insertVariableSymbol(ASTVariable node) {
         try {
-            SymbolTable st = getPreviousTable();
+            //SymbolTable st = getPreviousTable();
 
             // Get names of parent symbols
             //Set<String> varNames = st.getAllSymbols().stream().map(Symbol::getName).collect(Collectors.toSet());
 
-            List<Symbol> symbols = searchScopesForSymbol(node, node.name);
+            //List<Symbol> symbols = searchScopesForSymbol(node, node.name);
 
             // Don't add the symbol if we've already encountered it
-            if(symbols != null && !symbols.isEmpty()) {
-                return;
-            }
+            //if(symbols != null && !symbols.isEmpty()) {
+                //return;
+            //}
 
             Symbol symbol = new Symbol(node.name, node.type, node.isCollection);
             getCurrentTable().insert(node.name, symbol);

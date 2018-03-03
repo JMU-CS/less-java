@@ -52,6 +52,12 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     public static Path mainFile = Paths.get("generated/Main.java");
 
+    private static String imports = "import static org.junit.Assert.*;\n"
+                                  + "import static LJString.*;\n\n"
+                                  + "import org.junit.Test;\n"
+                                  + "import java.util.*;\n"
+                                  + "import java.io.*;";
+
     private List<String> lines = new ArrayList<>();
     private List<String> globalLines = new ArrayList<>();
     private List<String> testLines = new ArrayList<>();
@@ -59,7 +65,6 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     private List<String> classLines = new ArrayList<>();
     private List<String> testDeclarationLines = new ArrayList<>();
     private Set<String> functionDeclarationLines = new HashSet<>();
-    // private Set<String> mainVariables = new HashSet<>();
     private Set<String> functionVariables = new HashSet<>();
     private int indent = 1;
     private int testIndex = 0;
@@ -72,9 +77,6 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTProgram node) {
         this.currentFunction = null;
-
-        String imports = "import static org.junit.Assert.*;\n\n" + "import org.junit.Test;\n" + "import java.util.*;\n"
-                + "import java.io.*;";
 
         lines.add(imports);
 

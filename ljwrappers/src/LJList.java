@@ -1,3 +1,5 @@
+package wrappers;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -20,11 +22,11 @@ public class LJList<T> extends ArrayList<T> {
         this.add(element);
     }
 
-    public T pop()  {
+    public T pop() {
         return this.remove(this.size() - 1);
     }
 
-    public T dequeue()  {
+    public T dequeue() {
         return this.remove(0);
     }
 

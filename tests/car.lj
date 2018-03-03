@@ -1,0 +1,43 @@
+main() {
+    car = Car("Toyota", "Camry")
+    car.accelerate(100)
+    println(car.getSpeed())
+    car.brake()
+    println(car.getSpeed())
+
+    sportsCar = SportsCar("Lamborghini", "Aventador")
+    sportsCar.accelerate(100)
+    println(sportsCar.getSpeed())
+    sportsCar.brake()
+    println(sportsCar.getSpeed())
+}
+
+Car {
+    private make = ""
+    private model = ""
+
+    private speed = 0
+
+    Car(make, model) {
+        this.make = make
+        this.model = model
+    }
+
+    public accelerate(amount) {
+        this.speed = this.speed + amount
+    }
+
+    public brake() {
+        this.speed = 0
+    }
+
+    public getSpeed() {
+        return this.speed
+    }
+}
+
+SportsCar extends Car {
+    public accelerate(amount) {
+        this.speed = this.speed + amount*10
+    }
+}

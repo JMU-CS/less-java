@@ -1,0 +1,10 @@
+main() {
+    print(sumToString(1, 2))
+}
+
+sumToString(a, b) {
+    c = a + b
+    return format("%d", c)
+}
+
+test sumToString(1, 2) == "3"

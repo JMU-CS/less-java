@@ -8,7 +8,6 @@ import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
-import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTClassBlock;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTEntry;
@@ -18,6 +17,7 @@ import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTList;
 import com.github.lessjava.types.ast.ASTMap;
+import com.github.lessjava.types.ast.ASTMemberAccess;
 import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTProgram;
@@ -181,9 +181,11 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
-        if (ASTClass.nameClassMap.containsKey(node.name)) {
-            node.type = new HMTypeClass(node.name);
-        } else if (idFunctionMap.containsKey(node.getIdentifyingString())) {
+
+        //if (ASTClass.nameClassMap.containsKey(node.name) && !ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
+            //node.type = new HMTypeClass(node.name);
+        //} else
+        if (idFunctionMap.containsKey(node.getIdentifyingString())) {
             node.type = unify(node.type, idFunctionMap.get(node.getIdentifyingString()).returnType);
         }
     }
@@ -192,7 +194,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void preVisit(ASTVariable node) {
         super.preVisit(node);
 
-        if (parameters == null) {
+        if (this.parameters == null) {
             return;
         }
 
@@ -214,6 +216,13 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         }
 
         node.isCollection = node.isCollection || node.type instanceof HMTypeCollection;
+    }
+
+    @Override
+    public void postVisit(ASTMemberAccess node) {
+        super.postVisit(node);
+
+        node.type = node.var.type;
     }
 
     @Override
