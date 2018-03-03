@@ -53,10 +53,13 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public static Path mainFile = Paths.get("generated/Main.java");
 
     private static String imports = "import static org.junit.Assert.*;\n"
-                                  + "import static LJString.*;\n\n"
+                                  + "import static wrappers.LJString.*;\n"
+                                  + "\n"
                                   + "import org.junit.Test;\n"
                                   + "import java.util.*;\n"
-                                  + "import java.io.*;";
+                                  + "import java.io.*;\n"
+                                  + "\n"
+                                  + "import wrappers.*;\n";
 
     private List<String> lines = new ArrayList<>();
     private List<String> globalLines = new ArrayList<>();
