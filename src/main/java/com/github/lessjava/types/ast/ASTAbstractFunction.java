@@ -20,18 +20,6 @@ public abstract class ASTAbstractFunction extends ASTNode {
     public static Map<String, String> libraryFunctionStrings = new HashMap<>();
 
     static {
-        // Output
-        libraryFunctionStrings.put("print", "System.out.print");
-        libraryFunctionStrings.put("printf", "System.out.printf");
-        libraryFunctionStrings.put("println", "System.out.println");
-
-        // Input
-        libraryFunctionStrings.put("readInt", "scn.nextInt");
-        libraryFunctionStrings.put("readDouble", "scn.nextDouble");
-        libraryFunctionStrings.put("readChar", "scn.useDelimiter(\"\").next");
-        libraryFunctionStrings.put("readWord", "scn.useDelimiter(\"\\\\s+\").next");
-        libraryFunctionStrings.put("readLine", "scn.nextLine");
-
         // Constructors
         libraryFunctionStrings.put("List", "new LJList<>");
         libraryFunctionStrings.put("Set", "new LJSet<>");

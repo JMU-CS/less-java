@@ -54,6 +54,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     private static String imports = "import static org.junit.Assert.*;\n"
                                   + "import static wrappers.LJString.*;\n"
+                                  + "import static wrappers.LJIO.*;\n"
                                   + "\n"
                                   + "import org.junit.Test;\n"
                                   + "import java.util.*;\n"
