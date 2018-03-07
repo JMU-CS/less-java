@@ -2,13 +2,16 @@ package com.github.lessjava;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
-import javax.tools.SimpleJavaFileObject;
+import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -36,7 +39,7 @@ import com.github.lessjava.visitor.impl.LJStaticAnalysis;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
 
 public class LJCompiler {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             System.err.println("usage: LJCompiler <Files>");
             System.exit(0);
@@ -74,7 +77,7 @@ public class LJCompiler {
         LJStaticAnalysis staticAnalysis = new LJStaticAnalysis();
         BuildSymbolTables buildSymbolTables = new BuildSymbolTables();
         LJASTInferTypes inferTypes = new LJASTInferTypes();
-        //PrintDebugTree printTree = new PrintDebugTree();
+        // PrintDebugTree printTree = new PrintDebugTree();
         LJGenerateJava generateJava = new LJGenerateJava();
         LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
         LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
@@ -104,7 +107,7 @@ public class LJCompiler {
         }
 
         // TODO: Determine if necessary
-        //program.traverse(new LJUnifyVariables());
+        // program.traverse(new LJUnifyVariables());
 
         LJAssignTestVariables assignTestVariables = new LJAssignTestVariables();
 
@@ -120,17 +123,8 @@ public class LJCompiler {
             System.exit(1);
         }
 
-        // Compile java source file
-
-        List<String> optionList = new ArrayList<>();
-        // set compiler's classpath to be same as the runtime's
-        optionList.addAll(Arrays.asList("-classpath",System.getProperty("java.class.path")));
-
-        List<JavaFileObject> jfos = new ArrayList<>();
-        jfos.add(new FileSimpleJavaFileObject(new File(LJGenerateJava.mainFile.toString())));
-
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        compiler.getTask(null, null, null, optionList, null, jfos);
+        // Compile the generated Java source
+        JCompiler.compile();
 
         // TODO: exec junit
     }
@@ -142,9 +136,41 @@ public class LJCompiler {
         }
     }
 
-    private static class FileSimpleJavaFileObject extends SimpleJavaFileObject {
-        public FileSimpleJavaFileObject(File file) {
-            super(file.toURI(), JavaFileObject.Kind.SOURCE);
+    private static class JCompiler {
+        private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+        private static final StandardJavaFileManager FM = COMPILER.getStandardFileManager(null, null, null);
+        private static final List<String> OPTIONS = new ArrayList<>(
+                Arrays.asList("-classpath", System.getProperty("java.class.path")));
+        private static final Iterable<? extends JavaFileObject> SOURCE = FM
+                .getJavaFileObjectsFromFiles(JCompiler.getJavaFileObjects());
+
+        private static final String PATH_TO_SOURCE = "generated";
+
+        public static void compile() {
+            COMPILER.getTask(null, FM, null, OPTIONS, null, SOURCE).call();
+        }
+
+        private static List<File> getJavaFileObjects() {
+            List<File> source = new ArrayList<>();
+
+            try {
+                Files.walk(Paths.get(PATH_TO_SOURCE)).filter(p -> Files.isRegularFile(p) && isJavaSource(p))
+                        .forEach(p -> source.add(p.toFile()));
+
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+
+            return source;
+        }
+
+        private static boolean isJavaSource(Path file) {
+            String name = file.toFile().getName();
+            try {
+                return name.substring(name.lastIndexOf(".")).equals(".java");
+            } catch (Exception e) {
+                return false;
+            }
         }
     }
 }
