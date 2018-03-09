@@ -38,6 +38,6 @@ Car {
 
 SportsCar extends Car {
     public accelerate(amount) {
-        this.speed = this.speed + amount*10
+        super.speed = super.speed + amount * 10
     }
 }

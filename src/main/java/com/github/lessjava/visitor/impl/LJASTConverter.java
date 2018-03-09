@@ -646,9 +646,16 @@ public class LJASTConverter extends LJBaseListener {
         ASTMemberAccess memberAccess;
 
         String className = ctx.instance.getText();
+        String referencedClassName = className;
         ASTVariable var = (ASTVariable) parserASTMap.get(ctx.var());
 
-        memberAccess = new ASTMemberAccess(className, var);
+        if (className.equals("this")) {
+            referencedClassName = this.currentClassSignature.className;
+        } else if(className.equals("super")) {
+            referencedClassName = this.currentClassSignature.superName;
+        }
+
+        memberAccess = new ASTMemberAccess(className, referencedClassName, var);
 
         memberAccess.setDepth(ctx.depth());
 

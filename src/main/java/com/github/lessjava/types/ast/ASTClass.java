@@ -101,6 +101,9 @@ public class ASTClass extends ASTNode {
     public ASTClassBlock block;
     public ASTClass parent;
 
+    private Set<ASTVariable> members;
+    private Set<ASTMethod> methods;
+
     public ASTClass(ASTClassSignature signature, ASTClassBlock block) {
         this.signature = signature;
         this.block = block;
@@ -120,11 +123,41 @@ public class ASTClass extends ASTNode {
     }
 
     public boolean hasMethod(String name) {
-        List<String> methodNames = this.block.methods.stream()
-                                                     .map(m -> m.name)
-                                                     .collect(Collectors.toList());
+        return getMethod(name) != null;
+    }
 
-        return  methodNames.contains(name) || (this.parent != null && this.parent.hasMethod(name));
+    public ASTMethod getMethod(String name) {
+        if (methods == null) {
+            methods = this.block.methods;
+        }
+        ASTMethod method = methods.stream()
+                                  .filter(m -> m.name.equals(name))
+                                  .findAny()
+                                  .orElse(null);
+
+        if (method == null && this.parent != null) {
+            method = this.parent.getMethod(name);
+        }
+
+        return method;
+    }
+
+    public boolean hasAttribute(String name) {
+        return getAttribute(name) != null;
+    }
+
+    public ASTVariable getAttribute(String name) {
+        if (members == null) {
+            members = this.block.classAttributes.stream().map(a -> a.assignment.variable).collect(Collectors.toSet());
+        }
+
+        ASTVariable attribute = members.stream().filter(v -> v.name.equals(name)).findAny().orElse(null);
+
+        if (attribute == null && this.parent != null) {
+            attribute = this.parent.getAttribute(name);
+        }
+
+        return attribute;
     }
 
     @Override

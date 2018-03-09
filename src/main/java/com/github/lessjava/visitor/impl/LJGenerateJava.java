@@ -25,6 +25,7 @@ import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTGlobalAssignment;
+import com.github.lessjava.types.ast.ASTMemberAccess;
 import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
@@ -304,7 +305,10 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     @Override
     public void preVisit(ASTAssignment node) {
-        if (node.getParent() instanceof ASTGlobalAssignment) {
+        if (node.getParent() instanceof ASTGlobalAssignment
+                || node.getParent() instanceof ASTAttribute
+                || node.memberAccess != null) {
+
             return;
         }
 

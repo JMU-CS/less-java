@@ -8,10 +8,11 @@ public class ASTMethod extends ASTAbstractFunction {
 
     public boolean isConstructor;
 
-    public ASTMethod(String scope, ASTFunction function, String className) {
+    public ASTMethod(String scope, ASTFunction function, String containingClassName) {
         super(function);
         this.scope = scope;
         this.function = function;
+        this.containingClassName = containingClassName;
     }
 
     public String getIdentifyingString() {

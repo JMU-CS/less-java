@@ -2,10 +2,12 @@ package com.github.lessjava.types.ast;
 
 public class ASTMemberAccess extends ASTExpression {
     public String className;
+    public String referencedClassName;
     public ASTVariable var;
 
-    public ASTMemberAccess(String className, ASTVariable var) {
+    public ASTMemberAccess(String className, String referencedClassName, ASTVariable var) {
         this.className = className;
+        this.referencedClassName = referencedClassName;
         this.var = var;
     }
 

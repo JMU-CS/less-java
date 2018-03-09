@@ -2,16 +2,18 @@ package com.github.lessjava.visitor.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTBlock;
+import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTMethod;
+import com.github.lessjava.types.ast.ASTMethodCall;
 import com.github.lessjava.types.ast.ASTProgram;
+import com.github.lessjava.types.inference.impl.HMTypeClass;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 public class LJInstantiateFunctions extends LJAbstractAssignTypes {
@@ -27,20 +29,27 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
     @Override
     public void postVisit(ASTProgram node) {
-        super.preVisit(node);
+        super.postVisit(node);
     }
 
     @Override
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
-        ASTAbstractFunction f = idFunctionMap.get(node.getIdentifyingString());
+        ASTAbstractFunction prototype = program.functions.stream()
+            .filter(f -> f.name.equals(node.name) && !f.concrete)
+            .findAny()
+            .orElse(null);
 
-        if (f != null && f.concrete) {
+        if (prototype == null || prototype.body == null) {
             return;
         }
 
-        f = instantiateFunction(node.name, node.arguments);
+        if (prototype != null && prototype.concrete) {
+            return;
+        }
+
+        ASTFunction f = instantiateFunction(prototype, node.arguments);
 
         if (f != null) {
             if (program.functions.contains(f)) {
@@ -53,28 +62,17 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         }
     }
 
-    private ASTFunction instantiateFunction(String name, List<ASTExpression> arguments) {
+    private ASTFunction instantiateFunction(ASTAbstractFunction prototype, List<ASTExpression> arguments) {
         if (arguments.stream().anyMatch(arg -> !arg.type.isConcrete)) {
             // Can't instantiate; arg isn't concrete
             return null;
         }
 
-
-        List<ASTAbstractFunction> functions = program.functions.stream().filter(func -> func.name.equals(name))
-                .collect(Collectors.toList());
-
-        Optional<ASTAbstractFunction> prototype = functions.stream().filter(func -> !func.concrete).findFirst();
-
-        if (!prototype.isPresent() || prototype.get().body == null) {
-            // Can't instantiate
-            return null;
-        }
-
         ASTBlock blockCopy = new ASTBlock();
-        blockCopy.statements = prototype.get().body.statements;
-        blockCopy.variables = prototype.get().body.variables;
+        blockCopy.statements = prototype.body.statements;
+        blockCopy.variables = prototype.body.variables;
 
-        ASTFunction functionInstance = new ASTFunction(prototype.get().name, prototype.get().returnType, blockCopy);
+        ASTFunction functionInstance = new ASTFunction(prototype.name, prototype.returnType, blockCopy);
 
         blockCopy.setParent(functionInstance);
 
@@ -82,7 +80,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         functionInstance.parameters = new ArrayList<>();
 
         for (int i = 0; i < arguments.size(); i++) {
-            String pname = prototype.get().parameters.get(i).name;
+            String pname = prototype.parameters.get(i).name;
             Parameter parameter = new Parameter(pname, arguments.get(i).type.clone());
             functionInstance.parameters.add(parameter);
         }
@@ -99,4 +97,66 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         return functionInstance;
     }
 
+    @Override
+    public void postVisit(ASTMethodCall node) {
+        super.postVisit(node);
+
+        // Haven't performed sufficient unification
+        if (!(node.invoker.type instanceof HMTypeClass)) {
+            return;
+        }
+
+        HMTypeClass type = (HMTypeClass) node.invoker.type;
+        ASTClass containingClass = ASTClass.nameClassMap.get(type.name);
+        ASTMethod m = containingClass.getMethod(node.funcCall.name);
+
+        if (m != null && m.concrete) {
+            return;
+        }
+
+        m = instantiateMethod(m, node.funcCall.arguments);
+
+        if (m != null) {
+            containingClass.block.methods.add(m);
+        }
+    }
+
+    private ASTMethod instantiateMethod(ASTMethod prototype, List<ASTExpression> arguments) {
+        if (arguments.stream().anyMatch(arg -> !arg.type.isConcrete)) {
+            // Can't instantiate; arg isn't concrete
+            return null;
+        }
+
+        ASTClass containingClass = ASTClass.nameClassMap.get(prototype.containingClassName);
+
+        ASTBlock blockCopy = new ASTBlock();
+        blockCopy.statements = prototype.body.statements;
+        blockCopy.variables = prototype.body.variables;
+
+        ASTFunction functionInstance = new ASTFunction(prototype.name, prototype.returnType, blockCopy);
+
+        blockCopy.setParent(functionInstance);
+
+        functionInstance.concrete = true;
+        functionInstance.parameters = new ArrayList<>();
+
+        for (int i = 0; i < arguments.size(); i++) {
+            String pname = prototype.parameters.get(i).name;
+            Parameter parameter = new Parameter(pname, arguments.get(i).type.clone());
+            functionInstance.parameters.add(parameter);
+        }
+
+        functionInstance.setParent(program);
+        functionInstance.setDepth(2);
+
+        ASTMethod methodInstance = new ASTMethod(prototype.scope, functionInstance, prototype.containingClassName);
+
+        for (ASTMethod m : containingClass.block.methods) {
+            if (methodInstance.equals(m)) {
+                return null;
+            }
+        }
+
+        return methodInstance;
+    }
 }

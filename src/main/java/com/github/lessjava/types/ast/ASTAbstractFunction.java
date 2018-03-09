@@ -168,7 +168,7 @@ public abstract class ASTAbstractFunction extends ASTNode {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ASTAbstractFunction other = (ASTFunction) obj;
+        ASTAbstractFunction other = (ASTAbstractFunction) obj;
         if (name == null) {
             if (other.name != null)
                 return false;

@@ -8,6 +8,7 @@ import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
+import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTClassBlock;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTEntry;
@@ -66,6 +67,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             }
         } else {
             node.returnType = node.function.returnType;
+            node.concrete = node.function.concrete;
         }
     }
 
@@ -182,10 +184,9 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.postVisit(node);
 
 
-        //if (ASTClass.nameClassMap.containsKey(node.name) && !ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
-            //node.type = new HMTypeClass(node.name);
-        //} else
-        if (idFunctionMap.containsKey(node.getIdentifyingString())) {
+        if (ASTClass.nameClassMap.containsKey(node.name) && !ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
+            node.type = new HMTypeClass(node.name);
+        } else if(idFunctionMap.containsKey(node.getIdentifyingString())) {
             node.type = unify(node.type, idFunctionMap.get(node.getIdentifyingString()).returnType);
         }
     }
@@ -222,7 +223,13 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTMemberAccess node) {
         super.postVisit(node);
 
-        node.type = node.var.type;
+        ASTClass containingClass = ASTClass.nameClassMap.get(node.referencedClassName);
+
+        ASTVariable attribute = containingClass.getAttribute(node.var.name);
+
+        if (attribute != null) {
+            node.type = unify(node.type, attribute.type);
+        }
     }
 
     @Override
