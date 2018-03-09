@@ -12,6 +12,7 @@ import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.SymbolTable;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTBlock;
+import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTNode;
@@ -135,19 +136,15 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     protected void insertVariableSymbol(ASTVariable node) {
         try {
-            //SymbolTable st = getPreviousTable();
+            // TODO: Removing this fixes collections breaks globals
+            List<Symbol> symbols = searchScopesForSymbol(node, node.name);
 
-            // Get names of parent symbols
-            //Set<String> varNames = st.getAllSymbols().stream().map(Symbol::getName).collect(Collectors.toSet());
+            //Don't add the symbol if we've already encountered it
+            if(symbols != null && !symbols.isEmpty()) {
+                return;
+            }
 
-            //List<Symbol> symbols = searchScopesForSymbol(node, node.name);
-
-            // Don't add the symbol if we've already encountered it
-            //if(symbols != null && !symbols.isEmpty()) {
-                //return;
-            //}
-
-            Symbol symbol = new Symbol(node.name, node.type, node.isCollection);
+            Symbol symbol = new Symbol(node, node.name, node.type);
             getCurrentTable().insert(node.name, symbol);
         } catch (InvalidProgramException ex) {
             addError(ex);
@@ -160,7 +157,7 @@ public class BuildSymbolTables extends StaticAnalysis {
      */
     protected void insertParamSymbol(Parameter p) {
         try {
-            Symbol symbol = new Symbol(p.name, p.type);
+            Symbol symbol = new Symbol(p, p.name, p.type);
             getCurrentTable().insert(p.name, symbol);
         } catch (InvalidProgramException ex) {
             addError(ex);
@@ -174,6 +171,17 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     @Override
     public void postVisit(ASTProgram node) {
+        nodeSymbolTableMap.put(node, getCurrentTable());
+        finalizeScope();
+    }
+
+    @Override
+    public void preVisit(ASTClass node) {
+        node.attributes.put("symbolTable", initializeScope());
+    }
+
+    @Override
+    public void postVisit(ASTClass node) {
         nodeSymbolTableMap.put(node, getCurrentTable());
         finalizeScope();
     }
@@ -214,6 +222,9 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     @Override
     public void postVisit(ASTVariable node) {
+        if(node.name.equals("set")) {
+            //System.err.println(getCurrentTable());
+        }
         insertVariableSymbol(node);
     }
 

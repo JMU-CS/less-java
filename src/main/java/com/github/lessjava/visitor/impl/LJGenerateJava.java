@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +26,6 @@ import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTGlobalAssignment;
-import com.github.lessjava.types.ast.ASTMemberAccess;
 import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
@@ -53,15 +53,15 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     public static Path mainFile = Paths.get("generated/Main.java");
 
-    private static String imports = "import static org.junit.Assert.*;\n"
-                                  + "import static wrappers.LJString.*;\n"
-                                  + "import static wrappers.LJIO.*;\n"
-                                  + "\n"
-                                  + "import org.junit.Test;\n"
-                                  + "import java.util.*;\n"
-                                  + "import java.io.*;\n"
-                                  + "\n"
-                                  + "import wrappers.*;\n";
+    private static String[] imports = {"import static org.junit.Assert.*;",
+                                       "import static wrappers.LJString.*;",
+                                       "import static wrappers.LJIO.*;",
+                                       "",
+                                       "import org.junit.Test;",
+                                       "import java.util.*;",
+                                       "import java.io.*;",
+                                       "",
+                                       "import wrappers.*;"};
 
     private List<String> lines = new ArrayList<>();
     private List<String> globalLines = new ArrayList<>();
@@ -83,7 +83,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public void preVisit(ASTProgram node) {
         this.currentFunction = null;
 
-        lines.add(imports);
+        lines.addAll(Arrays.asList(imports));
 
         lines.add("public class Main");
         lines.add("{");
@@ -91,7 +91,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     @Override
     public void postVisit(ASTProgram node) {
-        lines.addAll(globalLines);
+        lines.addAll(imports.length + 2, globalLines);
         lines.addAll(testDeclarationLines);
         lines.addAll(testLines);
         lines.addAll(classLines);

@@ -14,7 +14,7 @@ public class ASTList extends ASTCollection {
 
         HMTypeList t = (HMTypeList) type;
 
-        initialization.append(String.format("new LJList<%s>(new %s(Arrays.asList(new %s[] %s)))", t.elementType, t, t.elementType, argString));
+        initialization.append(String.format("new LJList<%s>(Arrays.asList(new %s[] %s))", t.elementType, t.elementType, argString));
 
         return initialization.toString();
     }

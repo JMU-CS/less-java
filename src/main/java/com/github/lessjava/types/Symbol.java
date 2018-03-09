@@ -1,33 +1,14 @@
 package com.github.lessjava.types;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTNode;
+import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
 
-/**
- * Single Decaf symbol. Might represent a scalar variable, an array, or a formal
- * function parameter.
- */
 public class Symbol {
-    /**
-     * Memory access locations.
-     *
-     * May be one of the following:
-     *
-     * <ul>
-     * <li>STATIC_VAR - static variable w/ global symbol</li>
-     * <li>STATIC_FUNC - function w/ global symbol</li>
-     * <li>STACK_PARAM - stack-dynamic w/ positive offset from base pointer</li>
-     * <li>STACK_LOCAL - stack-dynamic w/ negative offset from stack pointer</li>
-     * </ul>
-     */
-    public enum MemLoc {
-        UNKNOWN, STATIC_VAR, STATIC_FUNC, STACK_PARAM, STACK_LOCAL
-    };
-
     /**
      * Name in source code
      */
@@ -48,73 +29,25 @@ public class Symbol {
      */
     public List<HMType> paramTypes;
 
-    /**
-     * Flag indicating this symbol represents an array
-     */
-    public boolean isArray;
+    public ASTFunction function;
+    public ASTVariable variable;
+    public Parameter parameter;
 
-    /**
-     * Length of array (for array symbols; should be 1 for others)
-     */
-    public int length;
-
-    /**
-     * Size of individual elements (in bytes)
-     */
-    public int elementSize;
-
-    /**
-     * Size of overall structure (in bytes); for scalar variables, elementSize ==
-     * totalSize
-     */
-    public int totalSize;
-
-    /**
-     * Memory location information
-     */
-    public MemLoc location;
-
-    /**
-     * Memory offset (if needed)
-     */
-    public int offset;
-
-    public ASTFunction node;
-
-    /**
-     * Create a new scalar symbol
-     * 
-     * @param name
-     *            Name in source code
-     * @param type
-     *            Data type ({@link ASTNode.DataType})
-     */
-    public Symbol(String name, HMType type) {
-        this(name, type, false);
-    }
-
-    /**
-     * Create a new array symbol
-     * 
-     * @param name
-     *            Name in source code
-     * @param isArray
-     *            Flag indicating whether the symbol represents an array or scalar
-     * @param type
-     *            Data type ({@link ASTNode.DataType})
-     * @param length
-     *            Array length (should be 1 for scalar)
-     */
-    public Symbol(String name, HMType type, boolean isArray) {
+    public Symbol(ASTVariable variable, String name, HMType type) {
+        this.variable = variable;
         this.name = name;
         this.type = type;
-        this.paramTypes = new ArrayList<HMType>();
-        this.isArray = isArray;
+    }
+
+    public Symbol(Parameter parameter, String name, HMType type) {
+        this.parameter = parameter;
+        this.name = name;
+        this.type = type;
     }
 
     /**
      * Create a new function symbol
-     * 
+     *
      * @param name
      *            Name in source code
      * @param returnType
@@ -122,37 +55,11 @@ public class Symbol {
      * @param paramTypes
      *            List of formal parameter data types
      */
-    public Symbol(String name, HMType returnType, List<HMType> paramTypes) {
+    public Symbol(ASTFunction function, String name, HMType returnType, List<HMType> paramTypes, boolean concrete) {
+        this.function = function;
         this.name = name;
         this.type = returnType;
         this.paramTypes = paramTypes;
-        this.length = 1;
-        this.elementSize = 8;
-        this.totalSize = 8;
-        this.location = MemLoc.STATIC_FUNC;
-        this.offset = 0;
-    }
-
-    /**
-     * Create a new function symbol
-     * 
-     * @param name
-     *            Name in source code
-     * @param returnType
-     *            Function return type ({@link ASTNode.DataType})
-     * @param paramTypes
-     *            List of formal parameter data types
-     */
-    public Symbol(ASTFunction node, String name, HMType returnType, List<HMType> paramTypes, boolean concrete) {
-        this.node = node;
-        this.name = name;
-        this.type = returnType;
-        this.paramTypes = paramTypes;
-        this.length = 1;
-        this.elementSize = 8;
-        this.totalSize = 8;
-        this.location = MemLoc.STATIC_FUNC;
-        this.offset = 0;
         this.concrete = concrete;
     }
 
@@ -178,13 +85,9 @@ public class Symbol {
     public String toString() {
         StringBuffer str = new StringBuffer();
         str.append(name);
-        if (isArray) {
-            str.append("[" + length + "]");
-        }
         str.append(" : ");
         str.append(type.toString());
-        
-        // str.append(" {total=" + Integer.toString(totalSize) + "}");
+
         return str.toString();
     }
 }

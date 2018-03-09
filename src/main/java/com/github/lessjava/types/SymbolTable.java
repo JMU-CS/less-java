@@ -27,7 +27,7 @@ public class SymbolTable {
 
     /**
      * Create a new, empty symbol table.
-     * 
+     *
      * @param parent
      *            Reference to parent table for enclosing scope.
      */
@@ -39,7 +39,7 @@ public class SymbolTable {
 
     /**
      * Inserts a new symbol into the symbol table
-     * 
+     *
      * @param name
      *            Decaf symbol name
      * @param symbol
@@ -54,7 +54,7 @@ public class SymbolTable {
 
     /**
      * Retrieves symbol information for a given symbol name.
-     * 
+     *
      * @param name
      *            Decaf symbol name
      * @return Symbol information from either this table or a parent table
@@ -71,9 +71,19 @@ public class SymbolTable {
         }
     }
 
+    //public List<Symbol> lookupVariable(String name) throws InvalidProgramException {
+        //if (localTable.containsKey(name)) {
+            //return localTable.get(name);
+        //} else if (parent != null) {
+            //return parent.lookup(name);
+        //} else {
+            //throw new InvalidProgramException("Symbol not found: \"" + name + "\"");
+        //}
+    //}
+
     /**
      * Get accessible symbol count
-     * 
+     *
      * @return Count of all symbols accessible in this scope
      */
     public int size() {
@@ -83,7 +93,7 @@ public class SymbolTable {
     /**
      * Gets all symbols defined defined in this scope, in the order in which they
      * were added.
-     * 
+     *
      * @return List of all symbols defined in this scope
      */
     public List<Symbol> getSymbols() {
@@ -93,7 +103,7 @@ public class SymbolTable {
     /**
      * Gets all symbols accessible in this scope that are not defined in this scope;
      * i.e., all symbols that are defined in a parent table.
-     * 
+     *
      * @return List of symbols accessible but not defined in this scope
      */
     public List<Symbol> getInheritedSymbols() {
@@ -116,7 +126,7 @@ public class SymbolTable {
      * Gets all symbols accessible in this scope, which includes all symbols defined
      * at this level ({@link getSymbols()}) plus all symbols defined in any parent
      * symbol table.
-     * 
+     *
      * @return List of symbols accessible in this scope
      */
     public List<Symbol> getAllSymbols() {
@@ -128,7 +138,7 @@ public class SymbolTable {
 
     /**
      * Helper method to create indentation strings
-     * 
+     *
      * @param level
      *            Indentation level
      * @return String with the given number of two-space indentations
@@ -152,7 +162,7 @@ public class SymbolTable {
 
     /**
      * Builds a nicely-formatted list of new symbols declared in this scope.
-     * 
+     *
      * @param level
      *            Number of two-space indentations before each symbol.
      */
