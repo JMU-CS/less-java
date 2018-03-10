@@ -1,1 +1,3 @@
-print("Hello, World!")
+main() {
+    println("Hello, World!")
+}
