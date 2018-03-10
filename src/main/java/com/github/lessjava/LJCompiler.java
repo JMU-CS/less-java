@@ -96,15 +96,12 @@ public class LJCompiler {
         program.traverse(inferConstructors);
         program.traverse(staticAnalysis);
 
-        boolean typesHaveChanged = true;
-        while (typesHaveChanged) {
+        do {
             program.traverse(buildSymbolTables);
             program.traverse(instantiateFunctions);
             program.traverse(inferTypes);
             program.traverse(checkTypesHaveChanged);
-
-            typesHaveChanged = LJASTCheckTypesHaveChanged.typesChanged;
-        }
+        } while (LJASTCheckTypesHaveChanged.typesChanged);
 
         // TODO: Determine if necessary
         // program.traverse(new LJUnifyVariables());
