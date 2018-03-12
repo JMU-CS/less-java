@@ -1,0 +1,26 @@
+main() {
+    x = A()
+    y = B()
+
+    foo(x)
+    foo(y)
+}
+
+foo(a) {
+    a.bar()
+}
+
+A
+{
+    public bar() {
+        println("Hello from A!")
+    }
+}
+
+B
+{
+    public bar() {
+        println("Hello from B!")
+    }
+}
+
