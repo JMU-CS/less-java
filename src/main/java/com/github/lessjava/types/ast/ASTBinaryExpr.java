@@ -181,21 +181,24 @@ public class ASTBinaryExpr extends ASTExpression {
         StringBuilder s = new StringBuilder();
         StringBuilder op = new StringBuilder(opToString(operator));
         String right = rightChild.toString();
+        String left = leftChild.toString();
 
         if (operator.equals(BinOp.EQ)) {
             right = String.format(".equals(%s)", rightChild);
             op = new StringBuilder("");
+        } else if(operator.equals(BinOp.NE)) {
+            System.err.println(leftChild.getClass());
+            System.err.println(leftChild.type);
+            left = String.format("!%s", leftChild);
+            right = String.format(".equals(%s)", rightChild);
+            op = new StringBuilder("");
         }
 
-        s = new StringBuilder(String.format("(%s%s%s)", leftChild.toString(), op, right));
+        s = new StringBuilder(String.format("(%s%s%s)", left, op, right));
 
         HMTypeBase t = this.type instanceof HMTypeBase ? (HMTypeBase) this.type : null;
 
-        if (t == null) {
-            return s.toString();
-        } else {
-            return wrapPrimitive(t, s.toString());
-        }
+        return t == null ? s.toString() : wrapPrimitive(t, s.toString());
     }
 
     public String wrapPrimitive(HMTypeBase t, String s) {

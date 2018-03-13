@@ -62,7 +62,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             node.returnType = node.function.returnType = new HMTypeClass(node.name);
             node.concrete = node.function.concrete = true;
 
-            for (Parameter p: node.function.parameters) {
+            for (Parameter p : node.function.parameters) {
                 p.type = unify(p.type, ASTClassBlock.nameAttributeMap.get(p.name).assignment.type);
             }
         } else {
@@ -183,11 +183,13 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
-
-        if (ASTClass.nameClassMap.containsKey(node.name) && !ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
+        if (ASTClass.nameClassMap.containsKey(node.name)
+                && !ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
             node.type = new HMTypeClass(node.name);
-        } else if(idFunctionMap.containsKey(node.getIdentifyingString())) {
+        } else if (idFunctionMap.containsKey(node.getIdentifyingString())) {
             node.type = unify(node.type, idFunctionMap.get(node.getIdentifyingString()).returnType);
+        } else if (ASTFunction.specialCases.containsKey(node.name)) {
+            node.type = unify(node.type, ASTFunction.specialCases.get(node.name).returnType);
         }
     }
 
@@ -322,7 +324,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
                     key = unify(key, node.funcCall.arguments.get(0).type);
                     value = unify(value, node.funcCall.arguments.get(1).type);
 
-                    t.elementType = new HMTypeTuple(Arrays.asList(new HMType[] {key, value}));
+                    t.elementType = new HMTypeTuple(Arrays.asList(new HMType[] { key, value }));
                 }
             }
         }

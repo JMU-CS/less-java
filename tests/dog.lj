@@ -1,3 +1,13 @@
+main () {
+    d = Dog("Dog", 10)
+    println(d.bark())
+    println(d.run())
+
+    dd = BullDog("Duke Dog", 20)
+    println(dd.bark())
+    println(dd.run())
+}
+
 Dog
 {
     public name = ""
@@ -9,31 +19,17 @@ Dog
     }
 
     public bark () {
-        printf("%s says BARK!\n", this.name)
+        return format("%s says BARK!", this.name)
     }
 
     public run () {
-        printf("%s runs!\n", this.name)
+        return format("%s runs!", this.name)
     }
 }
 
 BullDog extends Dog
 {
     public bark () {
-        printf("%s says BARK BARK!\n", this.name)
+        return format("%s says BARK BARK!", this.name)
     }
 }
-
-main () {
-    d = Dog("Duke", 10)
-    d.bark()
-    d.run()
-
-    d.name = "Duke Dog"
-    d.bark()
-
-    dd = BullDog("Duke Dog", 20)
-    dd.bark()
-    dd.run()
-}
-

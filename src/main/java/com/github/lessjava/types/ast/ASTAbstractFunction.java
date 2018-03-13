@@ -18,6 +18,8 @@ import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public abstract class ASTAbstractFunction extends ASTNode {
     public static Map<String, String> libraryFunctionStrings = new HashMap<>();
+    public static HashSet<ASTFunction> libraryFunctions = new HashSet<>();
+    public static Map<String, ASTFunction> specialCases = new HashMap<>();
 
     static {
         // Constructors
@@ -25,8 +27,6 @@ public abstract class ASTAbstractFunction extends ASTNode {
         libraryFunctionStrings.put("Set", "new LJSet<>");
         libraryFunctionStrings.put("Map", "new LJMap<>");
     }
-
-    public static HashSet<ASTFunction> libraryFunctions = new HashSet<>();
 
     static {
         // Input
@@ -55,7 +55,9 @@ public abstract class ASTAbstractFunction extends ASTNode {
         libraryFunctions.add(new ASTFunction("Map", new HMTypeMap(new HMTypeTuple(tuple)), null));
 
         // Strings
-        libraryFunctions.add(new ASTFunction("format", new HMTypeBase(BaseDataType.STR), null));
+        ASTFunction format = new ASTFunction("format", new HMTypeBase(BaseDataType.STR), null);
+        libraryFunctions.add(format);
+        specialCases.put(format.name, format);
     }
 
     public static class Parameter {
