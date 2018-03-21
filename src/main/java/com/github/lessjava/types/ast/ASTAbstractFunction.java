@@ -48,16 +48,27 @@ public abstract class ASTAbstractFunction extends ASTNode {
 
 
         // Native Data Structures (Constructors)
-        libraryFunctions.add(new ASTFunction("List", new HMTypeList(new HMTypeVar()), null));
-        libraryFunctions.add(new ASTFunction("Set", new HMTypeSet(new HMTypeVar()), null));
+        ASTFunction listConstructor = new ASTFunction("List", new HMTypeList(new HMTypeVar()), null);
+        ASTFunction listCopyConstructor = new ASTFunction("List", new HMTypeList(new HMTypeVar()), null);
+        listCopyConstructor.parameters.add(new Parameter("collection", new HMTypeList(new HMTypeVar())));
+        ASTFunction setConstructor = new ASTFunction("Set", new HMTypeSet(new HMTypeVar()), null);
+        ASTFunction setCopyConstructor = new ASTFunction("Set", new HMTypeList(new HMTypeVar()), null);
+        setCopyConstructor.parameters.add(new Parameter("collection", new HMTypeList(new HMTypeVar())));
+
+        libraryFunctions.add(listConstructor);
+        libraryFunctions.add(listCopyConstructor);
+        libraryFunctions.add(setConstructor);
+        libraryFunctions.add(setCopyConstructor);
 
         List<HMType> tuple = Arrays.asList(new HMType[] { new HMTypeVar(), new HMTypeVar() });
         libraryFunctions.add(new ASTFunction("Map", new HMTypeMap(new HMTypeTuple(tuple)), null));
 
-        // Strings
+        // TODO: definitely better way to do this............................
         ASTFunction format = new ASTFunction("format", new HMTypeBase(BaseDataType.STR), null);
         libraryFunctions.add(format);
         specialCases.put(format.name, format);
+        specialCases.put(listConstructor.name, listConstructor);
+        specialCases.put(setConstructor.name, setConstructor);
     }
 
     public static class Parameter {
