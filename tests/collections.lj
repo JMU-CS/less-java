@@ -1,27 +1,46 @@
-nonEmptyList() {
+listOperator() {
     list = ["a", "b", "c"]
     list.add("d")
 
     return list
 }
 
+test listOperator().size() == 4
+test listOperator().get(0) == "a"
+test listOperator().get(listOperator().size() - 1) == "d"
 
-test nonEmptyList().size() == 4
-test nonEmptyList().get(0) == "a"
-test nonEmptyList().get(nonEmptyList().size() - 1) == "d"
-
-emptyList() {
+emptyListConstructor() {
     list = List()
     list.add("a")
 
     return list
 }
 
-test emptyList().size() == 1
-test emptyList().get(0) == "a"
-test emptyList().get(emptyList().size() - 1) == "a"
+test emptyListConstructor().size() == 1
+test emptyListConstructor().get(0) == "a"
+test emptyListConstructor().get(emptyListConstructor().size() - 1) == "a"
 
-nonEmptySet() {
+listFromList() {
+    list = List(listOperator())
+    list.add("e")
+
+    return list
+}
+
+test listFromList().size() == 5
+test listFromList().get(0) == "a"
+test listFromList().get(listFromList().size() - 1) == "e"
+
+listFromSet() {
+    list = List(setOperator())
+    list.add("a")
+
+    return list
+}
+
+test listFromSet().size() == 5
+
+setOperator() {
     set = {"a", "a", "b", "c"}
     set.add("d")
     set.add("e")
@@ -30,11 +49,11 @@ nonEmptySet() {
     return set
 }
 
-test nonEmptySet().size() == 4
-test nonEmptySet().contains("a")
-test !nonEmptySet().contains("e")
+test setOperator().size() == 4
+test setOperator().contains("a")
+test !setOperator().contains("e")
 
-emptySet() {
+emptySetConstructor() {
     set = Set()
     set.add("a")
     set.add("a")
@@ -45,52 +64,58 @@ emptySet() {
     return set
 }
 
-test emptySet().size() == 2
-test emptySet().contains("a")
-test emptySet().contains("b")
-test !emptySet().contains("c")
+test emptySetConstructor().size() == 2
+test emptySetConstructor().contains("a")
+test emptySetConstructor().contains("b")
+test !emptySetConstructor().contains("c")
 
-nonEmptyMap() {
+setFromSet() {
+    set = Set(setOperator())
+    set.remove("d")
+
+    return set
+}
+
+test setFromSet().size() == 3
+test !setFromSet().contains("d")
+
+setFromList() {
+    set = Set(listFromSet())
+
+    return set
+}
+
+test setFromList().size() == 4
+
+mapOperator() {
     map = <"x" : 10>
     map.put("y", 100)
 
     return map
 }
 
-test nonEmptyMap().contains("x")
-test nonEmptyMap().contains("y")
-test nonEmptyMap().get("x") == 10
-test nonEmptyMap().get("y") == 100
+test mapOperator().contains("x")
+test mapOperator().contains("y")
+test mapOperator().get("x") == 10
+test mapOperator().get("y") == 100
 
-emptyMap() {
+emptyMapConstructor() {
     map = Map()
     map.put("x", 10)
 
     return map
 }
 
-test emptyMap().size() == 1
-test emptyMap().contains("x")
-test emptyMap().get("x") == 10
+test emptyMapConstructor().size() == 1
+test emptyMapConstructor().contains("x")
+test emptyMapConstructor().get("x") == 10
 
-nonEmptyQueue() {
+listAsQueue() {
     queue = ["a", "b", "c"]
     queue.enqueue("d")
 
     return queue
 }
 
-test nonEmptyQueue().size() == 4
-test nonEmptyQueue().get(nonEmptyQueue().size() - 1) == "d"
-
-// Fails
-/*nonEmptyIntQueue() {*/
-    /*queue = [1,2,3]*/
-    /*queue.enqueue("d")*/
-
-    /*return queue*/
-/*}*/
-
-/*test nonEmptyIntQueue().size() == 4*/
-/*test nonEmptyIntQueue().get(nonEmptyIntQueue().size() - 1) == 4*/
-
+test listAsQueue().size() == 4
+test listAsQueue().get(listAsQueue().size() - 1) == "d"

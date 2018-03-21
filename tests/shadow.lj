@@ -1,0 +1,7 @@
+main() {
+    print("hi")
+}
+
+print(a) {
+    return a
+} 

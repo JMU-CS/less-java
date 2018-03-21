@@ -1,0 +1,15 @@
+Car {
+    public make = ""
+    public model = ""
+
+    Car(make, model) {
+        this.make = make
+        this.model = model
+    }
+
+    public toString() {
+        return format("%s %s", this.make, this.model)
+    }
+}
+
+test Car("Toyota", "Camry").toString() == "Toyota Camry"
