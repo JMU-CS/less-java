@@ -95,7 +95,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
     @Override
     public void preVisit(ASTForLoop node) {
-        if (node.lowerBound == null) {
+        if (node.lowerBound == null && node.upperBound.type instanceof HMTypeCollection) {
             node.var.type = ((HMTypeCollection) node.upperBound.type).elementType;
         } else {
             node.var.type = new HMTypeBase(BaseDataType.INT);
