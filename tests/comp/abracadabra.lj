@@ -1,8 +1,10 @@
+main() {
+    abracadabra(5)
+    abracadabra(10)
+}
+
 abracadabra(n) {
     for (i: 1 -> n+1) {
         printf("%d Abracadabra\n", i)
     }
 }
-
-abracadabra(5)
-abracadabra(10)

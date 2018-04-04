@@ -1,0 +1,11 @@
+main() {
+    for (i: 1->10){
+        println(i)
+    }
+
+    abc = ["a", "b", "c"]
+
+    for (i: abc) {
+        println(i)
+    }
+}
