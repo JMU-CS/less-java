@@ -84,9 +84,9 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
     protected HMTypeBase unify(HMTypeBase left, HMTypeBase right) {
         if (left.getBaseType().equals(right.getBaseType())) {
             return left;
-        } else if (left.getBaseType().equals(BaseDataType.REAL) && right.getBaseType().equals(BaseDataType.INT)) {
+        } else if (left.getBaseType().equals(BaseDataType.DOUBLE) && right.getBaseType().equals(BaseDataType.INT)) {
             return left;
-        } else if (right.getBaseType().equals(BaseDataType.REAL) && left.getBaseType().equals(BaseDataType.INT)) {
+        } else if (right.getBaseType().equals(BaseDataType.DOUBLE) && left.getBaseType().equals(BaseDataType.INT)) {
             return right;
         }
 

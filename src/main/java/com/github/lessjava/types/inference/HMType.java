@@ -4,7 +4,7 @@ public abstract class HMType {
     public boolean isConcrete;
 
     public static enum BaseDataType {
-        INT, REAL, BOOL, VOID, STR
+        INT, DOUBLE, BOOL, VOID, STR
     }
 
     @Override

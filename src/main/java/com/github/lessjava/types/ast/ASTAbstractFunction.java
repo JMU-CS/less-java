@@ -31,7 +31,7 @@ public abstract class ASTAbstractFunction extends ASTNode {
     static {
         // Input
         libraryFunctions.add(new ASTFunction("readInt", new HMTypeBase(BaseDataType.INT), null));
-        libraryFunctions.add(new ASTFunction("readReal", new HMTypeBase(BaseDataType.REAL), null));
+        libraryFunctions.add(new ASTFunction("readDouble", new HMTypeBase(BaseDataType.DOUBLE), null));
         libraryFunctions.add(new ASTFunction("readChar", new HMTypeBase(BaseDataType.STR), null));
         libraryFunctions.add(new ASTFunction("readWord", new HMTypeBase(BaseDataType.STR), null));
         libraryFunctions.add(new ASTFunction("readLine", new HMTypeBase(BaseDataType.STR), null));

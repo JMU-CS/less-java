@@ -671,7 +671,7 @@ public class LJASTConverter extends LJBaseListener {
         } else if (ctx.INT() != null) {
             lit = new ASTLiteral(HMType.BaseDataType.INT, Integer.parseInt(ctx.INT().getText().trim()));
         } else if (ctx.REAL() != null) {
-            lit = new ASTLiteral(HMType.BaseDataType.REAL, Double.parseDouble(ctx.REAL().getText().trim()));
+            lit = new ASTLiteral(HMType.BaseDataType.DOUBLE, Double.parseDouble(ctx.REAL().getText().trim()));
         } else {
             assert (ctx.STR() != null);
             lit = new ASTLiteral(HMType.BaseDataType.STR,

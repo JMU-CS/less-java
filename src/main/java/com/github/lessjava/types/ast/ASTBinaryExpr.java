@@ -206,7 +206,7 @@ public class ASTBinaryExpr extends ASTExpression {
             return String.format("Boolean.valueOf(%s)", s);
         } else if (t.getBaseType() == BaseDataType.INT) {
             return String.format("Integer.valueOf(%s)", s);
-        } else if (t.getBaseType() == BaseDataType.REAL) {
+        } else if (t.getBaseType() == BaseDataType.DOUBLE) {
             return String.format("Double.valueOf(%s)", s);
         } else if (t.getBaseType() == BaseDataType.STR) {
             return String.format("%s", s);
