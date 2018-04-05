@@ -1,16 +1,19 @@
 # A language to introduce students to programming
----
-Get Gradle aliases from my .dotfiles repo: [Gradle Aliases](https://github.com/Zamua/.dotfiles/blob/master/gradle-aliases.sh)
+Get gradle aliases from my .dotfiles repo: [Gradle Aliases](https://github.com/Zamua/.dotfiles/blob/master/gradle-aliases.sh)
 
+###### *Note: Scripts reference `gradle` and thus won't work if you don't have gradle installed
 1. How to build:
     * If you have Gradle installed:
         `gradle build`
     * If not:
         * Unix:    `./gradlew build`
         * Windows: `gradlew build`
+    * After building: `./compile-wrappers.sh`
+        * This must be done once
 
 2. How to compile:
-    * With Gradle aliases: gr <file-name>
+    * With    gradle aliases: gr <file-name>
+    * Without gradle aliases: gradle run -Ptestfile=<file-name>
 
 3. How to run the most recently compiled file:
     * ./run.sh
