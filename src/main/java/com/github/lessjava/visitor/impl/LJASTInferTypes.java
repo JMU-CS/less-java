@@ -326,6 +326,8 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
                     t.elementType = new HMTypeTuple(Arrays.asList(new HMType[] { key, value }));
                 }
+            } else if(node.funcCall.name.equals("get")) {
+                node.funcCall.type = unify(node.funcCall.type, t.elementType);
             }
         }
 
