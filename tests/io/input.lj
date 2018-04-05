@@ -1,14 +1,22 @@
-nest1(s) {
-    return s
-}
+main() {
+    print("Integer: ")
+    println(readInt())
 
-nest2(s) {
-    return s
-}
+    print("Double: ")
+    println(readDouble())
 
-nest3(s) {
-    return s
-}
+    // Consume newline
+    readLine()
 
-print("Hello, world!")
-print(nest1(nest2(nest3(readLine()))))
+    print("Character: ")
+    println(readChar())
+
+    print("Word: ")
+    println(readWord())
+
+    // Consume newline
+    readLine()
+
+    print("Line: ")
+    println(readLine())
+}
