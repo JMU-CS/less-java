@@ -14,7 +14,7 @@ main() {
     grossPay = (hours * payRate) + BONUS // calculate their pay
 
     // print output
-    print("Hello " + name);
-    print("Your gross pay is $" + grossPay);
+    printf("Hello %s", name)
+    printf("Your gross pay is $%f", grossPay)
 }
 
