@@ -1,0 +1,21 @@
+main() {
+    BONUS = 500 // constant
+
+    // read information from the user
+    print("What is your name? ")
+    name = readLine()
+
+    print("How many hours did you work this week? ")
+    hours = readInt()
+
+    print("What is your hourly payrate? ")
+    payRate = readDouble()
+
+    grossPay = (hours * payRate) + BONUS // calculate their pay
+
+    // print output
+    print("\n")
+    printf("Hello %s\n", name)
+    printf("Your gross pay is $%f\n", grossPay)
+}
+
