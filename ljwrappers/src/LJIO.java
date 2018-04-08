@@ -3,7 +3,8 @@ package wrappers;
 import java.util.Scanner;
 
 public class LJIO {
-    private static Scanner scn = new Scanner(System.in);
+    private static Scanner inputScn = new Scanner(System.in);
+    private static Scanner lineScn = null;
 
     public static void print(Object o) {
         System.out.print(o);
@@ -18,22 +19,33 @@ public class LJIO {
     }
 
     public static int readInt() {
-        return scn.nextInt();
+        buffer();
+        return lineScn.nextInt();
     }
 
     public static double readDouble() {
-        return scn.nextDouble();
+        buffer();
+        return lineScn.nextDouble();
     }
 
     public static String readChar() {
-        return scn.useDelimiter("").next();
+        buffer();
+        return lineScn.useDelimiter("").next();
     }
 
     public static String readWord() {
-        return scn.useDelimiter("\\s+").next();
+        buffer();
+        return lineScn.useDelimiter("\\s+").next();
     }
 
     public static String readLine() {
-        return scn.nextLine();
+        buffer();
+        return lineScn.nextLine();
+    }
+
+    public static void buffer() {
+        if (lineScn == null || !lineScn.hasNext()) {
+            lineScn = new Scanner(inputScn.nextLine());
+        }
     }
 }
