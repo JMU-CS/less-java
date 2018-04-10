@@ -8,6 +8,11 @@ public class ASTVoidMethodCall extends ASTStatement {
     }
 
     @Override
+    public String toString() {
+        return String.format("%s.%s", methodCall.invoker, methodCall.funcCall);
+    }
+
+    @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
         methodCall.traverse(visitor);

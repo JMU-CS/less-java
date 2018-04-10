@@ -3,7 +3,6 @@ package com.github.lessjava.types.ast;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeClass;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
-import com.github.lessjava.types.inference.impl.HMTypeObject;
 
 public class ASTMethodCall extends ASTBinaryExpr {
     public ASTExpression invoker;
@@ -32,9 +31,9 @@ public class ASTMethodCall extends ASTBinaryExpr {
         }
 
         if (invoker.type instanceof HMTypeClass) {
-            HMTypeObject c = (HMTypeObject) invoker.type;
+            HMTypeClass c = (HMTypeClass) invoker.type;
 
-            return c.className;
+            return c.name;
         }
 
         return "UNKNOWN_CLASS_NAME";

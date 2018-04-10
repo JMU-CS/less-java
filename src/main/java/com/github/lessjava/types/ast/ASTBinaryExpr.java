@@ -187,8 +187,6 @@ public class ASTBinaryExpr extends ASTExpression {
             right = String.format(".equals(%s)", rightChild);
             op = new StringBuilder("");
         } else if(operator.equals(BinOp.NE)) {
-            System.err.println(leftChild.getClass());
-            System.err.println(leftChild.type);
             left = String.format("!%s", leftChild);
             right = String.format(".equals(%s)", rightChild);
             op = new StringBuilder("");

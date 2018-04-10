@@ -66,20 +66,10 @@ public class SymbolTable {
             return localTable.get(name);
         } else if (parent != null) {
             return parent.lookup(name);
-        } else {
-            throw new InvalidProgramException("Symbol not found: \"" + name + "\"");
         }
-    }
 
-    //public List<Symbol> lookupVariable(String name) throws InvalidProgramException {
-        //if (localTable.containsKey(name)) {
-            //return localTable.get(name);
-        //} else if (parent != null) {
-            //return parent.lookup(name);
-        //} else {
-            //throw new InvalidProgramException("Symbol not found: \"" + name + "\"");
-        //}
-    //}
+        throw new InvalidProgramException("Symbol not found: \"" + name + "\"");
+    }
 
     /**
      * Get accessible symbol count

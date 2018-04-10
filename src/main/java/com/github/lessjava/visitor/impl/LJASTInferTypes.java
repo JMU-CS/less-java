@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.github.lessjava.types.Symbol;
+import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
@@ -171,7 +172,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void preVisit(ASTUnaryExpr node) {
         super.preVisit(node);
 
-        unify(node.type, node.child.type);
+        node.type = unify(node.type, node.child.type);
     }
 
     @Override
@@ -186,10 +187,18 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         if (ASTClass.nameClassMap.containsKey(node.name)
                 && !ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
             node.type = new HMTypeClass(node.name);
-        } else if (idFunctionMap.containsKey(node.getIdentifyingString())) {
-            node.type = unify(node.type, idFunctionMap.get(node.getIdentifyingString()).returnType);
-        } else if (ASTFunction.specialCases.containsKey(node.name)) {
+        }
+        else if (ASTFunction.specialCases.containsKey(node.name)) {
             node.type = unify(node.type, ASTFunction.specialCases.get(node.name).returnType);
+        }
+        else if (idFunctionMap.containsKey(node.getIdentifyingString())) {
+            List<ASTAbstractFunction> functions = idFunctionMap.get(node.getIdentifyingString());
+
+            for (ASTAbstractFunction function: functions) {
+                if (function.parameters.size() == node.arguments.size()) {
+                    node.type = unify(node.type, function.returnType);
+                }
+            }
         }
     }
 
@@ -215,7 +224,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name);
 
         if (symbols != null && !symbols.isEmpty()) {
-            symbols.forEach(s -> node.type = unify(node.type, s.type));
+            symbols.forEach(s -> node.type = s.variable == null ? node.type : unify(node.type, s.type));
         }
 
         node.isCollection = node.isCollection || node.type instanceof HMTypeCollection;
@@ -305,33 +314,45 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         // TODO: Better way??
         if (node.invoker.type instanceof HMTypeCollection) {
             HMTypeCollection t = (HMTypeCollection) node.invoker.type;
+            List<ASTExpression> arguments = node.funcCall.arguments;
+            String name = node.funcCall.name;
 
-            if (node.funcCall.name.equals("add")) {
-                t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
-            } else if (node.funcCall.name.equals("insert")) {
-                t.elementType = unify(t.elementType, node.funcCall.arguments.get(1).type);
-            } else if (node.funcCall.name.equals("remove")) {
-                if (!node.funcCall.arguments.isEmpty()) {
-                    t.elementType = unify(t.elementType, node.funcCall.arguments.get(0).type);
+            if (name.equals("add")) {
+                t.elementType = unify(t.elementType, arguments.get(0).type);
+            } else if (name.equals("insert")) {
+                t.elementType = unify(t.elementType, arguments.get(1).type);
+            } else if (name.equals("remove")) {
+                if (!arguments.isEmpty()) {
+                    t.elementType = unify(t.elementType, arguments.get(0).type);
                 }
-            } else if (node.funcCall.name.equals("put")) {
-                if (!node.funcCall.arguments.isEmpty()) {
+            } else if (name.equals("put")) {
+                if (!arguments.isEmpty()) {
                     HMTypeTuple tuple = (HMTypeTuple) t.elementType;
 
                     HMType key = tuple.types.get(0);
                     HMType value = tuple.types.get(1);
 
-                    key = unify(key, node.funcCall.arguments.get(0).type);
-                    value = unify(value, node.funcCall.arguments.get(1).type);
+                    key = unify(key, arguments.get(0).type);
+                    value = unify(value, arguments.get(1).type);
 
                     t.elementType = new HMTypeTuple(Arrays.asList(new HMType[] { key, value }));
                 }
-            } else if(node.funcCall.name.equals("get")) {
+            } else if(name.equals("get")) {
                 node.funcCall.type = unify(node.funcCall.type, t.elementType);
             }
         }
 
-        node.type = node.funcCall.type;
+        if (idFunctionMap.containsKey(node.getIdentifyingString())) {
+            List<ASTAbstractFunction> functions = idFunctionMap.get(node.getIdentifyingString());
+
+            for (ASTAbstractFunction function: functions) {
+                if (function.parameters.size() == node.funcCall.arguments.size()) {
+                    node.type = unify(node.type, function.returnType);
+                }
+            }
+        }
+
+        node.type = unify(node.type, node.funcCall.type);
     }
 
     @Override

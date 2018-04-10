@@ -58,7 +58,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
             program.functions.add(f);
 
-            idFunctionMap.put(node.getIdentifyingString(), f);
+            idFunctionMap.get(node.getIdentifyingString()).add(f);
         }
     }
 

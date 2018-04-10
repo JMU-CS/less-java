@@ -26,7 +26,8 @@ public class ASTFunctionCall extends ASTExpression {
         StringBuilder sb = new StringBuilder();
 
         sb.append(name);
-        sb.append(getArgString());
+        //sb.append(getArgString());
+        sb.append(arguments.size());
 
         return sb.toString();
     }

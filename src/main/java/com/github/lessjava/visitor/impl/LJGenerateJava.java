@@ -414,7 +414,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     public void preVisit(ASTVoidMethodCall node) {
         String line;
 
-        line = String.format("%s;", node.methodCall.toString());
+        line = String.format("%s;", node);
 
         addLine(node, line);
     }

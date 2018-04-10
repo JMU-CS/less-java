@@ -52,7 +52,7 @@ public abstract class ASTAbstractFunction extends ASTNode {
         ASTFunction listCopyConstructor = new ASTFunction("List", new HMTypeList(new HMTypeVar()), null);
         listCopyConstructor.parameters.add(new Parameter("collection", new HMTypeList(new HMTypeVar())));
         ASTFunction setConstructor = new ASTFunction("Set", new HMTypeSet(new HMTypeVar()), null);
-        ASTFunction setCopyConstructor = new ASTFunction("Set", new HMTypeList(new HMTypeVar()), null);
+        ASTFunction setCopyConstructor = new ASTFunction("Set", new HMTypeSet(new HMTypeVar()), null);
         setCopyConstructor.parameters.add(new Parameter("collection", new HMTypeList(new HMTypeVar())));
 
         libraryFunctions.add(listConstructor);
@@ -67,8 +67,6 @@ public abstract class ASTAbstractFunction extends ASTNode {
         ASTFunction format = new ASTFunction("format", new HMTypeBase(BaseDataType.STR), null);
         libraryFunctions.add(format);
         specialCases.put(format.name, format);
-        specialCases.put(listConstructor.name, listConstructor);
-        specialCases.put(setConstructor.name, setConstructor);
     }
 
     public static class Parameter {
@@ -163,7 +161,7 @@ public abstract class ASTAbstractFunction extends ASTNode {
         StringBuilder sb = new StringBuilder();
 
         sb.append(name);
-        sb.append(getParameterStr());
+        sb.append(parameters.size());
 
         return sb.toString();
     }

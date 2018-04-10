@@ -27,25 +27,27 @@ import com.github.lessjava.types.inference.impl.HMTypeVar;
  * appropriate symbol tables.
  */
 public class BuildSymbolTables extends StaticAnalysis {
+    public static final String SYMBOL_TABLE = "symbolTable";
+
+    public static Map<ASTNode, SymbolTable> nodeSymbolTableMap = new HashMap<>();
+
     /**
      * Stack of symbol tables, representing all active nested scopes.
      */
     protected Deque<SymbolTable> tableStack;
     protected Map<String, ASTVariable> nameVarMap;
 
-    public static Map<ASTNode, SymbolTable> nodeSymbolTableMap = new HashMap<>();
-
     /**
      * Retrieves symbol information for a given symbol name. Searches for symbol
-     * tables up the parent tree if there is no table at the given node. Adds a
-     * static analysis error and returns null if the symbol cannot be found.
+     * tables up the parent tree if there is no table at the given node. Returns
+     * null if the symbol cannot be found.
      *
      */
     public static List<Symbol> searchScopesForSymbol(ASTNode node, String name) {
         List<Symbol> symbols = null;
         try {
-            if (node.attributes.containsKey("symbolTable")) {
-                SymbolTable table = (SymbolTable) node.attributes.get("symbolTable");
+            if (node.attributes.containsKey(SYMBOL_TABLE)) {
+                SymbolTable table = (SymbolTable) node.attributes.get(SYMBOL_TABLE);
                 symbols = table.lookup(name);
             }
 
@@ -53,7 +55,6 @@ public class BuildSymbolTables extends StaticAnalysis {
                 symbols = searchScopesForSymbol(node.getParent(), name);
             }
         } catch (InvalidProgramException ex) {
-            //addError(new InvalidProgramException(ex.getMessage()));
         }
         return symbols;
     }
@@ -139,8 +140,8 @@ public class BuildSymbolTables extends StaticAnalysis {
             // TODO: Removing this fixes collections breaks globals
             List<Symbol> symbols = searchScopesForSymbol(node, node.name);
 
-            //Don't add the symbol if we've already encountered it
-            if(symbols != null && !symbols.isEmpty()) {
+            // Don't add the symbol if we've already encountered it
+            if (symbols != null && !symbols.isEmpty()) {
                 return;
             }
 
@@ -166,7 +167,7 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     @Override
     public void preVisit(ASTProgram node) {
-        node.attributes.put("symbolTable", initializeScope());
+        node.attributes.put(SYMBOL_TABLE, initializeScope());
     }
 
     @Override
@@ -177,7 +178,7 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     @Override
     public void preVisit(ASTClass node) {
-        node.attributes.put("symbolTable", initializeScope());
+        node.attributes.put(SYMBOL_TABLE, initializeScope());
     }
 
     @Override
@@ -188,7 +189,7 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     @Override
     public void preVisit(ASTForLoop node) {
-        node.attributes.put("symbolTable", initializeScope());
+        node.attributes.put(SYMBOL_TABLE, initializeScope());
     }
 
     @Override
@@ -200,7 +201,7 @@ public class BuildSymbolTables extends StaticAnalysis {
     @Override
     public void preVisit(ASTFunction node) {
         insertFunctionSymbol(node);
-        node.attributes.put("symbolTable", initializeScope());
+        node.attributes.put(SYMBOL_TABLE, initializeScope());
     }
 
     @Override
@@ -211,7 +212,7 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     @Override
     public void preVisit(ASTBlock node) {
-        node.attributes.put("symbolTable", initializeScope());
+        node.attributes.put(SYMBOL_TABLE, initializeScope());
     }
 
     @Override
@@ -222,10 +223,6 @@ public class BuildSymbolTables extends StaticAnalysis {
 
     @Override
     public void postVisit(ASTVariable node) {
-        if(node.name.equals("set")) {
-            //System.err.println(getCurrentTable());
-        }
         insertVariableSymbol(node);
     }
-
 }

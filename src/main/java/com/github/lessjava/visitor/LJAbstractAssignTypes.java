@@ -1,8 +1,10 @@
 package com.github.lessjava.visitor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import com.github.lessjava.types.ast.ASTAbstractFunction;
@@ -18,18 +20,22 @@ import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
 
 public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJAssignTypes {
-    protected static Map<String, ASTAbstractFunction> idFunctionMap = new HashMap<>();
+    protected static Map<String, List<ASTAbstractFunction>> idFunctionMap = new HashMap<>();
 
     @Override
     public void preVisit(ASTProgram node) {
         for (ASTAbstractFunction function : node.functions) {
-            idFunctionMap.put(function.getIdentifyingString(), function);
+            idFunctionMap.computeIfAbsent(function.getIdentifyingString(), k -> new ArrayList<>()).add(function);
         }
 
         for (ASTClass astClass: node.classes) {
             for (ASTMethod method: astClass.block.methods) {
-                idFunctionMap.put(method.getIdentifyingString(), method);
+                idFunctionMap.computeIfAbsent(method.getIdentifyingString(), k -> new ArrayList<>()).add(method);
             }
+        }
+
+        for (ASTAbstractFunction function: ASTAbstractFunction.libraryFunctions) {
+            idFunctionMap.computeIfAbsent(function.getIdentifyingString(), k -> new ArrayList<>()).add(function);
         }
     }
 
