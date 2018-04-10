@@ -1,5 +1,6 @@
 main() {
-    list = [1, 3, 2]
+    /*list = [1, 3, 2]*/
+    list = [1, 3, 2, -5, 999, 4, 2, 8]
 
     printf("Before: %s\n", list)
     sort(list, 0, list.size() - 1)
@@ -7,7 +8,7 @@ main() {
 }
 
 partition(list, low, high) {
-    pivot = list.get(list.size()-1)
+    pivot = list.get(high)
     i = low - 1
 
     for (j: low -> high) {
