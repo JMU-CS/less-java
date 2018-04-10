@@ -30,6 +30,10 @@ public class LJList<T> extends ArrayList<T> {
         return this.remove(0);
     }
 
+    public T set(int index, T element) {
+        return super.set(index, element);
+    }
+
     public void insert(int index, T element) {
         this.add(index, element);
     }
