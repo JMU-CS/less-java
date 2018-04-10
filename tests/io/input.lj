@@ -5,17 +5,11 @@ main() {
     print("Double: ")
     println(readDouble())
 
-    // Consume newline
-    readLine()
-
     print("Character: ")
     println(readChar())
 
     print("Word: ")
     println(readWord())
-
-    // Consume newline
-    readLine()
 
     print("Line: ")
     println(readLine())

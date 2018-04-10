@@ -1,0 +1,36 @@
+global list = [1, 3, 2]
+
+main() {
+    printf("Before: %s\n", list)
+    sort(0, list.size() - 1)
+    printf("After: %s\n", list)
+}
+
+partition(low, high) {
+    pivot = list.get(list.size()-1)
+    i = low - 1
+
+    for (j: low -> high) {
+        if (list.get(j) <= pivot) {
+            i = i + 1
+
+            temp = list.get(i)
+            list.set(i, j)
+            list.set(j, temp)
+        }
+    }
+
+    temp = list.get(i + 1)
+    list.set(i + 1, list.get(high))
+    list.set(high, temp)
+
+    return i + 1
+}
+
+sort(low, high) {
+    if (low < high) {
+        pi = partition(low, high)
+        sort(low, pi - 1)
+        sort(pi + 1, high)
+    }
+}

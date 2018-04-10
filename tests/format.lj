@@ -1,5 +1,5 @@
 main() {
-    print(sumToString(1, 2))
+    println(sumToString(1, 2))
 }
 
 sumToString(a, b) {

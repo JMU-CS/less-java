@@ -18,4 +18,5 @@ foo() {
     }
 
     g.add("a")
+    println(g)
 }

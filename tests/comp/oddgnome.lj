@@ -1,5 +1,5 @@
 main() {
-    print(oddGnome([1,2,3,7,4,5]))
+    println(oddGnome([1,2,3,7,4,5]))
 }
 
 oddGnome(gnomes) {

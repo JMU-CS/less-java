@@ -3,9 +3,7 @@ main() {
         println(i)
     }
 
-    abc = ["a", "b", "c"]
-
-    for (i: abc) {
+    for (i: ["a", "b", "c"]) {
         println(i)
     }
 }
