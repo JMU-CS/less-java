@@ -1,12 +1,12 @@
-global list = [1, 3, 2]
-
 main() {
+    list = [1, 3, 2]
+
     printf("Before: %s\n", list)
-    sort(0, list.size() - 1)
+    sort(list, 0, list.size() - 1)
     printf("After: %s\n", list)
 }
 
-partition(low, high) {
+partition(list, low, high) {
     pivot = list.get(list.size()-1)
     i = low - 1
 
@@ -27,10 +27,10 @@ partition(low, high) {
     return i + 1
 }
 
-sort(low, high) {
+sort(list, low, high) {
     if (low < high) {
-        pi = partition(low, high)
-        sort(low, pi - 1)
-        sort(pi + 1, high)
+        pi = partition(list, low, high)
+        sort(list, low, pi - 1)
+        sort(list, pi + 1, high)
     }
 }
