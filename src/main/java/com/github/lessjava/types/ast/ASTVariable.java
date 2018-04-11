@@ -1,6 +1,7 @@
 package com.github.lessjava.types.ast;
 
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
+import com.github.lessjava.types.inference.impl.HMTypeList;
 
 /**
  * Decaf variable declaration. Contains a name, a data type, and an array flag.
@@ -28,6 +29,9 @@ public class ASTVariable extends ASTExpression {
         StringBuilder sb = new StringBuilder();
 
         sb.append(name);
+        if (type instanceof HMTypeList && index != null) {
+            sb.append(String.format(".get(%s)", index.toString()));
+        }
 
         return sb.toString();
     }

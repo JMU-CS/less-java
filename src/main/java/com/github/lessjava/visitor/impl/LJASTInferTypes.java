@@ -297,7 +297,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         if (node.value instanceof ASTVariable) {
             ASTVariable var = (ASTVariable) node.value;
 
-            if (var.index != null) {
+            if (var.type instanceof HMTypeCollection && var.index != null) {
                 node.variable.type = ((HMTypeCollection) var.type).elementType;
             }
         }
