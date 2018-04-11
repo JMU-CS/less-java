@@ -7,11 +7,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTAttribute;
@@ -79,6 +82,8 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     private ASTMethod currentMethod;
 
+    private Map<String, List<ASTAbstractFunction>> emittedIdFunctionMap = new HashMap<>();
+
     @Override
     public void preVisit(ASTProgram node) {
         this.currentFunction = null;
@@ -122,6 +127,25 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
             return;
         }
 
+        // TODO: refactor, this is a hack to prevent duplicate functions/methods
+        List<ASTAbstractFunction> functions = null;
+
+        if (node.getParent() instanceof ASTMethod) {
+            ASTMethod parent = (ASTMethod) node.getParent();
+            functions = emittedIdFunctionMap.get(parent.getIdentifyingString());
+        } else {
+            functions = emittedIdFunctionMap.get(node.getIdentifyingString());
+        }
+
+        if (functions != null && !functions.isEmpty()) {
+            for (ASTAbstractFunction f: functions) {
+                if (f.parameters.equals(node.parameters)) {
+                    return;
+                }
+            }
+        }
+        // TODO: end hack
+
         // Add parameters so they don't get declared
         this.functionVariables.addAll(node.parameters.stream()
                                                      .map(Parameter::getName)
@@ -164,6 +188,33 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
             this.currentFunction = null;
             return;
         }
+
+        // TODO: refactor, this is a hack to prevent duplicate functions/methods
+        List<ASTAbstractFunction> functions = null;
+        ASTMethod parent = null;
+
+        if (node.getParent() instanceof ASTMethod) {
+            parent = (ASTMethod) node.getParent();
+            functions = emittedIdFunctionMap.get(parent.getIdentifyingString());
+        } else {
+            functions = emittedIdFunctionMap.get(node.getIdentifyingString());
+        }
+
+        if (functions != null && !functions.isEmpty()) {
+            for (ASTAbstractFunction f: functions) {
+                if (f.parameters.equals(node.parameters)) {
+                    return;
+                }
+            }
+        }
+
+        if (parent != null) {
+            emittedIdFunctionMap.computeIfAbsent(parent.getIdentifyingString(), k->new ArrayList<>()).add(node);
+        } else {
+            emittedIdFunctionMap.computeIfAbsent(node.getIdentifyingString(), k->new ArrayList<>()).add(node);
+        }
+        // TODO: end hack
+
         try {
             functionLines.addAll(2, functionDeclarationLines);
         } catch(IndexOutOfBoundsException ioobe) {

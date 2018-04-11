@@ -49,6 +49,11 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             return;
         }
 
+        // Already handled as a method
+        if (node.getParent() instanceof ASTMethodCall) {
+            return;
+        }
+
         ASTFunction f = instantiateFunction(prototype, node.arguments);
 
         if (f != null) {
@@ -146,10 +151,10 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             functionInstance.parameters.add(parameter);
         }
 
-        functionInstance.setParent(program);
-        functionInstance.setDepth(2);
-
         ASTMethod methodInstance = new ASTMethod(prototype.scope, functionInstance, prototype.containingClassName);
+
+        functionInstance.setParent(methodInstance);
+        functionInstance.setDepth(2);
 
         for (ASTMethod m : containingClass.block.methods) {
             if (methodInstance.equals(m)) {

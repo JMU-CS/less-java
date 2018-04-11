@@ -132,7 +132,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTClassSignature classSignature = (ASTClassSignature) parserASTMap.get(ctx.classSignature());
         ASTClassBlock classBlock = (ASTClassBlock) parserASTMap.get(ctx.classBlock());
 
-        class_ =  new ASTClass(classSignature, classBlock);
+        class_ = new ASTClass(classSignature, classBlock);
         class_.setDepth(ctx.depth());
 
         parserASTMap.put(ctx, class_);
@@ -763,7 +763,6 @@ public class LJASTConverter extends LJBaseListener {
 
         for (ASTClass c : ASTClass.libraryClasses) {
             for (ASTMethod m : c.block.methods) {
-                // m.setDepth(3);
                 m.setParent(c.block);
             }
         }

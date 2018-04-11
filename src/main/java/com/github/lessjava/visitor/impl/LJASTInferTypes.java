@@ -187,11 +187,9 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         if (ASTClass.nameClassMap.containsKey(node.name)
                 && !ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
             node.type = new HMTypeClass(node.name);
-        }
-        else if (ASTFunction.specialCases.containsKey(node.name)) {
+        } else if (ASTFunction.specialCases.containsKey(node.name)) {
             node.type = unify(node.type, ASTFunction.specialCases.get(node.name).returnType);
-        }
-        else if (idFunctionMap.containsKey(node.getIdentifyingString())) {
+        } else if (idFunctionMap.containsKey(node.getIdentifyingString())) {
             List<ASTAbstractFunction> functions = idFunctionMap.get(node.getIdentifyingString());
 
             for (ASTAbstractFunction function: functions) {
@@ -342,15 +340,23 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             }
         }
 
-        if (idFunctionMap.containsKey(node.getIdentifyingString())) {
-            List<ASTAbstractFunction> functions = idFunctionMap.get(node.getIdentifyingString());
+        if (node.invoker.type instanceof HMTypeClass) {
+            HMTypeClass type = (HMTypeClass) node.invoker.type;
+            HMType returnType = ASTClass.nameClassMap.get(type.name).getMethod(node.funcCall.name).returnType;
 
-            for (ASTAbstractFunction function: functions) {
-                if (function.parameters.size() == node.funcCall.arguments.size()) {
-                    node.type = unify(node.type, function.returnType);
-                }
-            }
+            node.type = unify(node.type, returnType);
         }
+
+        // TODO: Determine if unnecessary
+        //if (idFunctionMap.containsKey(node.getIdentifyingString())) {
+            //List<ASTAbstractFunction> functions = idFunctionMap.get(node.getIdentifyingString());
+
+            //for (ASTAbstractFunction function: functions) {
+                //if (function.parameters.size() == node.funcCall.arguments.size()) {
+                    //node.type = unify(node.type, function.returnType);
+                //}
+            //}
+        //}
 
         node.type = unify(node.type, node.funcCall.type);
     }
