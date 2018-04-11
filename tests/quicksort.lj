@@ -1,37 +1,36 @@
 main() {
-    /*list = [1, 3, 2]*/
     list = [1, 3, 2, -5, 999, 4, 2, 8]
 
-    printf("Before: %s\n", list)
+    printf("Before: %s\n", list)    // [1, 3, 2, -5, 999, 4, 2, 8]
     sort(list, 0, list.size() - 1)
-    printf("After: %s\n", list)
+    printf("After: %s\n", list)     // [-5, 1, 2, 2, 3, 4, 8, 999]
 }
 
-partition(list, low, high) {
-    pivot = list.get(high)
-    i = low - 1
+partition(A, lo, hi) {
+    pivot = A.get(hi)
+    i = lo - 1
 
-    for (j: low -> high) {
-        if (list.get(j) <= pivot) {
+    for (j: lo -> hi) {
+        if (A.get(j) < pivot) {
             i = i + 1
 
-            temp = list.get(i)
-            list.set(i, j)
-            list.set(j, temp)
+            temp = A.get(i)
+            A.set(i, A.get(j))
+            A.set(j, temp)
         }
     }
 
-    temp = list.get(i + 1)
-    list.set(i + 1, list.get(high))
-    list.set(high, temp)
+    temp = A.get(i + 1)
+    A.set(i + 1, A.get(hi))
+    A.set(hi, temp)
 
     return i + 1
 }
 
-sort(list, low, high) {
-    if (low < high) {
-        pi = partition(list, low, high)
-        sort(list, low, pi - 1)
-        sort(list, pi + 1, high)
+sort(A, lo, hi) {
+    if (lo < hi) {
+        p = partition(A, lo, hi)
+        sort(A, lo, p - 1)
+        sort(A, p + 1, hi)
     }
 }
