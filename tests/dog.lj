@@ -1,35 +1,36 @@
-main () {
-    d = Dog("Dog", 10)
-    println(d.bark())
-    println(d.run())
-
-    dd = BullDog("Duke Dog", 20)
-    println(dd.bark())
-    println(dd.run())
-}
-
 Dog
 {
-    public name = ""
-    private age = 0
+    private name = ""
+    private bark = ""
 
-    Dog (name, age) {
+    Dog (name, bark) {
         this.name = name
-        this.age = age
+        this.bark = bark
     }
 
     public bark () {
-        return format("%s says BARK!", this.name)
+        return format("%s says %s", this.name, this.bark)
     }
 
     public run () {
-        return format("%s runs!", this.name)
+        return format("See %s run!", this.name)
     }
 }
 
-BullDog extends Dog
+DukeDog extends Dog
 {
-    public bark () {
-        return format("%s says BARK BARK!", this.name)
+    DukeDog() {
+        super("Duke Dog", "GO DUKES!")
     }
 }
+
+dog() {
+    return Dog("Spot", "Bark!")
+}
+
+dukeDog() {
+    return DukeDog()
+}
+
+test dog().bark() == "Spot says Bark!"
+test dukeDog().bark() == "Duke Dog says GO DUKES!"

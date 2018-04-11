@@ -1,9 +1,21 @@
-main() {
+index() {
+    list = []
     for (i: 1->10){
-        println(i)
+        list.add(i)
     }
 
-    for (i: ["a", "b", "c"]) {
-        println(i)
-    }
+    return list
 }
+
+iterator() {
+    list = []
+
+    for (i: ["a", "b", "c"]) {
+        list.add(i)
+    }
+
+    return list
+}
+
+test index()    == [1,2,3,4,5,6,7,8,9]
+test iterator() == ["a", "b", "c"]

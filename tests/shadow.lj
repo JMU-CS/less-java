@@ -1,7 +1,5 @@
-main() {
-    print("hi")
-}
-
 print(a) {
     return a
 } 
+
+test print("hi") == "hi" // the native print function is being shadowed

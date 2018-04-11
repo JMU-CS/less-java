@@ -1,17 +1,3 @@
-main() {
-    car = Car("Toyota", "Camry")
-    car.accelerate(100)
-    println(car.getSpeed())
-    car.brake()
-    println(car.getSpeed())
-
-    sportsCar = SportsCar("Lamborghini", "Aventador")
-    sportsCar.accelerate(100)
-    println(sportsCar.getSpeed())
-    sportsCar.brake()
-    println(sportsCar.getSpeed())
-}
-
 Car {
     private make = ""
     private model = ""
@@ -41,3 +27,18 @@ SportsCar extends Car {
         super.speed = super.speed + amount * 10
     }
 }
+
+carSpeed() {
+    car = Car("Toyota", "Camry")
+    car.accelerate(100)
+    return car.getSpeed()
+}
+
+sportsCarSpeed() {
+    sportsCar = SportsCar("Lamborghini", "Aventador")
+    sportsCar.accelerate(100)
+    return sportsCar.getSpeed()
+}
+
+test carSpeed() == 100
+test sportsCarSpeed() == 1000
