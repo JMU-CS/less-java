@@ -1,19 +1,19 @@
 partition(A, lo, hi) {
-    pivot = A.get(hi)
+    pivot = A[hi]
     i = lo - 1
 
     for (j: lo -> hi) {
-        if (A.get(j) < pivot) {
+        if (A[j] < pivot) {
             i = i + 1
 
-            temp = A.get(i)
-            A.set(i, A.get(j))
+            temp = A[i]
+            A.set(i, A[j])
             A.set(j, temp)
         }
     }
 
-    temp = A.get(i + 1)
-    A.set(i + 1, A.get(hi))
+    temp = A[i + 1]
+    A.set(i + 1, A[hi])
     A.set(hi, temp)
 
     return i + 1
