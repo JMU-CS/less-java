@@ -22,9 +22,14 @@ public class LJASTInferConstructors extends LJDefaultASTVisitor {
 
         if (!node.hasExplicitConstructor()) {
             ASTMethod constructor = generateConstructor(node);
+            ASTMethod emptyConstructor = generateEmptyConstructor(node);
 
             node.block.methods.add(constructor);
+            node.block.methods.add(emptyConstructor);
             node.block.constructor = constructor;
+        } else {
+            ASTMethod emptyConstructor = generateEmptyConstructor(node);
+            node.block.methods.add(emptyConstructor);
         }
     }
 
@@ -48,6 +53,27 @@ public class LJASTInferConstructors extends LJDefaultASTVisitor {
             f.body = new ASTBlock();
 
             superConstructor.setParent(f);
+            f.body.statements.add(new ASTVoidFunctionCall(superConstructor));
+        }
+
+        f.setParent(constructor);
+        constructor.setParent(node.block);
+        constructor.isConstructor = true;
+
+        return constructor;
+    }
+
+    private ASTMethod generateEmptyConstructor(ASTClass node) {
+        String name = node.signature.className;
+        HMTypeClass type = new HMTypeClass(name);
+        ASTFunction f = new ASTFunction(name, type, new ASTBlock());
+        ASTMethod constructor = new ASTMethod(ASTClass.PUBLIC, f, name);
+
+        if (node.parent != null) {
+            ASTFunctionCall superConstructor = new ASTFunctionCall("super");
+            superConstructor.setParent(f);
+
+            f.body = new ASTBlock();
             f.body.statements.add(new ASTVoidFunctionCall(superConstructor));
         }
 

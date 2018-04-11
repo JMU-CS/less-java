@@ -11,16 +11,12 @@ Dog
     public bark () {
         return format("%s says %s", this.name, this.bark)
     }
-
-    public run () {
-        return format("See %s run!", this.name)
-    }
 }
 
 DukeDog extends Dog
 {
-    DukeDog() {
-        super("Duke Dog", "GO DUKES!")
+    public bark() {
+        return "GO DUKES!"
     }
 }
 
@@ -33,4 +29,4 @@ dukeDog() {
 }
 
 test dog().bark() == "Spot says Bark!"
-test dukeDog().bark() == "Duke Dog says GO DUKES!"
+test dukeDog().bark() == "GO DUKES!"
