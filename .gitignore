@@ -2,3 +2,6 @@ decaf-compiler-reference/
 compiler.out
 generated/
 in
+
+build/
+.gradle
