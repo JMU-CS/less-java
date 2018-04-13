@@ -39,6 +39,11 @@ jar {
     }
 }
 
+generateGrammarSource {
+    arguments += ['-package', 'com.github.lessjava.generated']
+    outputDirectory = file('build/generated-src/antlr/main/com/github/lessjava/generated')
+}
+
 task fatJar(type:Jar) {
     manifest {
         attributes 'Main-Class': 'com.github.lessjava.LJCompiler'
@@ -48,8 +53,14 @@ task fatJar(type:Jar) {
     with jar
 }
 
-generateGrammarSource {
-    arguments += ['-package', 'com.github.lessjava.generated']
-    outputDirectory = file('build/generated-src/antlr/main/com/github/lessjava/generated')
+task copyWrappers {
+    dependsOn ':ljwrappers:classes'
+    doLast {
+        copy {
+            from files(project(':ljwrappers').sourceSets.main.runtimeClasspath)
+            into 'generated/'
+        }
+    }
 }
 
+run.dependsOn(copyWrappers)
