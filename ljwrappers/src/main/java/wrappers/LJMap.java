@@ -1,4 +1,4 @@
-package test.wrappers;
+package wrappers;
 
 import java.util.HashMap;
 import java.util.Map;
