@@ -1,4 +1,4 @@
-package wrappers;
+package test.wrappers;
 
 import java.util.ArrayList;
 import java.util.Collection;

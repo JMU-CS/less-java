@@ -1,4 +1,4 @@
-package wrappers;
+package test.wrappers;
 
 public class LJString {
     public static String format(String format, Object... args) {
