@@ -1,0 +1,29 @@
+global UNDECLARED = "Undeclared"
+global COMPUTER_SCIENCE = "Computer Science"
+global WHATEVER = "Whatever"
+
+main() {
+    myName = "Kyle"
+    myAge = 21
+    myMajor = COMPUTER_SCIENCE
+
+    kyle = Person(myName, myAge, myMajor)
+
+    println(kyle)
+}
+
+Person {
+    private name = ""
+    private age = -1
+    private major = UNDECLARED
+
+    Person(name, age, major) {
+        this.name = name
+        this.age = age
+        this.major = major
+    }
+
+    public toString() {
+        return format("%s is a %d-year-old %s major", name, age, major)
+    }
+}
