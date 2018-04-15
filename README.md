@@ -2,16 +2,14 @@
 Get gradle aliases from my .dotfiles repo: [Gradle Aliases](https://github.com/Zamua/.dotfiles/blob/master/gradle-aliases.sh)
 
 ###### *Note: Scripts reference `gradle` and thus won't work if you don't have gradle installed
-1. How to build:
+1. How to build the compiler:
     * If you have Gradle installed:
         `gradle build`
     * If not:
         * Unix:    `./gradlew build`
         * Windows: `gradlew build`
-    * After building: `./compile-wrappers.sh`
-        * This must be done once
 
-2. How to compile:
+2. How to compile Less-Java source:
     * With    gradle aliases: gr <file-name>
     * Without gradle aliases: gradle run -Ptestfile=<file-name>
 

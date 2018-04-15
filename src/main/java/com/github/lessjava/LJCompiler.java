@@ -137,7 +137,7 @@ public class LJCompiler {
         private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
         private static final StandardJavaFileManager FM = COMPILER.getStandardFileManager(null, null, null);
         private static final List<String> OPTIONS = new ArrayList<>(
-                Arrays.asList("-classpath", System.getProperty("java.class.path")));
+                Arrays.asList("-classpath", System.getProperty("java.class.path") + ":generated"));
         private static final Iterable<? extends JavaFileObject> SOURCE = FM
                 .getJavaFileObjectsFromFiles(JCompiler.getJavaFileObjects());
 

@@ -6,9 +6,9 @@ plugins {
 }
 
 // Configure subprojects
-// subprojects {
-    // apply plugin: 'java'
-// }
+subprojects {
+    apply plugin: 'java'
+}
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -49,6 +49,9 @@ clean.doLast {
 }
 
 task fatJar(type:Jar) {
+    group 'LessJava'
+    description 'Assemble Fat JAR'
+
     manifest {
         attributes 'Main-Class': 'com.github.lessjava.LJCompiler'
     }
@@ -57,18 +60,12 @@ task fatJar(type:Jar) {
     with jar
 }
 
-task copyWrappers (type:Copy) {
-    from 'ljwrappers/'
-    into 'generated/wrappers'
+task copyWrappers (type:Copy, dependsOn:':ljwrappers:classes') {
+    group 'LessJava'
+    description 'Copy compiled source from wrappers subproject'
 
-    // dependsOn ':ljwrappers:classes'
-    // doLast {
-        // copy {
-            // from files(project(':ljwrappers').sourceSets.main.runtimeClasspath)
-            // from files(project(':ljwrappers').sourceSets.main.allJava)
-            // into 'generated'
-            // }
-    // }
+    from files(project('ljwrappers').sourceSets.main.runtimeClasspath)
+    into 'generated/'
 }
 
 run.dependsOn(copyWrappers)
