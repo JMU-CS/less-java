@@ -5,3 +5,8 @@ in
 
 build/
 .gradle/
+
+.classpath
+.project
+.settings/
+
