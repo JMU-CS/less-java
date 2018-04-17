@@ -1,0 +1,8 @@
+getb() {
+    a = []
+    a.add("a")
+    b = a.remove(0)
+    return b
+}
+
+test getb() == "a"
