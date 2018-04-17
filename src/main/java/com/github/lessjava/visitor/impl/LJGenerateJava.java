@@ -436,7 +436,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         if (node.expr instanceof ASTBinaryExpr) {
             ASTBinaryExpr expr = (ASTBinaryExpr) node.expr;
 
-            if (expr.leftChild.type.equals(HMTypeBase.INT) || expr.leftChild.type.equals(HMTypeBase.REAL)) {
+            if (expr.operator == ASTBinaryExpr.BinOp.EQ) {
                 line = String.format("%4sassertEquals(%s, %s);", "", expr.rightChild, expr.leftChild);
             } else {
                 line = String.format("%4sassertTrue(%s);", "", node.expr);
