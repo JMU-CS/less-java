@@ -10,13 +10,12 @@ Get gradle aliases from my .dotfiles repo: [Gradle Aliases](https://github.com/Z
         * Windows: `gradlew build`
 
 2. How to compile Less-Java source:
-    * With    gradle aliases: gr <file-name>
-    * Without gradle aliases: gradle run -Ptestfile=<file-name>
+    * `./compile.sh <file-name>`
 
 3. How to run the most recently compiled file:
-    * ./run.sh
+    * `./run.sh`
 
 4. How to run the tests in the most recently compiled file:
-    * ./test.sh
+    * `./test.sh`
 
 5. If you would like to use Eclipse, then run `gradle eclipse` to generate project files.
