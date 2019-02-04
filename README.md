@@ -18,4 +18,10 @@ Get gradle aliases from my .dotfiles repo: [Gradle Aliases](https://github.com/Z
 4. How to run the tests in the most recently compiled file:
     * `./test.sh`
 
-5. If you would like to use Eclipse, then run `gradle eclipse` to generate project files.
+5. How to run all sample files against previously-known output:
+    * `./dotests.sh -r tests`
+
+6. How to set expected output for a sample file:
+    * `./dotests.sh -s <file-name>`
+
+7. If you would like to use Eclipse, then run `gradle eclipse` to generate project files.

@@ -10,3 +10,5 @@ build/
 .project
 .settings/
 
+tests/**/outputs/*.diff
+tests/**/outputs/*.out

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-gradle run -Ptestfile=${1}
+gradle -q run -Ptestfile=${1}
 
