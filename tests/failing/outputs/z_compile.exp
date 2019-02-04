@@ -1,0 +1,6 @@
+generated/Main.java:22: error: cannot find symbol
+            c = (c+b(i));
+                   ^
+  symbol:   method b(Integer)
+  location: class Main
+1 error
