@@ -25,3 +25,7 @@ Get gradle aliases from my .dotfiles repo: [Gradle Aliases](https://github.com/Z
     * `./dotests.sh -s <file-name>`
 
 7. If you would like to use Eclipse, then run `gradle eclipse` to generate project files.
+
+If you use this project in an academic project, please cite the following paper:
+
+Paper: Zamua O. Nasrawt and Michael O. Lam. 2019. Less-Java, more learning: language design for introductory programming. J. Comput. Sci. Coll. 34, 3 (January 2019), 64-72. [ACM DL](https://dl.acm.org/citation.cfm?id=3306476)
