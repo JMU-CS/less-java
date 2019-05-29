@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-gradle -q run -Ptestfile=${1}
+GRADLE_WRAPPER="./gradlew"
+
+"$GRADLE_WRAPPER" -q run -Ptestfile=${1}
 

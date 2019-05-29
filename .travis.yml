@@ -3,7 +3,7 @@ cache:
   directories:
   - $HOME/.m2
 install:
-  - gradle build
+  - ./gradlew build
 script:
   - ./compile.sh tests/bracket-access.lj && ./test.sh
   - ./compile.sh tests/comp/3np1for.lj && ./test.sh
