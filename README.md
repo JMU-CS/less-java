@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/JMU-CS/less-java.svg?branch=master)](https://travis-ci.org/JMU-CS/less-java)
+
 # A language to introduce students to programming
 Get gradle aliases from my .dotfiles repo: [Gradle Aliases](https://github.com/Zamua/.dotfiles/blob/master/gradle-aliases.sh)
 
