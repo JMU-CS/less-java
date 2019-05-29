@@ -56,11 +56,11 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
     public static Path mainFile = Paths.get("generated/Main.java");
 
-    private static String[] imports = {"import static org.junit.Assert.*;",
+    private static String[] imports = {"import static org.junit.jupiter.api.Assertions.*;",
                                        "import static wrappers.LJString.*;",
                                        "import static wrappers.LJIO.*;",
                                        "",
-                                       "import org.junit.Test;",
+                                       "import org.junit.jupiter.api.Test;",
                                        "import java.util.*;",
                                        "import java.io.*;",
                                        "",
