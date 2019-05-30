@@ -1,5 +1,13 @@
-JUnit version 4.12
-.
+[36m╷[0m
+[36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
+[36m│  └─[0m [36mMain[0m [32m✔[0m
+[36m│     └─[0m [34mtest0()[0m [32m✔[0m
 
-OK (1 test)
+Test run finished after 96 ms
+[         1 tests found           ]
+[         0 tests skipped         ]
+[         1 tests started         ]
+[         0 tests aborted         ]
+[         1 tests successful      ]
+[         0 tests failed          ]
 

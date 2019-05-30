@@ -64,18 +64,6 @@ instructions above. Then simply run:
 ./test.sh
 ```
 
-You will need to make sure that the file has a line outside of any functions
-that begins with the `test` keyword. If such a line does not exist, then you will
-receive output that looks like the following:
-
-```
-JUnit version 4.12
-.E
-Time: 0.005
-There was 1 failure:
-1) initializationError(Main)
-
-```
 ## Running All Tests
 
 It is possible to run all the tests in the `tests/` directory and to set the

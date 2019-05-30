@@ -1,28 +1,11 @@
-JUnit version 4.12
-.E
-There was 1 failure:
-1) initializationError(Main)
-java.lang.Exception: No runnable methods
-	at org.junit.runners.BlockJUnit4ClassRunner.validateInstanceMethods(BlockJUnit4ClassRunner.java:191)
-	at org.junit.runners.BlockJUnit4ClassRunner.collectInitializationErrors(BlockJUnit4ClassRunner.java:128)
-	at org.junit.runners.ParentRunner.validate(ParentRunner.java:416)
-	at org.junit.runners.ParentRunner.<init>(ParentRunner.java:84)
-	at org.junit.runners.BlockJUnit4ClassRunner.<init>(BlockJUnit4ClassRunner.java:65)
-	at org.junit.internal.builders.JUnit4Builder.runnerForClass(JUnit4Builder.java:10)
-	at org.junit.runners.model.RunnerBuilder.safeRunnerForClass(RunnerBuilder.java:59)
-	at org.junit.internal.builders.AllDefaultPossibilitiesBuilder.runnerForClass(AllDefaultPossibilitiesBuilder.java:26)
-	at org.junit.runner.Computer.getRunner(Computer.java:40)
-	at org.junit.runner.Computer$1.runnerForClass(Computer.java:31)
-	at org.junit.runners.model.RunnerBuilder.safeRunnerForClass(RunnerBuilder.java:59)
-	at org.junit.runners.model.RunnerBuilder.runners(RunnerBuilder.java:101)
-	at org.junit.runners.model.RunnerBuilder.runners(RunnerBuilder.java:87)
-	at org.junit.runners.Suite.<init>(Suite.java:81)
-	at org.junit.runner.Computer.getSuite(Computer.java:28)
-	at org.junit.runner.Request.classes(Request.java:75)
-	at org.junit.runner.JUnitCommandLineParseResult.createRequest(JUnitCommandLineParseResult.java:118)
-	at org.junit.runner.JUnitCore.runMain(JUnitCore.java:77)
-	at org.junit.runner.JUnitCore.main(JUnitCore.java:36)
+[36m╷[0m
+[36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
 
-FAILURES!!!
-Tests run: 1,  Failures: 1
+Test run finished after 60 ms
+[         0 tests found           ]
+[         0 tests skipped         ]
+[         0 tests started         ]
+[         0 tests aborted         ]
+[         0 tests successful      ]
+[         0 tests failed          ]
 
