@@ -7,4 +7,4 @@
 # The grep -v filter removes lines that are unnecessary or potentially
 #    confusing to an end user.
 java -jar libs/junit-platform-console-standalone-1.4.2.jar --class-path ".:generated" --include-classname='.*' --disable-banner --scan-class-path \
-    | grep -v -e '\[.*containers.*\]' -e 'JUnit Vintage'
+    | grep -v -e '\[.*containers.*\]' -e 'JUnit Vintage' -e 'Test run finished after'
