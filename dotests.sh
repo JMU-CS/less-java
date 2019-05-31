@@ -29,10 +29,16 @@ test() {
         ./compile.sh $file 2>&1 | grep -wvi time > $base\_compile.out
         echo "Done compiling"
         echo
-        echo "Running $file"
-        ./run.sh 2>&1 | tee $base\_run.out
-        echo "Done running"
-        echo
+        if [ -n "$(grep "main(" $file)" ]; then
+            echo "Running $file"
+            if [ -e "$parent/$name.in" ]; then
+                ./run.sh < "$parent/$name.in" 2>&1 | tee $base\_run.out
+            else
+                ./run.sh 2>&1 | tee $base\_run.out
+            fi
+            echo "Done running"
+            echo
+        fi
         echo "Running tests for $file"
         ./test.sh 2>&1 | grep -wvi time > $base\_test.out
         echo "Done testing"
@@ -45,7 +51,7 @@ test() {
             touch $base\_compile.exp
             touch $base\_run.exp
             touch $base\_test.exp
-            diff -u $base\_compile.out $base\_compile.exp > $base\_compile.diff
+            diff -uB $base\_compile.out $base\_compile.exp > $base\_compile.diff
             if [ -s $base\_compile.diff ]; then
                 ((changes_found += 1))
                 echo "Changes detected in compile output; use -s option to set expected output"
@@ -53,15 +59,17 @@ test() {
                 cat $base\_compile.diff
                 echo
             fi
-            diff -u $base\_run.out $base\_run.exp > $base\_run.diff
-            if [ -s $base\_run.diff ]; then
-                ((changes_found += 1))
-                echo "Changes detected in run output; use -s option to set expected output"
-                echo
-                cat $base\_run.diff
-                echo
+            if [ -s "$(grep "main(" $file)" ]; then
+                diff -uB $base\_run.out $base\_run.exp > $base\_run.diff
+                if [ -s $base\_run.diff ]; then
+                    ((changes_found += 1))
+                    echo "Changes detected in run output; use -s option to set expected output"
+                    echo
+                    cat $base\_run.diff
+                    echo
+                fi
             fi
-            diff -u $base\_test.out $base\_test.exp > $base\_test.diff
+            diff -uB $base\_test.out $base\_test.exp > $base\_test.diff
             if [ -s $base\_test.diff ]; then
                 ((changes_found += 1))
                 echo "Changes detected in test output; use -s option to set expected output"

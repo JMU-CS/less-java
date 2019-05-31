@@ -1,5 +1,5 @@
-Integer: 0
-Double: 0.0
-Character: 0
-Word: 0
-Line: 0
+Integer: 5
+Double: 3.14
+Character: x
+Word: hello
+Line: This is a line-based test.
