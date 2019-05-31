@@ -20,7 +20,6 @@ Failures (1):
        java.base/java.lang.reflect.Method.invoke(Method.java:566)
        [...]
 
-Test run finished after 85 ms
 [         2 tests found           ]
 [         0 tests skipped         ]
 [         2 tests started         ]
