@@ -1,9 +1,12 @@
-print(1)
-print("a")
-print(true)
-println()
+main() {
+    print(1)
+    print("a")
+    print(true)
+    println("")
 
-println(1)
-println(true)
+    println(1)
+    println(true)
 
-printf("a%s", "hi")
+    printf("a%s", "hi")
+    println("")
+}

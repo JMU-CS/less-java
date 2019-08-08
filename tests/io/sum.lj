@@ -1,9 +1,12 @@
-x = readInt()
-sum = 0
-while (x >= 0) {
-    sum = sum + x
-    print(sum)
+main() {
+    println("Enter positive integers to sum, one per line (-1 to exit):")
     x = readInt()
+    sum = 0
+    while (x >= 0) {
+        sum = sum + x
+        println(sum)
+        x = readInt()
+    }
+    print("Sum: ")
+    println(sum)
 }
-print("Sum: ")
-print(sum)

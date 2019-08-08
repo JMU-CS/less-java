@@ -1,3 +1,5 @@
-if (readWord() == "hello") {
-    print("how are you?\n")
+main() {
+    if (readWord() == "hello") {
+        print("how are you?\n")
+    }
 }
