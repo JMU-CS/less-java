@@ -35,6 +35,10 @@ run {
     args = (project.hasProperty('testfile')) ? [testfile] : [defaultTestfile]
 }
 
+test {
+    useJUnitPlatform()
+}
+
 jar {
     manifest {
         attributes 'Main-Class': 'com.github.lessjava.LJCompiler'
