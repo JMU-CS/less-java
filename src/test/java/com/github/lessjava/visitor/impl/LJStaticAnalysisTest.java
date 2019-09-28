@@ -1,0 +1,318 @@
+package com.github.lessjava.visitor.impl;
+
+import com.github.lessjava.generated.LJLexer;
+import com.github.lessjava.generated.LJParser;
+import com.github.lessjava.types.ast.ASTProgram;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class LJStaticAnalysisTest {
+    private static final String CLASS_A =
+            "A {\n" +
+                    "public intMember = 0\n" +
+                    "private privateMember = 1.0\n" +
+                    "A(num) {\n" +
+                        "this.intMember = num\n" +
+                    "}\n" +
+                    "getNumber() {\n" +
+                        "return this.intMember\n" +
+                    "}" +
+            "}\n";
+
+    private static final String CLASS_B =
+            "B extends A {\n" +
+                    "public strMember = \"\"\n" +
+                    "B(num, word) {\n" +
+                        "super(num)\n" +
+                        "this.strMember = word\n" +
+                    "}" +
+            "}\n";
+
+    private LJStaticAnalysis underTest;
+
+    @BeforeEach
+    public void init() {
+        this.underTest = new LJStaticAnalysis();
+        StaticAnalysis.resetErrors();
+    }
+
+    private ASTProgram compile(String programText) {
+        LJLexer lexer = new LJLexer(new ANTLRInputStream(programText));
+        ParseTreeWalker walker = new ParseTreeWalker();
+
+        LJParser parser = new LJParser(new CommonTokenStream(lexer));
+        LJASTConverter converter = new LJASTConverter();
+
+        BuildParentLinks buildParentLinks = new BuildParentLinks();
+        LJASTBuildClassLinks buildClassLinks = new LJASTBuildClassLinks();
+        LJStaticAnalysis staticAnalysis = new LJStaticAnalysis();
+        BuildSymbolTables buildSymbolTables = new BuildSymbolTables();
+        LJASTInferTypes inferTypes = new LJASTInferTypes();
+        // PrintDebugTree printTree = new PrintDebugTree();
+        LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
+        LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
+        LJASTInferConstructors inferConstructors = new LJASTInferConstructors();
+
+        // ANTLR Parsing
+        ParseTree parseTree = parser.program();
+
+        // Convert to AST
+        walker.walk(converter, parseTree);
+        ASTProgram program = converter.getAST();
+
+        // Apply visitors to AST
+        program.traverse(buildParentLinks);
+        program.traverse(buildClassLinks);
+        program.traverse(inferConstructors);
+        program.traverse(staticAnalysis);
+
+        do {
+            program.traverse(buildSymbolTables);
+            program.traverse(instantiateFunctions);
+            program.traverse(inferTypes);
+            program.traverse(checkTypesHaveChanged);
+        } while (LJASTCheckTypesHaveChanged.typesChanged);
+
+        LJAssignTestVariables assignTestVariables = new LJAssignTestVariables();
+
+        program.traverse(assignTestVariables);
+        return program;
+    }
+
+    private void assertInvalid(String programText) {
+        ASTProgram program = compile(programText);
+        program.traverse(underTest);
+        assertFalse(StaticAnalysis.getErrors().isEmpty());
+    }
+
+    private void assertValid(String programText) {
+        ASTProgram program = compile(programText);
+        program.traverse(underTest);
+        assertTrue(StaticAnalysis.getErrors().isEmpty());
+    }
+
+    @Test
+    public void testIfInt_invalid() {
+        assertInvalid("main() { if(0) {} }");
+    }
+
+    @Test
+    public void testIfBool_valid() {
+        assertValid("main() { if(true) {} }");
+    }
+
+    @Test
+    public void testAddIntStr_invalid() {
+        assertInvalid("main() { a = 5 + \"test\" }");
+    }
+
+    @Test
+    public void testAssignIntVarStrVal_invalid() {
+        String program =
+                "main() {\n" +
+                        "a = 0\n" +
+                        "a = \"test\"\n" +
+                        "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testWhileInt_invalid() {
+        assertInvalid("main() { while(5) {} }");
+    }
+
+    @Test
+    public void testWhileBool_valid() {
+        assertValid("main() { while(true) {} }");
+    }
+
+    @Test
+    public void testIncrementIntByStr_invalid() {
+        String program =
+                "main() {\n" +
+                        "a = 0\n" +
+                        "a += \"hi\"\n" +
+                        "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testBreakNotInWhile_invalid() {
+        assertInvalid("main() { break }");
+    }
+
+    @Test
+    public void testContinueNotInWhile_invalid() {
+        assertInvalid("main() { continue }");
+    }
+
+    @Test
+    public void testBreakInWhile_valid() {
+        assertValid("main() { while(true) { break } }");
+    }
+
+    @Test
+    public void testContinueInWhile_valid() {
+        assertValid("main() { while(true) { continue } }");
+    }
+
+    @Test
+    public void testIntMemberAccess_valid() {
+        String program = CLASS_A +
+                "main() {\n" +
+                    "a = A()\n" +
+                    "b = a.intMember\n" +
+                "}";
+        assertValid(program);
+    }
+
+    @Test
+    public void testIntMemberAssignStr_invalid() {
+        String program = CLASS_A +
+                "main() {\n" +
+                    "a = A()\n" +
+                    "a.intMember = \"hi\"\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testAssignSuper_invalid() {
+        assertInvalid("main() { super = 0 }");
+    }
+
+    @Test
+    public void testAssignThis_invalid() {
+        assertInvalid("main() { this = 0 }");
+    }
+
+    @Test
+    public void testBExtendsAButANotDeclared_invalid() {
+        assertInvalid(CLASS_B + "main() { b = B(1, \"hi\") }");
+    }
+
+    @Test
+    public void testNoApplicableConstructor_invalid() {
+        assertInvalid(CLASS_A + "main() { a = A() }");
+    }
+
+    @Test
+    public void testFunctionCall_valid() {
+        assertValid("fun(a) { return a }\n" +
+                "main() { b = fun(5) }");
+    }
+
+    @Test
+    public void testAccessSuperclassMembers_valid() {
+        String program = CLASS_A + CLASS_B +
+                "main() {\n" +
+                    "b = B(5, \"hi\")\n" +
+                    "num = b.intMember\n" +
+                "}";
+        assertValid(program);
+    }
+
+    @Test
+    public void testForInt_valid() {
+        assertValid("main() { for(a: 0 -> 10) {} }");
+    }
+
+    @Test
+    public void testForDouble_invalid() {
+        assertInvalid("main() { for(a: 0.3 -> 5.7) {} }");
+    }
+
+    @Test
+    public void testFunctionWithMultipleParamBindings_valid() {
+        String program =
+                "func(a, b) {\n" +
+                        "return a\n" +
+                "}\n" +
+                "main() {\n" +
+                        "func(5, 5)\n" +
+                        "func(\"hi\", 5)\n" +
+                "}";
+        assertValid(program);
+    }
+
+    @Test
+    public void testFunctionReturnDifferentTypesWithDifferentParameterBindings_invalid() {
+        String program =
+                "func(a) { return a }\n" +
+                "main() {\n" +
+                        "x = func(5)\n" +
+                        "y = func(\"hi\")\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testFunctionReturnMultipleTypes_invalid() {
+        String program =
+                "func a() {\n" +
+                        "if(true) {\n" +
+                            "return 0\n" +
+                        "} else {\n" +
+                            "return false\n" +
+                        "}\n" +
+                "}\n" +
+                "main() {\n" +
+                        "x = a()\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testConstructorWithWrongTypes_invalid() {
+        String program = CLASS_A +
+                "main() {\n" +
+                    "a = A(\"hi\")\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testSuperConstructorWithWrongTypes_invalid() {
+        String program = CLASS_A + CLASS_B +
+                "main() {\n" +
+                    "b = B(\"hi\", \"hi\")\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testOverrideWithDifferentReturnType_invalid() {
+        String program = CLASS_A +
+                "C {\n" +
+                    "C() {\n" +
+                        "super(0)\n" +
+                    "}\n" +
+                    "getNumber() {\n" +
+                        "return \"zero\"\n" +
+                    "}\n" +
+                "}\n" +
+                "main() {\n" +
+                    "c = C()\n" +
+                    "num = c.getNumber()\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testAccessPrivateMembers_invalid() {
+        String program = CLASS_A +
+                "main() {\n" +
+                    "a = A(0)\n" +
+                    "p = a.privateMember\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+}
