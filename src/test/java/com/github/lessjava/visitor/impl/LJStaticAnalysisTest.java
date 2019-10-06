@@ -315,4 +315,137 @@ class LJStaticAnalysisTest {
         assertInvalid(program);
     }
 
+    @Test
+    public void testAccessSuperclassPrivateMembers_invalid() {
+        String program = CLASS_A + CLASS_B +
+                "main() {\n" +
+                    "b = B()\n" +
+                    "p = b.privateMember\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testClassNamedObject_invalid() {
+        String program =
+                "Object {}\n" +
+                "main() {" +
+                        "o = Object()\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testVarNamedInt_invalid() {
+        assertInvalid("main() { int = 0 }");
+    }
+
+    @Test
+    public void testVarNamedDouble_invalid() {
+        assertInvalid("main() { double = 0.0 }");
+    }
+
+    @Test
+    public void testVarNamedBoolean_invalid() {
+        assertInvalid("main() { boolean = 0.0 }");
+    }
+
+    @Test
+    public void testVarNamedChar_invalid() {
+        assertInvalid("main() { char = 0.0 }");
+    }
+
+    @Test
+    public void testVarNamedClass_invalid() {
+        assertInvalid("main() { class = 0.0 }");
+    }
+
+    @Test
+    public void testEqualsReturnsInt_invalid() {
+        String program =
+                "Foo {\n" +
+                        "equals(other) {\n" +
+                            "return 1\n" +
+                        "}\n" +
+                "}\n" +
+                "main() {\n" +
+                        "f = Foo()\n" +
+                        "a = f.equals(Foo())\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testConstructorReturnsSomething_invalid() {
+        String program =
+                "Foo {\n" +
+                        "Foo() {\n" +
+                            "return 1\n" +
+                        "}\n" +
+                "}\n" +
+                "main() {\n" +
+                        "a = Foo()\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testCallMethodDefinedInSuper_valid() {
+        String program = CLASS_A + CLASS_B +
+                "main() {\n" +
+                    "b = new B(5, \"hi\")\n" +
+                    "c = b.getNumber()\n" +
+                "}";
+        assertValid(program);
+    }
+
+    @Test
+    public void testMethodWithMultipleBindings_valid() {
+        String program =
+                "Foo {\n" +
+                        "bar(a) {\n" +
+                            "return 1\n" +
+                        "}\n" +
+                "}\n" +
+                "main() {\n" +
+                        "a = Foo()\n" +
+                        "b = a.bar(true)\n" +
+                        "c = a.bar(1)\n" +
+                "}";
+        assertValid(program);
+    }
+
+    @Test
+    public void testMethodReturnTypeDependsOnParameterBinding_invalid() {
+        String program =
+                "Foo {" +
+                        "bar(a) {\n" +
+                            "return a\n" +
+                        "}\n" +
+                "}\n" +
+                "main() {\n" +
+                        "a = Foo()\n" +
+                        "b = a.bar(0)\n" +
+                        "c = a.bar(true)\n" +
+                "}";
+        assertInvalid(program);
+    }
+
+    @Test
+    public void testRebindInheritedMethods_valid() {
+        String program =
+                "Foo {\n" +
+                        "bar(a) {\n" +
+                            "return 0\n" +
+                        "}\n" +
+                "}\n" +
+                "Baz extends Foo {}\n" +
+                "main() {\n" +
+                        "a = Baz()\n" +
+                        "b = a.bar(0)\n" +
+                        "c = a.bar(true)\n" +
+                "}";
+        assertValid(program);
+    }
+
 }
