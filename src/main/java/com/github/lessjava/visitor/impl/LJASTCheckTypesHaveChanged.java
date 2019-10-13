@@ -1,10 +1,11 @@
 package com.github.lessjava.visitor.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.github.lessjava.types.ast.ASTBinaryExpr;
-import com.github.lessjava.types.ast.ASTExpression;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTNode;
@@ -15,6 +16,7 @@ import com.github.lessjava.types.inference.HMType;
 
 public class LJASTCheckTypesHaveChanged extends StaticAnalysis {
     private static Map<ASTNode, HMType> exprTypeMap = new HashMap<>();
+    private List<String> typeMessages = new ArrayList<>();
 
     public static boolean typesChanged;
 
@@ -48,6 +50,10 @@ public class LJASTCheckTypesHaveChanged extends StaticAnalysis {
         typesChanged = typeChanged(node, node.type);
     }
 
+    public List<String> getTypeMessages() {
+        return typeMessages;
+    }
+
     private boolean typeChanged(ASTNode node, HMType type) {
         boolean typeChanged = false;
 
@@ -56,6 +62,11 @@ public class LJASTCheckTypesHaveChanged extends StaticAnalysis {
 
 
         if (!equalToMapValue) {
+            if(inMap) {
+                typeMessages.add("Type of " + node + " changed from " + exprTypeMap.get(node) + " to " + type + " on line " + node.lineNumber);
+            } else {
+                typeMessages.add("Type of " + node + " initialized to " + type + " on line " + node.lineNumber);
+            }
             exprTypeMap.put(node, type);
 
             typeChanged = true;

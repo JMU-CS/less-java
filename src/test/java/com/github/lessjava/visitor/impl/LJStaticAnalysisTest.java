@@ -52,7 +52,6 @@ class LJStaticAnalysisTest {
 
         BuildParentLinks buildParentLinks = new BuildParentLinks();
         LJASTBuildClassLinks buildClassLinks = new LJASTBuildClassLinks();
-        LJStaticAnalysis staticAnalysis = new LJStaticAnalysis();
         BuildSymbolTables buildSymbolTables = new BuildSymbolTables();
         LJASTInferTypes inferTypes = new LJASTInferTypes();
         // PrintDebugTree printTree = new PrintDebugTree();
@@ -71,7 +70,6 @@ class LJStaticAnalysisTest {
         program.traverse(buildParentLinks);
         program.traverse(buildClassLinks);
         program.traverse(inferConstructors);
-        program.traverse(staticAnalysis);
 
         do {
             program.traverse(buildSymbolTables);

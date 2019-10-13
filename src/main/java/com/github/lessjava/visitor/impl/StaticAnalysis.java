@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.github.lessjava.exceptions.InvalidProgramException;
+import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 /**
@@ -32,8 +33,8 @@ public class StaticAnalysis extends LJDefaultASTVisitor {
      * 
      * @param msg
      */
-    public static void addError(String msg) {
-        errors.add(msg);
+    public static void addError(ASTNode node, String msg) {
+        errors.add("Line " + node.lineNumber + ": " + msg);
     }
 
     /**
