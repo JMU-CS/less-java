@@ -101,6 +101,7 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void exitProgram(ProgramContext ctx) {
         ast = new ASTProgram();
+        ast.lineNumber = ctx.getStart().getLine();
 
         for (Class_Context c : ctx.class_()) {
             ast.classes.add((ASTClass) parserASTMap.get(c));
@@ -133,6 +134,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTClassBlock classBlock = (ASTClassBlock) parserASTMap.get(ctx.classBlock());
 
         class_ = new ASTClass(classSignature, classBlock);
+        class_.lineNumber = ctx.getStart().getLine();
         class_.setDepth(ctx.depth());
 
         parserASTMap.put(ctx, class_);
@@ -146,6 +148,7 @@ public class LJASTConverter extends LJBaseListener {
         String superName = ctx.superName == null ? null : ctx.superName.getText();
 
         signature = new ASTClassSignature(className, superName);
+        signature.lineNumber = ctx.getStart().getLine();
 
         this.currentClassSignature = signature;
 
@@ -156,6 +159,7 @@ public class LJASTConverter extends LJBaseListener {
     @Override
     public void enterClassBlock(ClassBlockContext ctx) {
         this.currentClassBlock = new ASTClassBlock();
+        currentClassBlock.lineNumber = ctx.getStart().getLine();
 
         this.currentClassBlock.setDepth(ctx.depth());
 
@@ -170,6 +174,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTAssignment assignment = (ASTAssignment) parserASTMap.get(ctx.assignment());
 
         attribute = new ASTAttribute(scope, assignment);
+        attribute.lineNumber = ctx.getStart().getLine();
 
         attribute.setDepth(ctx.depth());
 
@@ -196,6 +201,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTFunction function = (ASTFunction) parserASTMap.get(ctx.function());
 
         method = new ASTMethod(scope, function, this.currentClassSignature.className);
+        method.lineNumber = ctx.getStart().getLine();
         method.isConstructor = isConstructor;
         method.containingClassName = currentClassSignature.className;
 
@@ -217,6 +223,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTFunction.Parameter parameter;
 
         function = new ASTFunction(ctx.ID().getText(), (ASTBlock) parserASTMap.get(ctx.block()));
+        function.lineNumber = ctx.getStart().getLine();
         if (ctx.paramList() != null && ctx.paramList().ID().size() > 0) {
             for (TerminalNode tn : ctx.paramList().ID()) {
                 parameter = new ASTFunction.Parameter(tn.getText(), new HMTypeVar());
@@ -236,6 +243,7 @@ public class LJASTConverter extends LJBaseListener {
 
         expr = (ASTExpression) parserASTMap.get(ctx.expr());
         test = new ASTTest(expr);
+        test.lineNumber = ctx.getStart().getLine();
 
         test.setDepth(ctx.depth());
 
@@ -249,6 +257,7 @@ public class LJASTConverter extends LJBaseListener {
 
         assignment = (ASTAssignment) parserASTMap.get(ctx.assignment());
         globalAssignment = new ASTGlobalAssignment(assignment);
+        globalAssignment.lineNumber = ctx.getStart().getLine();
 
         globalAssignment.setDepth(ctx.depth());
 
@@ -260,6 +269,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTBlock block;
 
         block = new ASTBlock();
+        block.lineNumber = ctx.getStart().getLine();
 
         blocks.push(block);
 
@@ -288,6 +298,7 @@ public class LJASTConverter extends LJBaseListener {
         }
 
         argList = new ASTArgList(args);
+        argList.lineNumber = ctx.getStart().getLine();
 
         parserASTMap.put(ctx, argList);
     }
@@ -299,6 +310,7 @@ public class LJASTConverter extends LJBaseListener {
 
         assignment = (ASTAssignment) parserASTMap.get(ctx.assignment());
         voidAssignment = new ASTVoidAssignment(assignment);
+        voidAssignment.lineNumber = ctx.getStart().getLine();
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(voidAssignment);
@@ -325,6 +337,7 @@ public class LJASTConverter extends LJBaseListener {
         } else {
             conditional = new ASTConditional(condition, ifBlock);
         }
+        conditional.lineNumber = ctx.getStart().getLine();
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(conditional);
@@ -345,6 +358,7 @@ public class LJASTConverter extends LJBaseListener {
         body = (ASTBlock) parserASTMap.get(ctx.block());
 
         whileLoop = new ASTWhileLoop(guard, body);
+        whileLoop.lineNumber = ctx.getStart().getLine();
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(whileLoop);
@@ -374,6 +388,7 @@ public class LJASTConverter extends LJBaseListener {
             upperBound = (ASTExpression) parserASTMap.get(ctx.expr(0));
             forLoop = new ASTForLoop(var, upperBound, block);
         }
+        forLoop.lineNumber = ctx.getStart().getLine();
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(forLoop);
@@ -392,6 +407,7 @@ public class LJASTConverter extends LJBaseListener {
         expression = (ASTExpression) parserASTMap.get(ctx.expr());
 
         ret = new ASTReturn(expression);
+        ret.lineNumber = ctx.getStart().getLine();
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(ret);
@@ -407,6 +423,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTBreak br;
 
         br = new ASTBreak();
+        br.lineNumber = ctx.getStart().getLine();
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(br);
@@ -422,6 +439,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTContinue cont;
 
         cont = new ASTContinue();
+        cont.lineNumber = ctx.getStart().getLine();
 
         if (!blocks.empty()) {
             blocks.peek().statements.add(cont);
@@ -440,6 +458,7 @@ public class LJASTConverter extends LJBaseListener {
         functionCall = (ASTFunctionCall) parserASTMap.get(ctx.funcCall());
 
         voidFuncCall = new ASTVoidFunctionCall(functionCall);
+        voidFuncCall.lineNumber = ctx.getStart().getLine();
 
         voidFuncCall.setDepth(ctx.depth());
 
@@ -457,6 +476,7 @@ public class LJASTConverter extends LJBaseListener {
 
         methodCall = (ASTMethodCall) parserASTMap.get(ctx.methodCall());
         voidMethodCall = new ASTVoidMethodCall(methodCall);
+        voidMethodCall.lineNumber = ctx.getStart().getLine();
 
         voidMethodCall.setDepth(ctx.depth());
 
@@ -496,6 +516,7 @@ public class LJASTConverter extends LJBaseListener {
             binOp = ASTBinaryExpr.stringToOp(ctx.op.getText());
 
             expr = new ASTBinaryExpr(binOp, left, right);
+            expr.lineNumber = ctx.getStart().getLine();
         }
 
         expr.setDepth(ctx.depth());
@@ -521,6 +542,7 @@ public class LJASTConverter extends LJBaseListener {
             expr = (ASTExpression) parserASTMap.get(ctx.expression);
 
             unExpr = new ASTUnaryExpr(op, expr);
+            unExpr.lineNumber = ctx.getStart().getLine();
 
             unExpr.setDepth(ctx.depth());
 
@@ -579,6 +601,7 @@ public class LJASTConverter extends LJBaseListener {
 
 
         assignment.setDepth(ctx.depth());
+        assignment.lineNumber = ctx.getStart().getLine();
 
         parserASTMap.put(ctx, assignment);
     }
@@ -588,6 +611,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTFunctionCall funcCall;
 
         funcCall = new ASTFunctionCall(ctx.ID().getText());
+        funcCall.lineNumber = ctx.getStart().getLine();
 
         funcCall.setDepth(ctx.depth());
 
@@ -620,6 +644,7 @@ public class LJASTConverter extends LJBaseListener {
         ASTFunctionCall funcCall = calls.get(calls.size() - 1);
 
         methodCall = new ASTMethodCall(invoker, funcCall);
+        methodCall.lineNumber = ctx.getStart().getLine();
 
         methodCall.setDepth(ctx.depth());
 
@@ -635,6 +660,7 @@ public class LJASTConverter extends LJBaseListener {
         } else {
             var = new ASTVariable(ctx.name.getText(), (ASTExpression) parserASTMap.get(ctx.expr()));
         }
+        var.lineNumber = ctx.getStart().getLine();
 
         var.setDepth(ctx.depth());
 
@@ -656,6 +682,7 @@ public class LJASTConverter extends LJBaseListener {
         }
 
         memberAccess = new ASTMemberAccess(className, referencedClassName, var);
+        memberAccess.lineNumber = ctx.getStart().getLine();
 
         memberAccess.setDepth(ctx.depth());
 
@@ -677,6 +704,7 @@ public class LJASTConverter extends LJBaseListener {
             lit = new ASTLiteral(HMType.BaseDataType.STR,
                     ctx.STR().getText().substring(1, ctx.STR().getText().length() - 1));
         }
+        lit.lineNumber = ctx.getStart().getLine();
 
         lit.setDepth(ctx.depth());
 
@@ -690,6 +718,7 @@ public class LJASTConverter extends LJBaseListener {
 
         initialElements = (ASTArgList) parserASTMap.get(ctx.argList());
         list = new ASTList(initialElements);
+        list.lineNumber = ctx.getStart().getLine();
 
         list.setDepth(ctx.depth());
 
@@ -703,6 +732,7 @@ public class LJASTConverter extends LJBaseListener {
 
         initialElements = (ASTArgList) parserASTMap.get(ctx.argList());
         set = new ASTSet(initialElements);
+        set.lineNumber = ctx.getStart().getLine();
 
         set.setDepth(ctx.depth());
 
@@ -716,6 +746,7 @@ public class LJASTConverter extends LJBaseListener {
 
         initialElements = (ASTArgList) parserASTMap.get(ctx.argList());
         map = new ASTMap(initialElements);
+        map.lineNumber = ctx.getStart().getLine();
 
         map.setDepth(ctx.depth());
 
@@ -731,6 +762,7 @@ public class LJASTConverter extends LJBaseListener {
         key = (ASTExpression) parserASTMap.get(ctx.key);
         value = (ASTExpression) parserASTMap.get(ctx.value);
         entry = new ASTEntry(key, value);
+        entry.lineNumber = ctx.getStart().getLine();
 
         entry.setDepth(ctx.depth());
 

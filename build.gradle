@@ -33,6 +33,9 @@ run {
 
     def defaultTestfile = 'tests/fact.lj'
     args = (project.hasProperty('testfile')) ? [testfile] : [defaultTestfile]
+    if(project.hasProperty('printTypeChanges')) {
+        args = ['-t'] + args
+    }
 }
 
 test {

@@ -58,6 +58,8 @@ import com.github.lessjava.types.SymbolTable;
 public abstract class ASTNode {
     public Map<String, Object> attributes;
 
+    public int lineNumber;
+
     private ASTNode parentScope;
 
     public ASTNode() {

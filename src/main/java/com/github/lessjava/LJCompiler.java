@@ -47,26 +47,18 @@ import com.github.lessjava.visitor.impl.LJStaticAnalysis;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
 
 public class LJCompiler {
-    public static void main(String[] args) throws IOException {
-        if (args.length == 0) {
-            System.err.println("usage: LJCompiler <Files>");
-            System.exit(0);
-        }
 
-        for (String s : args) {
-            if (!s.endsWith("lj")) {
-                System.err.println("Only accepts .lj files");
-                System.exit(0);
-            }
-        }
+    private static String fileName = null;
+    private static boolean printTypeChanges = false;
+
+    public static void main(String[] args) throws IOException {
+        parseArgs(args);
 
         // Lexing
 
         LJLexer lexer = null;
         try {
-            for (String s : args) {
-                lexer = new LJLexer(new ANTLRFileStream(s));
-            }
+            lexer = new LJLexer(new ANTLRFileStream(fileName));
         } catch (IOException ioe) {
             ioe.printStackTrace();
             System.exit(0);
@@ -102,7 +94,6 @@ public class LJCompiler {
         program.traverse(buildParentLinks);
         program.traverse(buildClassLinks);
         program.traverse(inferConstructors);
-        program.traverse(staticAnalysis);
 
         do {
             program.traverse(buildSymbolTables);
@@ -111,6 +102,12 @@ public class LJCompiler {
             program.traverse(checkTypesHaveChanged);
         } while (LJASTCheckTypesHaveChanged.typesChanged);
 
+        if(printTypeChanges) {
+            for (String message : checkTypesHaveChanged.getTypeMessages()) {
+                System.out.println(message);
+            }
+        }
+
         // TODO: Determine if necessary
         // program.traverse(new LJUnifyVariables());
 
@@ -118,20 +115,43 @@ public class LJCompiler {
 
         program.traverse(assignTestVariables);
 
-        program.traverse(new LJStaticAnalysis());
-
-        // program.traverse(printTree);
-        program.traverse(generateJava);
+        program.traverse(staticAnalysis);
 
         if (!StaticAnalysis.getErrors().isEmpty()) {
             System.out.printf("%n%s%n", StaticAnalysis.getErrorString());
             System.exit(1);
         }
 
+        // program.traverse(printTree);
+        program.traverse(generateJava);
+
         // Compile the generated Java source
         JCompiler.compile();
 
         // TODO: exec junit
+    }
+
+    private static void parseArgs(String[] args) {
+        if (args.length == 0) {
+            System.err.println("usage: LJCompiler [OPTIONS] <File>");
+            System.out.println("    OPTIONS:");
+            System.out.println("        -t, --printTypeChanges: print type inference changes of expressions, variables, and functions.");
+            System.out.println("    File:");
+            System.out.println("        A Less-Java source file.");
+            System.exit(0);
+        }
+
+        for (String s : args) {
+            if(s.equals("-t") || s.equals("--printTypeChanges")) {
+                printTypeChanges = true;
+            }
+        }
+
+        fileName = args[args.length - 1];
+        if(!fileName.endsWith(".lj")) {
+            System.err.println("Only accepts .lj files");
+            System.exit(0);
+        }
     }
 
     private static void runTests(Class test) {
