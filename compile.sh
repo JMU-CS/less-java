@@ -2,5 +2,50 @@
 
 GRADLE_WRAPPER="./gradlew"
 
-"$GRADLE_WRAPPER" -q run -Ptestfile=${1}
+help() {
+    echo "Usage: $0 [options] file"
+    echo ""
+    echo "  Options:"
+    echo "    -h  Print this help message and exit"
+    echo "    -t  Print type changes found by type inference"
+    echo "    -v  Print output from Gradle"
+}
 
+args="run"
+verbose=false
+while getopts :thv flag; do
+  case $flag in
+    h)
+      help
+      exit
+      ;;
+    t)
+      args="${args} -PprintTypeChanges"
+      ;;
+    v)
+      verbose=true
+      ;;
+    \?)
+      echo "Unrecognized option $OPTARG" 1>&2
+      echo
+      help
+      exit
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if ! $verbose; then
+  args="${args} -q"
+fi
+
+if [ $# == 0 ]; then
+  echo "Expecting a file" 1>&2
+  echo
+  help
+  exit
+fi
+
+args="${args} -Ptestfile=${1}"
+"$GRADLE_WRAPPER" $args
+exit
