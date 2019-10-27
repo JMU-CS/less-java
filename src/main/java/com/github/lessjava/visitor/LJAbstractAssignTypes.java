@@ -11,6 +11,7 @@ import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
 import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTMethod;
+import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
@@ -39,7 +40,13 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
         }
     }
 
-    protected HMType unify(HMType left, HMType right) {
+    protected HMType unify(ASTNode node, HMType left, HMType right) {
+        if(left == null) {
+            return right;
+        }
+        if(right == null) {
+            return left;
+        }
         boolean leftIsBase = left instanceof HMTypeBase;
         boolean leftIsVar = left instanceof HMTypeVar;
         boolean leftIsCollection = left instanceof HMTypeCollection;
@@ -49,11 +56,11 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
         boolean rightIsCollection = right instanceof HMTypeCollection;
 
         if (leftIsBase && rightIsBase) {
-            return unify((HMTypeBase) left, (HMTypeBase) right);
+            return unify(node, (HMTypeBase) left, (HMTypeBase) right);
         } else if (leftIsVar && rightIsVar) {
             return unify((HMTypeVar) left, (HMTypeVar) right);
         } else if (leftIsCollection && rightIsCollection) {
-            return unify((HMTypeCollection) left, (HMTypeCollection) right);
+            return unify(node, (HMTypeCollection) left, (HMTypeCollection) right);
         }
 
         // TODO: This can't be right...
@@ -73,11 +80,11 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
         return left;
     }
 
-    protected HMType unify(HMTypeCollection left, HMTypeCollection right) {
+    protected HMType unify(ASTNode node, HMTypeCollection left, HMTypeCollection right) {
         HMType unifiedType = left;
 
         if (left.collectionName.equals(right.collectionName)) {
-            left.elementType = right.elementType = unify(left.elementType, right.elementType);
+            left.elementType = right.elementType = unify(node, left.elementType, right.elementType);
         }
 
         return unifiedType;
@@ -87,7 +94,7 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
         return left;
     }
 
-    protected HMTypeBase unify(HMTypeBase left, HMTypeBase right) {
+    protected HMTypeBase unify(ASTNode node, HMTypeBase left, HMTypeBase right) {
         if (left.getBaseType().equals(right.getBaseType())) {
             return left;
         } else if (left.getBaseType().equals(BaseDataType.DOUBLE) && right.getBaseType().equals(BaseDataType.INT)) {
@@ -96,14 +103,16 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
             return right;
         }
 
+        StaticAnalysis.addError(node, "Cannot unify types " + left + " and " + right);
+
         return left;
     }
 
     protected static HashSet<BinOp> ignoreOps = new HashSet<BinOp>(
             Arrays.asList(new BinOp[] { BinOp.EQ, BinOp.NE, BinOp.ADDASGN, BinOp.SUBASGN, BinOp.INVOKE }));
 
-    protected HMType unify(HMType left, HMType right, BinOp op) {
-        HMType unifiedType = unify(left, right);
+    protected HMType unify(ASTNode node, HMType left, HMType right, BinOp op) {
+        HMType unifiedType = unify(node, left, right);
 
         if (!ignoreOps.contains(op)) {
             switch (op) {
@@ -117,7 +126,7 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
                 case GE:
                 case LE:
                 case ASGN:
-                    unifiedType = unify(left, right);
+                    unifiedType = unify(node, left, right);
                     break;
                 case AND:
                 case OR:

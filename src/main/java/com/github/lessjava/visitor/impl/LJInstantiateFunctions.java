@@ -17,40 +17,47 @@ import com.github.lessjava.types.inference.impl.HMTypeClass;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 public class LJInstantiateFunctions extends LJAbstractAssignTypes {
-    private static ASTProgram program;
+    private ASTProgram program;
 
     @Override
     public void preVisit(ASTProgram node) {
         super.preVisit(node);
-        if (LJInstantiateFunctions.program == null) {
-            LJInstantiateFunctions.program = node;
+        if (program == null) {
+            program = node;
         }
     }
 
     @Override
     public void postVisit(ASTProgram node) {
         super.postVisit(node);
+        program = null;
     }
 
     @Override
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
+        // Already handled as a method
+        if (node.getParent() instanceof ASTMethodCall) {
+            return;
+        }
+
+        // Don't need to instantiate library functions
+        if(ASTAbstractFunction.libraryFunctions.stream().anyMatch(f -> f.name.equals(node.name))) {
+            return;
+        }
+
         ASTAbstractFunction prototype = program.functions.stream()
-            .filter(f -> f.name.equals(node.name) && !f.concrete)
+            .filter(f -> f.name.equals(node.name) && f.parameters.size() == node.arguments.size())
             .findAny()
             .orElse(null);
 
-        if (prototype == null || prototype.body == null) {
+        if (prototype == null) {
+            StaticAnalysis.addError(node, "Cannot find function " + node.name + " with " + node.arguments.size() + " arguments");
             return;
         }
 
         if (prototype != null && prototype.concrete) {
-            return;
-        }
-
-        // Already handled as a method
-        if (node.getParent() instanceof ASTMethodCall) {
             return;
         }
 

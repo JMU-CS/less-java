@@ -29,6 +29,11 @@ public class Symbol {
      */
     public List<HMType> paramTypes;
 
+    /**
+     * Identifies the type of this symbol (variable or function)
+     */
+    public SymbolType symbolType;
+
     public ASTFunction function;
     public ASTVariable variable;
     public Parameter parameter;
@@ -37,12 +42,14 @@ public class Symbol {
         this.variable = variable;
         this.name = name;
         this.type = type;
+        this.symbolType = SymbolType.VARIABLE;
     }
 
     public Symbol(Parameter parameter, String name, HMType type) {
         this.parameter = parameter;
         this.name = name;
         this.type = type;
+        this.symbolType = SymbolType.VARIABLE;
     }
 
     /**
@@ -61,6 +68,7 @@ public class Symbol {
         this.type = returnType;
         this.paramTypes = paramTypes;
         this.concrete = concrete;
+        this.symbolType = SymbolType.FUNCTION;
     }
 
     /**
@@ -89,5 +97,9 @@ public class Symbol {
         str.append(type.toString());
 
         return str.toString();
+    }
+
+    public enum SymbolType {
+        VARIABLE, FUNCTION, ANY;
     }
 }

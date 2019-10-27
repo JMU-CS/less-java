@@ -96,6 +96,7 @@ public class LJCompiler {
         program.traverse(inferConstructors);
 
         do {
+            StaticAnalysis.resetErrors();   // Remove errors found in old iterations
             program.traverse(buildSymbolTables);
             program.traverse(instantiateFunctions);
             program.traverse(inferTypes);
