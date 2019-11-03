@@ -9,10 +9,10 @@ import com.github.lessjava.visitor.LJAbstractAssignTypes;
 public class LJUnifyVariables extends LJAbstractAssignTypes {
     @Override
     public void preVisit(ASTVariable node) {
-        List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name);
+        List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name, Symbol.SymbolType.VARIABLE);
 
         if (symbols != null && !symbols.isEmpty()) {
-            symbols.forEach(s -> node.type = unify(node.type, s.type));
+            symbols.forEach(s -> node.type = unify(node, node.type, s.type));
         }
     }
 

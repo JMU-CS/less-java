@@ -1,5 +1,8 @@
 package com.github.lessjava.visitor.impl;
 
+import java.util.List;
+
+import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.ast.ASTAssignment;
 import com.github.lessjava.types.ast.ASTAttribute;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
@@ -27,6 +30,9 @@ import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 
 public class LJStaticAnalysis extends StaticAnalysis {
+
+    private static final List<String> RESERVED_WORDS = List.of("this", "super", "class", "int", "boolean", "double", "char", "long", "float");
+
     @Override
     public void preVisit(ASTProgram node) {
     }
@@ -48,9 +54,19 @@ public class LJStaticAnalysis extends StaticAnalysis {
         super.preVisit(node);
     }
 
+    /**
+     * Add an error if the variable doesn't have type information in the symbol table, i.e. it was never assigned to
+     *
+     * @param node the variable
+     */
     @Override
     public void postVisit(ASTVariable node) {
         super.postVisit(node);
+        List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name, Symbol.SymbolType.VARIABLE);
+
+        if(symbols == null || symbols.isEmpty()) {
+            addError(node, "Cannot find variable " + node.name);
+        }
     }
 
     @Override
@@ -68,9 +84,17 @@ public class LJStaticAnalysis extends StaticAnalysis {
         super.preVisit(node);
     }
 
+    /**
+     * Make sure we don't assign to some reserved words
+     *
+     * @param node an assignment node
+     */
     @Override
     public void postVisit(ASTAssignment node) {
         super.postVisit(node);
+        if(RESERVED_WORDS.contains(node.variable.name)) {
+            addError(node, "Cannot assign to " + node.variable.name);
+        }
     }
 
     @Override
@@ -88,6 +112,11 @@ public class LJStaticAnalysis extends StaticAnalysis {
         super.preVisit(node);
     }
 
+    /**
+     * Ensure that the conditional is a boolean expression
+     *
+     * @param node
+     */
     @Override
     public void postVisit(ASTConditional node) {
         super.postVisit(node);
@@ -101,6 +130,11 @@ public class LJStaticAnalysis extends StaticAnalysis {
         super.preVisit(node);
     }
 
+    /**
+     * Ensure that the while loop guard is a boolean expression
+     *
+     * @param node
+     */
     @Override
     public void postVisit(ASTWhileLoop node) {
         super.postVisit(node);
@@ -123,6 +157,11 @@ public class LJStaticAnalysis extends StaticAnalysis {
         super.preVisit(node);
     }
 
+    /**
+     * Ensures that break statements only occur within while or for loops
+     *
+     * @param node
+     */
     @Override
     public void postVisit(ASTBreak node) {
         super.postVisit(node);
@@ -135,6 +174,11 @@ public class LJStaticAnalysis extends StaticAnalysis {
         }
     }
 
+    /**
+     * Ensures that continue statements only occur in while or for loops
+     *
+     * @param node
+     */
     @Override
     public void preVisit(ASTContinue node) {
         super.preVisit(node);
@@ -172,9 +216,54 @@ public class LJStaticAnalysis extends StaticAnalysis {
         super.inVisit(node);
     }
 
+    /**
+     * Ensure that binary expressions are only between compatible types
+     *
+     * @param node a binary expression
+     */
     @Override
     public void postVisit(ASTBinaryExpr node) {
         super.postVisit(node);
+        HMTypeBase INT_TYPE = new HMTypeBase(HMType.BaseDataType.INT);
+        HMTypeBase DOUBLE_TYPE = new HMTypeBase(HMType.BaseDataType.DOUBLE);
+        HMTypeBase BOOL_TYPE = new HMTypeBase(HMType.BaseDataType.BOOL);
+        switch (node.operator) {
+            case ADDASGN:
+            case SUBASGN:
+                if(!INT_TYPE.equals(node.rightChild.type) && !DOUBLE_TYPE.equals(node.rightChild.type)) {
+                    addError(node, "Cannot apply operator " + node.operator + " with non-numeric right expression type " + node.rightChild.type);
+                }
+                break;
+            case OR:
+            case AND:
+                if(!BOOL_TYPE.equals(node.leftChild.type)) {
+                    addError(node, "Cannot apply operator " + node.operator + " with non-boolean left expression type " + node.leftChild.type);
+                }
+                if(!BOOL_TYPE.equals(node.rightChild.type)) {
+                    addError(node, "Cannot apply operator " + node.operator + " with non-boolean right expression type " + node.rightChild.type);
+                }
+                break;
+            case EQ:
+            case NE:
+                break;
+            case LT:
+            case GT:
+            case LE:
+            case GE:
+            case ADD:
+            case SUB:
+            case MUL:
+            case DIV:
+            case MOD:
+                if(!INT_TYPE.equals(node.leftChild.type) && !DOUBLE_TYPE.equals(node.leftChild.type)) {
+                    addError(node, "Cannot apply operator " + node.operator + " with non-numeric left expression type " + node.leftChild.type);
+                }
+                if(!INT_TYPE.equals(node.rightChild.type) && !DOUBLE_TYPE.equals(node.rightChild.type)) {
+                    addError(node, "Cannot apply operator " + node.operator + " with non-numeric right expression type " + node.rightChild.type);
+                }
+                break;
+            default:
+        }
     }
 
     @Override
@@ -217,13 +306,21 @@ public class LJStaticAnalysis extends StaticAnalysis {
         super.postVisit(node);
     }
 
+    /**
+     * Ensures that the loop variable, upper bound, and lower bound of a for loop are all integers
+     *
+     * @param node
+     */
     @Override
     public void postVisit(ASTForLoop node) {
         super.postVisit(node);
         final HMType INT_TYPE = new HMTypeBase(HMType.BaseDataType.INT);
-        boolean varIsInt = INT_TYPE.equals(node.var.type) && BuildSymbolTables.searchScopesForSymbol(node, node.var.name).stream().allMatch(s -> INT_TYPE.equals(s.type));
+        boolean varIsInt = INT_TYPE.equals(node.var.type) && BuildSymbolTables.searchScopesForSymbol(node, node.var.name, Symbol.SymbolType.VARIABLE).stream().allMatch(s -> INT_TYPE.equals(s.type));
         boolean lowerIsInt = INT_TYPE.equals(node.lowerBound.type);
         boolean upperIsInt = INT_TYPE.equals(node.upperBound.type);
+        if(!BuildSymbolTables.searchScopesForSymbol(node.getParent(), node.var.name, Symbol.SymbolType.VARIABLE).isEmpty()) {
+            addError(node, "Variable named " + node.var.name + " already exists");
+        }
         if(!(varIsInt && lowerIsInt && upperIsInt)) {
             addError(node, "For loops can only run through integers");
         }

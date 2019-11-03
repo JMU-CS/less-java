@@ -20,13 +20,14 @@ import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
+import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 /**
  * Static analysis pass to construct symbol tables. Visits an AST, maintaining a
  * stack of active symbol tables and annotating various AST nodes with the
  * appropriate symbol tables.
  */
-public class BuildSymbolTables extends StaticAnalysis {
+public class BuildSymbolTables extends LJAbstractAssignTypes {
     public static final String SYMBOL_TABLE = "symbolTable";
 
     public static Map<ASTNode, SymbolTable> nodeSymbolTableMap = new HashMap<>();
@@ -43,16 +44,16 @@ public class BuildSymbolTables extends StaticAnalysis {
      * null if the symbol cannot be found.
      *
      */
-    public static List<Symbol> searchScopesForSymbol(ASTNode node, String name) {
-        List<Symbol> symbols = null;
+    public static List<Symbol> searchScopesForSymbol(ASTNode node, String name, Symbol.SymbolType symbolType) {
+        List<Symbol> symbols = new ArrayList<>();
         try {
             if (node.attributes.containsKey(SYMBOL_TABLE)) {
                 SymbolTable table = (SymbolTable) node.attributes.get(SYMBOL_TABLE);
-                symbols = table.lookup(name);
+                symbols = table.lookup(name, symbolType);
             }
 
-            if ((symbols == null || symbols.isEmpty()) && node.getParent() != null) {
-                symbols = searchScopesForSymbol(node.getParent(), name);
+            if (symbols.isEmpty() && node.getParent() != null) {
+                symbols = searchScopesForSymbol(node.getParent(), name, symbolType);
             }
         } catch (InvalidProgramException ex) {
         }
@@ -116,39 +117,41 @@ public class BuildSymbolTables extends StaticAnalysis {
      * Add a symbol for the given function to the current (innermost) scope.
      */
     protected void insertFunctionSymbol(ASTFunction node) {
-        try {
-            boolean isConcrete = node.returnType instanceof HMTypeVar;
-            List<HMType> ptypes = new ArrayList<>();
-            for (ASTFunction.Parameter p : node.parameters) {
-                insertParamSymbol(p);
-                ptypes.add(p.type);
+        boolean isConcrete = node.returnType instanceof HMTypeVar;
+        List<HMType> ptypes = new ArrayList<>();
+        for (ASTFunction.Parameter p : node.parameters) {
+            ptypes.add(p.type);
 
-                if (p.type instanceof HMTypeVar) {
-                    isConcrete = false;
-                }
+            if (p.type instanceof HMTypeVar) {
+                isConcrete = false;
             }
-            Symbol symbol = new Symbol(node, node.name, node.returnType, ptypes, isConcrete);
-
-            getCurrentTable().insert(node.name, symbol);
-        } catch (InvalidProgramException ex) {
-            addError(ex);
         }
+        Symbol symbol = new Symbol(node, node.name, node.returnType, ptypes, isConcrete);
+
+        getCurrentTable().insert(node.name, symbol);
     }
 
+    /**
+     * Insert a symbol for a variable into the current symbol table. If the current symbol is
+     * already present in the table, unify its type with the new one to get updated type information.
+     *
+     * @param node the variable to add a symbol for
+     */
     protected void insertVariableSymbol(ASTVariable node) {
-        try {
-            // TODO: Removing this fixes collections breaks globals
-            List<Symbol> symbols = searchScopesForSymbol(node, node.name);
+        if(!(node.type instanceof HMTypeVar)) {
+            List<Symbol> symbols = searchScopesForSymbol(node, node.name, Symbol.SymbolType.VARIABLE);
 
-            // Don't add the symbol if we've already encountered it
+            HMType type = node.type;
+
             if (symbols != null && !symbols.isEmpty()) {
-                return;
+                for(Symbol s : symbols) {
+                    type = unify(node, s.type, type);
+                }
+                getCurrentTable().removeSymbol(node.name, Symbol.SymbolType.VARIABLE);
             }
 
-            Symbol symbol = new Symbol(node, node.name, node.type);
+            Symbol symbol = new Symbol(node, node.name, type);
             getCurrentTable().insert(node.name, symbol);
-        } catch (InvalidProgramException ex) {
-            addError(ex);
         }
     }
 
@@ -157,12 +160,8 @@ public class BuildSymbolTables extends StaticAnalysis {
      * scope.
      */
     protected void insertParamSymbol(Parameter p) {
-        try {
-            Symbol symbol = new Symbol(p, p.name, p.type);
-            getCurrentTable().insert(p.name, symbol);
-        } catch (InvalidProgramException ex) {
-            addError(ex);
-        }
+        Symbol symbol = new Symbol(p, p.name, p.type);
+        getCurrentTable().insert(p.name, symbol);
     }
 
     @Override
@@ -202,6 +201,7 @@ public class BuildSymbolTables extends StaticAnalysis {
     public void preVisit(ASTFunction node) {
         insertFunctionSymbol(node);
         node.attributes.put(SYMBOL_TABLE, initializeScope());
+        node.parameters.forEach(this::insertParamSymbol);
     }
 
     @Override

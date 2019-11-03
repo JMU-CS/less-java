@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.github.lessjava.exceptions.InvalidProgramException;
 
@@ -44,10 +45,8 @@ public class SymbolTable {
      *            Decaf symbol name
      * @param symbol
      *            Symbol information
-     * @throws InvalidProgramException
-     *             Thrown if the symbol is already defined.
      */
-    public void insert(String name, Symbol symbol) throws InvalidProgramException {
+    public void insert(String name, Symbol symbol) {
         this.localSymbols.add(symbol);
         this.localTable.computeIfAbsent(name, unused -> new ArrayList<>()).add(symbol);
     }
@@ -56,16 +55,21 @@ public class SymbolTable {
      * Retrieves symbol information for a given symbol name.
      *
      * @param name
-     *            Decaf symbol name
+     *            Symbol name
+     * @param symbolType
+     *            The type of symbol (variable or function) to look for
      * @return Symbol information from either this table or a parent table
      * @throws InvalidProgramException
      *             Thrown if the symbol is not found
      */
-    public List<Symbol> lookup(String name) throws InvalidProgramException {
-        if (localTable.containsKey(name)) {
-            return localTable.get(name);
+    public List<Symbol> lookup(String name, Symbol.SymbolType symbolType) throws InvalidProgramException {
+        if (localTable.containsKey(name) && localTable.get(name).stream().anyMatch(s -> s.symbolType == symbolType)) {
+            return localTable.get(name)
+                    .stream()
+                    .filter(s -> symbolType == Symbol.SymbolType.ANY || s.symbolType == symbolType)
+                    .collect(Collectors.toList());
         } else if (parent != null) {
-            return parent.lookup(name);
+            return parent.lookup(name, symbolType);
         }
 
         throw new InvalidProgramException("Symbol not found: \"" + name + "\"");
@@ -101,7 +105,7 @@ public class SymbolTable {
         if (parent != null) {
             for (Symbol s : parent.getAllSymbols()) {
                 try {
-                    if (lookup(s.name) == s) {
+                    if (lookup(s.name, Symbol.SymbolType.ANY) == s) {
                         allSymbols.add(s);
                     }
                 } catch (InvalidProgramException ex) {
@@ -163,5 +167,12 @@ public class SymbolTable {
             str.append("\n" + indent(level) + "  + " + s.toString());
         }
         return str.toString();
+    }
+
+    public void removeSymbol(String name, Symbol.SymbolType symbolType) {
+        if(localTable.containsKey(name)) {
+            localTable.get(name).removeIf(s -> s.name.equals(name) && s.symbolType == symbolType);
+            localSymbols.removeIf(s -> s.name.equals(name) && s.symbolType == symbolType);
+        }
     }
 }
