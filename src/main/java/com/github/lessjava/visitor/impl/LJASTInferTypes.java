@@ -8,6 +8,7 @@ import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTAttribute;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTClassBlock;
@@ -228,6 +229,21 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTMemberAccess node) {
         super.postVisit(node);
 
+        // Set the referenced class name to the name of whatever class the invoker belongs to
+        if(!("this".equals(node.className) || "super".equals(node.className))) {
+            List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.className, Symbol.SymbolType.VARIABLE);
+            if(symbols != null && !symbols.isEmpty()) {
+                HMType type = symbols.get(0).type;
+                if(type instanceof HMTypeClass) {
+                    node.referencedClassName = ((HMTypeClass)type).name;
+                } else {
+                    StaticAnalysis.addError(node, "Cannot access members of " + node.className + "; type of " + node.className + " is " + type);
+                }
+            } else {
+                return;
+            }
+        }
+
         ASTClass containingClass = ASTClass.nameClassMap.get(node.referencedClassName);
 
         ASTVariable attribute = containingClass.getAttribute(node.var.name);
@@ -288,7 +304,9 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTAssignment node) {
         super.postVisit(node);
 
-        node.variable.type = unify(node, node.variable.type, node.value.type);
+        if(node.variable != null) {
+            node.variable.type = unify(node, node.variable.type, node.value.type);
+        }
 
         if (node.value instanceof ASTVariable) {
             ASTVariable var = (ASTVariable) node.value;

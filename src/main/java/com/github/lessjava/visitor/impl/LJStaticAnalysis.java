@@ -62,6 +62,12 @@ public class LJStaticAnalysis extends StaticAnalysis {
     @Override
     public void postVisit(ASTVariable node) {
         super.postVisit(node);
+
+        // Don't need to check if the var is within a member access
+        if(node.getParent() instanceof ASTMemberAccess) {
+            return;
+        }
+
         List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name, Symbol.SymbolType.VARIABLE);
 
         if(symbols == null || symbols.isEmpty()) {

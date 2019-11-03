@@ -2,6 +2,8 @@ package com.github.lessjava.visitor.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
@@ -47,7 +49,10 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             return;
         }
 
-        ASTAbstractFunction prototype = program.functions.stream()
+        ArrayList<ASTAbstractFunction> functions = new ArrayList<>(program.functions);
+        program.classes.forEach(c -> functions.addAll(c.block.methods.stream().filter(m -> m.isConstructor).collect(Collectors.toList())));
+
+        ASTAbstractFunction prototype = functions.stream()
             .filter(f -> f.name.equals(node.name) && f.parameters.size() == node.arguments.size())
             .findAny()
             .orElse(null);
