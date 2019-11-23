@@ -1,13 +1,11 @@
 package com.github.lessjava.types.ast;
 
 public class ASTMemberAccess extends ASTExpression {
-    public String className;
-    public String referencedClassName;
+    public ASTVariable instance;
     public ASTVariable var;
 
-    public ASTMemberAccess(String className, String referencedClassName, ASTVariable var) {
-        this.className = className;
-        this.referencedClassName = referencedClassName;
+    public ASTMemberAccess(String className, ASTVariable var) {
+        this.instance = new ASTVariable(className);
         this.var = var;
     }
 
@@ -15,7 +13,7 @@ public class ASTMemberAccess extends ASTExpression {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format("%s.%s", className, var));
+        sb.append(String.format("%s.%s", instance.name, var));
 
         return sb.toString();
     }
@@ -23,6 +21,7 @@ public class ASTMemberAccess extends ASTExpression {
     @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
+        this.instance.traverse(visitor);
         this.var.traverse(visitor);
         visitor.postVisit(this);
     }

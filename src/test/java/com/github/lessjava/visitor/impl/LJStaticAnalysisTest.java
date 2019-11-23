@@ -2,6 +2,8 @@ package com.github.lessjava.visitor.impl;
 
 import com.github.lessjava.generated.LJLexer;
 import com.github.lessjava.generated.LJParser;
+import com.github.lessjava.types.ast.ASTClass;
+import com.github.lessjava.types.ast.ASTClassBlock;
 import com.github.lessjava.types.ast.ASTProgram;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -43,6 +45,9 @@ class LJStaticAnalysisTest {
         this.underTest = new LJStaticAnalysis();
         StaticAnalysis.resetErrors();
         BuildSymbolTables.nodeSymbolTableMap.clear();
+        ASTClass.nameClassMap.clear();
+        ASTClassBlock.nameAttributeMap.clear();
+        StaticAnalysis.collectErrors = true;
     }
 
     private ASTProgram compile(String programText) {
@@ -74,6 +79,7 @@ class LJStaticAnalysisTest {
         program.traverse(inferConstructors);
 
         do {
+            program.traverse(buildParentLinks); // Rebuild parent links in case we instantiated new functions
             StaticAnalysis.resetErrors();   // Remove errors found in old iterations
             program.traverse(buildSymbolTables);
             program.traverse(instantiateFunctions);

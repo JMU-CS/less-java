@@ -25,7 +25,11 @@ public class ASTAssignment extends ASTBinaryExpr {
     @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
-        variable.traverse(visitor);
+        if(this.memberAccess == null) {
+            variable.traverse(visitor);
+        } else {
+            memberAccess.traverse(visitor);
+        }
         value.traverse(visitor);
         visitor.postVisit(this);
     }

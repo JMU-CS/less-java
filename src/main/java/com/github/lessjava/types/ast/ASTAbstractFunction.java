@@ -67,6 +67,9 @@ public abstract class ASTAbstractFunction extends ASTNode {
         ASTFunction format = new ASTFunction("format", new HMTypeBase(BaseDataType.STR), null);
         libraryFunctions.add(format);
         specialCases.put(format.name, format);
+        ASTFunction printf = new ASTFunction("printf", new HMTypeBase(BaseDataType.VOID), null);
+        libraryFunctions.add(printf);
+        specialCases.put(printf.name, printf);
     }
 
     public static class Parameter {

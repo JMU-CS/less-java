@@ -9,12 +9,12 @@ import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTBreak;
 import com.github.lessjava.types.ast.ASTClass;
-import com.github.lessjava.types.ast.ASTClassBlock;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
+import com.github.lessjava.types.ast.ASTGlobalAssignment;
 import com.github.lessjava.types.ast.ASTLiteral;
 import com.github.lessjava.types.ast.ASTLocation;
 import com.github.lessjava.types.ast.ASTMemberAccess;
@@ -28,13 +28,16 @@ import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.ast.ASTWhileLoop;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeClass;
 
 public class LJStaticAnalysis extends StaticAnalysis {
 
     private static final List<String> RESERVED_WORDS = List.of("this", "super", "class", "int", "boolean", "double", "char", "long", "float");
+    private ASTClass enclosingClass;
 
     @Override
     public void preVisit(ASTProgram node) {
+        StaticAnalysis.collectErrors = true;
     }
 
     @Override
@@ -42,7 +45,24 @@ public class LJStaticAnalysis extends StaticAnalysis {
     }
 
     @Override
+    public void preVisit(ASTClass node) {
+        StaticAnalysis.collectErrors = true;
+        enclosingClass = node;
+    }
+
+    @Override
+    public void postVisit(ASTClass node) {
+        enclosingClass = null;
+    }
+
+    @Override
+    public void preVisit(ASTGlobalAssignment node) {
+        StaticAnalysis.collectErrors = true;
+    }
+
+    @Override
     public void preVisit(ASTFunction node) {
+        StaticAnalysis.collectErrors = node.concrete;
     }
 
     @Override
@@ -205,6 +225,7 @@ public class LJStaticAnalysis extends StaticAnalysis {
     @Override
     public void preVisit(ASTTest node) {
         super.preVisit(node);
+        StaticAnalysis.collectErrors = true;
     }
 
     @Override
@@ -313,37 +334,64 @@ public class LJStaticAnalysis extends StaticAnalysis {
     }
 
     /**
-     * Ensures that the loop variable, upper bound, and lower bound of a for loop are all integers
+     * Ensures type safety for for loops. If we have a lower bound, then we're iterating over integers and need to type
+     * check. Otherwise we're iterating through a list and type inference would've caught errors already.
      *
      * @param node
      */
     @Override
     public void postVisit(ASTForLoop node) {
         super.postVisit(node);
-        final HMType INT_TYPE = new HMTypeBase(HMType.BaseDataType.INT);
-        boolean varIsInt = INT_TYPE.equals(node.var.type) && BuildSymbolTables.searchScopesForSymbol(node, node.var.name, Symbol.SymbolType.VARIABLE).stream().allMatch(s -> INT_TYPE.equals(s.type));
-        boolean lowerIsInt = INT_TYPE.equals(node.lowerBound.type);
-        boolean upperIsInt = INT_TYPE.equals(node.upperBound.type);
-        if(!BuildSymbolTables.searchScopesForSymbol(node.getParent(), node.var.name, Symbol.SymbolType.VARIABLE).isEmpty()) {
-            addError(node, "Variable named " + node.var.name + " already exists");
-        }
-        if(!(varIsInt && lowerIsInt && upperIsInt)) {
-            addError(node, "For loops can only run through integers");
+        if(node.lowerBound != null) {
+            // Iterating over ints
+            final HMType INT_TYPE = new HMTypeBase(HMType.BaseDataType.INT);
+            boolean varIsInt = INT_TYPE.equals(node.var.type) && BuildSymbolTables.searchScopesForSymbol(node, node.var.name, Symbol.SymbolType.VARIABLE).stream().allMatch(s -> INT_TYPE.equals(s.type));
+            boolean lowerIsInt = INT_TYPE.equals(node.lowerBound.type);
+            boolean upperIsInt = INT_TYPE.equals(node.upperBound.type);
+            if (!BuildSymbolTables.searchScopesForSymbol(node.getParent(), node.var.name, Symbol.SymbolType.VARIABLE).isEmpty()) {
+                addError(node, "Variable named " + node.var.name + " already exists");
+            }
+            if (!(varIsInt && lowerIsInt && upperIsInt)) {
+                addError(node, "For loops can only run through integers");
+            }
         }
     }
 
+    /**
+     * Determine if the member access accesses a member that both exists and is visible
+     *
+     * @param node a member access
+     */
     @Override
     public void postVisit(ASTMemberAccess node) {
         super.postVisit(node);
-        ASTClassBlock referencedClass = ASTClass.nameClassMap.get(node.referencedClassName).block;
-        ASTAttribute member = referencedClass.classAttributes.stream().filter(attr -> attr.assignment.variable.name.equals(node.var.name)).findFirst().orElse(null);
-        if(member == null) {
-            addError(node, node.className + " does not have attribute " + node.var.name);
-            return;
+        if(node.instance.type instanceof HMTypeClass) {
+            ASTClass instanceClass = ASTClass.nameClassMap.get(((HMTypeClass)node.instance.type).name);
+            ASTAttribute member = instanceClass.block.classAttributes.stream().filter(attr -> attr.assignment.variable.name.equals(node.var.name)).findFirst().orElse(null);
+            if (member == null) {
+                addError(node, node.instance.name + " does not have attribute " + node.var.name);
+                return;
+            }
+            if (!isExtendedBy(instanceClass, enclosingClass) && !member.scope.equals("public")) {
+                addError(node, "Attribute " + node.var.name + " is not public");
+            }
+        } else {
+            addError(node, "Cannot access members of " + node.instance.name + "; type of " + node.instance.name + " is " + node.instance.type);
         }
-        if(!member.scope.equals("public")) {
-            addError(node, "Attribute " + node.var.name + " is not public");
+    }
+
+    /**
+     * Return true iff base is extended by descendant
+     * @param base base class
+     * @param descendant the class we want to be a descendant of base
+     * @return true iff descendant is a descendant of base
+     */
+    private boolean isExtendedBy(ASTClass base, ASTClass descendant) {
+        ASTClass currentClass = descendant;
+        while(currentClass != null && !currentClass.signature.className.equals(base.signature.className)) {
+            currentClass = ASTClass.nameClassMap.get(currentClass.signature.superName);
         }
+        return currentClass != null;
     }
 
 }
