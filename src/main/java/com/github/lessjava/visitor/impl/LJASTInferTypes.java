@@ -91,14 +91,17 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         }
 
         node.returnType = this.returnType == null ? HMTypeBase.VOID : unify(node, node.returnType, this.returnType);
+        BuildSymbolTables.searchScopesForSymbol(node, node.name, Symbol.SymbolType.FUNCTION).forEach(s -> node.returnType = unify(node, node.returnType, s.type));
         node.concrete = node.parameters.stream().noneMatch(p -> p.type instanceof HMTypeVar);
         this.returnType = null;
     }
 
     @Override
     public void preVisit(ASTForLoop node) {
-        if (node.lowerBound == null && node.upperBound.type instanceof HMTypeCollection) {
-            node.var.type = ((HMTypeCollection) node.upperBound.type).elementType;
+        if (node.lowerBound == null) {
+            if(node.upperBound.type instanceof HMTypeCollection){
+                node.var.type = ((HMTypeCollection) node.upperBound.type).elementType;
+            }
         } else {
             node.var.type = new HMTypeBase(BaseDataType.INT);
         }
@@ -215,6 +218,11 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTVariable node) {
         super.postVisit(node);
 
+        // If the variable is the member in a member access, we don't infer the type here
+        if(node.getParent() instanceof ASTMemberAccess && ((ASTMemberAccess)node.getParent()).var == node) {
+            return;
+        }
+
         List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name, Symbol.SymbolType.VARIABLE);
 
         if (symbols != null && !symbols.isEmpty()) {
@@ -228,12 +236,17 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTMemberAccess node) {
         super.postVisit(node);
 
-        ASTClass containingClass = ASTClass.nameClassMap.get(node.referencedClassName);
+        if(node.instance.type instanceof HMTypeClass) {
+            ASTClass containingClass = ASTClass.nameClassMap.get(((HMTypeClass) node.instance.type).name);
 
-        ASTVariable attribute = containingClass.getAttribute(node.var.name);
+            ASTVariable attribute = containingClass.getAttribute(node.var.name);
 
-        if (attribute != null) {
-            node.type = unify(node, node.type, attribute.type);
+            if (attribute != null) {
+                node.var.type = unify(node, node.var.type, attribute.type);
+                node.type = node.var.type;
+            }
+        } else {
+            addError(node, "Cannot access members of " + node.instance.name + "; type of " + node.instance.name + " is " + node.instance.type);
         }
     }
 

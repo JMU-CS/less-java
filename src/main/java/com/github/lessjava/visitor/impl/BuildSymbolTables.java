@@ -15,10 +15,12 @@ import com.github.lessjava.types.ast.ASTBlock;
 import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
+import com.github.lessjava.types.ast.ASTMemberAccess;
 import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTVariable;
 import com.github.lessjava.types.inference.HMType;
+import com.github.lessjava.types.inference.impl.HMTypeClass;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
@@ -178,6 +180,16 @@ public class BuildSymbolTables extends LJAbstractAssignTypes {
     @Override
     public void preVisit(ASTClass node) {
         node.attributes.put(SYMBOL_TABLE, initializeScope());
+        ASTVariable thisVar = new ASTVariable("this");
+        thisVar.type = new HMTypeClass(node.signature.className);
+        insertVariableSymbol(thisVar);
+        ASTVariable superVar = new ASTVariable("super");
+        if(node.signature.superName != null) {
+            superVar.type = new HMTypeClass(node.signature.superName);
+        } else {
+            superVar.type = new HMTypeClass("Object");
+        }
+        insertVariableSymbol(superVar);
     }
 
     @Override
@@ -223,6 +235,11 @@ public class BuildSymbolTables extends LJAbstractAssignTypes {
 
     @Override
     public void postVisit(ASTVariable node) {
+        // Don't insert a symbol for the member in a member access
+        if(node.getParent() instanceof ASTMemberAccess && ((ASTMemberAccess)node.getParent()).var == node) {
+            return;
+        }
+
         insertVariableSymbol(node);
     }
 }

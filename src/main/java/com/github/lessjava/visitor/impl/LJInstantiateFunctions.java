@@ -2,6 +2,8 @@ package com.github.lessjava.visitor.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
@@ -47,7 +49,14 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             return;
         }
 
-        ASTAbstractFunction prototype = program.functions.stream()
+        if(node.name.equals(("super"))) {
+            return;
+        }
+
+        ArrayList<ASTAbstractFunction> functions = new ArrayList<>(program.functions);
+        program.classes.forEach(c -> functions.addAll(c.block.methods.stream().filter(m -> m.isConstructor).collect(Collectors.toList())));
+
+        ASTAbstractFunction prototype = functions.stream()
             .filter(f -> f.name.equals(node.name) && f.parameters.size() == node.arguments.size())
             .findAny()
             .orElse(null);
@@ -57,7 +66,8 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             return;
         }
 
-        if (prototype != null && prototype.concrete) {
+        // Don't instantiate if there's either already a concrete implementation or if the prototype is a constructor (ASTMethod)
+        if (prototype.concrete || prototype instanceof ASTMethod) {
             return;
         }
 
@@ -80,9 +90,8 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             return null;
         }
 
-        ASTBlock blockCopy = new ASTBlock();
-        blockCopy.statements = prototype.body.statements;
-        blockCopy.variables = prototype.body.variables;
+        LJDuplicateBlock blockDuplicator = new LJDuplicateBlock();
+        ASTBlock blockCopy = blockDuplicator.duplicateBlock(prototype.body);
 
         ASTFunction functionInstance = new ASTFunction(prototype.name, prototype.returnType, blockCopy);
 
@@ -90,6 +99,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
         functionInstance.concrete = true;
         functionInstance.parameters = new ArrayList<>();
+        functionInstance.lineNumber = prototype.lineNumber;
 
         for (int i = 0; i < arguments.size(); i++) {
             String pname = prototype.parameters.get(i).name;
@@ -141,9 +151,8 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
         ASTClass containingClass = ASTClass.nameClassMap.get(prototype.containingClassName);
 
-        ASTBlock blockCopy = new ASTBlock();
-        blockCopy.statements = prototype.body.statements;
-        blockCopy.variables = prototype.body.variables;
+        LJDuplicateBlock blockDuplicator = new LJDuplicateBlock();
+        ASTBlock blockCopy = blockDuplicator.duplicateBlock(prototype.body);
 
         ASTFunction functionInstance = new ASTFunction(prototype.name, prototype.returnType, blockCopy);
 
@@ -151,6 +160,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
         functionInstance.concrete = true;
         functionInstance.parameters = new ArrayList<>();
+        functionInstance.lineNumber = prototype.lineNumber;
 
         for (int i = 0; i < arguments.size(); i++) {
             String pname = prototype.parameters.get(i).name;

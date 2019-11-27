@@ -14,11 +14,13 @@ public class HMTypeClass extends HMType {
     public HMTypeClass(String name, HashSet<String> methods) {
         this.name = name;
         this.methods = methods;
+        this.isConcrete = true;
     }
 
     public HMTypeClass(String name) {
         this.name = name;
         this.methods = new HashSet<>();
+        this.isConcrete = true;
     }
 
     public void addMethod(ASTFunction method) {

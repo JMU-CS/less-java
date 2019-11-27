@@ -96,6 +96,7 @@ public class LJCompiler {
         program.traverse(inferConstructors);
 
         do {
+            program.traverse(buildParentLinks); // Rebuild parent links in case we instantiated new functions
             StaticAnalysis.resetErrors();   // Remove errors found in old iterations
             program.traverse(buildSymbolTables);
             program.traverse(instantiateFunctions);

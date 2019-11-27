@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTBinaryExpr.BinOp;
@@ -16,6 +17,7 @@ import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeClass;
 import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.impl.StaticAnalysis;
@@ -50,10 +52,12 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
         boolean leftIsBase = left instanceof HMTypeBase;
         boolean leftIsVar = left instanceof HMTypeVar;
         boolean leftIsCollection = left instanceof HMTypeCollection;
+        boolean leftIsClass = left instanceof HMTypeClass;
 
         boolean rightIsBase = right instanceof HMTypeBase;
         boolean rightIsVar = right instanceof HMTypeVar;
         boolean rightIsCollection = right instanceof HMTypeCollection;
+        boolean rightIsClass = right instanceof HMTypeClass;
 
         if (leftIsBase && rightIsBase) {
             return unify(node, (HMTypeBase) left, (HMTypeBase) right);
@@ -61,6 +65,8 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
             return unify((HMTypeVar) left, (HMTypeVar) right);
         } else if (leftIsCollection && rightIsCollection) {
             return unify(node, (HMTypeCollection) left, (HMTypeCollection) right);
+        } else if (leftIsClass && rightIsClass) {
+            return unify(node, (HMTypeClass)left, (HMTypeClass)right);
         }
 
         // TODO: This can't be right...
@@ -78,6 +84,25 @@ public abstract class LJAbstractAssignTypes extends StaticAnalysis implements LJ
         }
 
         return left;
+    }
+
+    protected HMType unify(ASTNode node, HMTypeClass left, HMTypeClass right) {
+        Set<String> leftClasses = new HashSet<>();
+        String leftClass = left.name;
+        while(leftClass != null) {
+            leftClasses.add(leftClass);
+            leftClass = ASTClass.nameClassMap.get(leftClass).signature.superName;
+        }
+        String rightClass = right.name;
+        while(rightClass != null && !leftClasses.contains(rightClass)) {
+            rightClass = ASTClass.nameClassMap.get(rightClass).signature.superName;
+        }
+        if(rightClass != null) {
+            return new HMTypeClass(rightClass);
+        } else {
+            addError(node, "Cannot unify classes " + left.name + " and " + right.name + "; classes have no common superclass.");
+            return left;
+        }
     }
 
     protected HMType unify(ASTNode node, HMTypeCollection left, HMTypeCollection right) {

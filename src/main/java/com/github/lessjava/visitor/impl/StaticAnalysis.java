@@ -16,6 +16,7 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
  */
 public class StaticAnalysis extends LJDefaultASTVisitor {
     protected static List<String> errors = new ArrayList<String>();
+    public static boolean collectErrors = true;
 
     /**
      * Report an {@link InvalidProgramException} error. This error is saved for
@@ -34,7 +35,9 @@ public class StaticAnalysis extends LJDefaultASTVisitor {
      * @param msg
      */
     public static void addError(ASTNode node, String msg) {
-        errors.add("Line " + node.lineNumber + ": " + msg);
+        if(collectErrors) {
+            errors.add("Line " + node.lineNumber + ": " + msg);
+        }
     }
 
     /**
