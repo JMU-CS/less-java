@@ -54,7 +54,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         }
 
         ArrayList<ASTAbstractFunction> functions = new ArrayList<>(program.functions);
-        program.classes.forEach(c -> functions.addAll(c.block.methods.stream().filter(m -> m.isConstructor).collect(Collectors.toList())));
+        program.classes.forEach(c -> functions.addAll(c.block.constructors));
 
         ASTAbstractFunction prototype = functions.stream()
             .filter(f -> f.name.equals(node.name) && f.parameters.size() == node.arguments.size())

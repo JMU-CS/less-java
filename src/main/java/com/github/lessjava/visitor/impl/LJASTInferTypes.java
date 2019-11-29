@@ -8,6 +8,7 @@ import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTArgList;
 import com.github.lessjava.types.ast.ASTAssignment;
+import com.github.lessjava.types.ast.ASTAttribute;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTClassBlock;
@@ -27,6 +28,7 @@ import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTSet;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
+import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
@@ -64,7 +66,12 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             node.concrete = node.function.concrete = true;
 
             for (Parameter p : node.function.parameters) {
-                p.type = unify(node, p.type, ASTClassBlock.nameAttributeMap.get(p.name).assignment.type);
+                ASTAttribute member = ASTClassBlock.nameAttributeMap.get(p.name);
+                if (member == null) {
+                    StaticAnalysis.addError(node, "Constructor parameter names must match class member names. \"" + p.name + "\" is not a member.");
+                } else {
+                    p.type = unify(node, p.type, ASTClassBlock.nameAttributeMap.get(p.name).assignment.type);
+                }
             }
         } else {
             node.returnType = node.function.returnType;

@@ -114,12 +114,13 @@ public class ASTClass extends ASTNode {
         }
     }
 
-    public boolean hasExplicitConstructor() {
-        List<String> methodNames = this.block.methods.stream()
-                                                     .map(m -> m.name)
-                                                     .collect(Collectors.toList());
-
-        return methodNames.contains(signature.className);
+    /**
+     * Return true iff the class has a constructor that takes no parameters.
+     *
+     * @return true iff the class has a constructor that takes no parameters
+     */
+    public boolean hasEmptyConstructor() {
+        return block.constructors.stream().map(c -> c.parameters).anyMatch(List::isEmpty);
     }
 
     public boolean hasMethod(String name) {
