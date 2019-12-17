@@ -10,7 +10,7 @@ public class ASTClassBlock extends ASTNode {
 
     public Set<ASTAttribute> classAttributes;
     public Set<ASTMethod> methods;
-    public ASTMethod constructor;
+    public Set<ASTMethod> constructors;
 
     public ASTClassBlock() {
         this(null, null, null);
@@ -23,7 +23,10 @@ public class ASTClassBlock extends ASTNode {
     public ASTClassBlock(Set<ASTAttribute> attributes, Set<ASTMethod> methods, ASTMethod constructor) {
         this.classAttributes = attributes != null ? attributes : new HashSet<>();
         this.methods = methods != null ? methods : new HashSet<>();
-        this.constructor = constructor;
+        this.constructors = new HashSet<>();
+        if(constructor != null) {
+            this.constructors.add(constructor);
+        }
 
         for (ASTAttribute a: classAttributes) {
             nameAttributeMap.put(a.assignment.variable.name, a);

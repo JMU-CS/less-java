@@ -188,12 +188,8 @@ public class LJASTConverter extends LJBaseListener {
         ASTMethod method;
         String scope;
 
-        boolean isConstructor = false;
-
-        // Null if constructor
         if (ctx.scope == null) {
             scope = ASTClass.PUBLIC;
-            isConstructor = true;
         } else {
             scope = ctx.scope.getText();
         }
@@ -202,13 +198,13 @@ public class LJASTConverter extends LJBaseListener {
 
         method = new ASTMethod(scope, function, this.currentClassSignature.className);
         method.lineNumber = ctx.getStart().getLine();
-        method.isConstructor = isConstructor;
+        method.isConstructor = function.name.equals(this.currentClassSignature.className);
         method.containingClassName = currentClassSignature.className;
 
         currentClassBlock.methods.add(method);
 
-        if (isConstructor) {
-            currentClassBlock.constructor = method;
+        if (method.isConstructor) {
+            currentClassBlock.constructors.add(method);
         }
 
         method.setDepth(ctx.depth());
