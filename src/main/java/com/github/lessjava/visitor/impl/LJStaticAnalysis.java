@@ -367,7 +367,12 @@ public class LJStaticAnalysis extends StaticAnalysis {
         super.postVisit(node);
         if(node.instance.type instanceof HMTypeClass) {
             ASTClass instanceClass = ASTClass.nameClassMap.get(((HMTypeClass)node.instance.type).name);
-            ASTAttribute member = instanceClass.block.classAttributes.stream().filter(attr -> attr.assignment.variable.name.equals(node.var.name)).findFirst().orElse(null);
+            ASTClass classToLookIn = instanceClass;
+            ASTAttribute member;
+            do {
+                member = classToLookIn.block.classAttributes.stream().filter(attr -> attr.assignment.variable.name.equals(node.var.name)).findFirst().orElse(null);
+                classToLookIn = classToLookIn.parent;
+            } while (member == null && classToLookIn != null);
             if (member == null) {
                 addError(node, node.instance.name + " does not have attribute " + node.var.name);
                 return;

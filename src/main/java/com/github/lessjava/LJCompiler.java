@@ -93,6 +93,10 @@ public class LJCompiler {
         // Apply visitors to AST
         program.traverse(buildParentLinks);
         program.traverse(buildClassLinks);
+        if(!StaticAnalysis.getErrors().isEmpty()) {
+            System.out.printf("%n%s%n", StaticAnalysis.getErrorString());
+            System.exit(1);
+        }
         program.traverse(inferConstructors);
 
         do {

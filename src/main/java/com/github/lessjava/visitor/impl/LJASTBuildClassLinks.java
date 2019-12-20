@@ -10,11 +10,37 @@ public class LJASTBuildClassLinks extends LJDefaultASTVisitor {
 
     public final static Map<String, ASTClass> nameClassMap = new HashMap<>();
 
+    // Add some undeclarable classes to the map
+    static {
+        nameClassMap.put("Object",null);
+        nameClassMap.put("String", null);
+        nameClassMap.put("Integer", null);
+        nameClassMap.put("Double", null);
+        nameClassMap.put("Boolean", null);
+        nameClassMap.put("Char", null);
+        nameClassMap.put("LJList", null);
+        nameClassMap.put("LJSet", null);
+        nameClassMap.put("LJMap", null);
+    }
+
     @Override
     public void postVisit(ASTClass node) {
         super.postVisit(node);
 
-        nameClassMap.putIfAbsent(node.signature.className, node);
-        node.parent = nameClassMap.get(node.signature.superName);
+        String className = node.signature.className;
+        if(nameClassMap.containsKey(className)) {
+            StaticAnalysis.addError(node, className + " already declared.");
+        } else {
+            nameClassMap.put(className, node);
+        }
+
+        String superName = node.signature.superName;
+        if(superName != null) {
+            if(nameClassMap.containsKey(superName)) {
+                node.parent = nameClassMap.get(superName);
+            } else {
+                StaticAnalysis.addError(node, "Superclass " + superName + " not found.");
+            }
+        }
     }
 }
