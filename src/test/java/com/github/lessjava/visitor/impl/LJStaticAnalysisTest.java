@@ -4,6 +4,8 @@ import com.github.lessjava.generated.LJLexer;
 import com.github.lessjava.generated.LJParser;
 import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTClassBlock;
+import com.github.lessjava.types.ast.ASTClassSignature;
+import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTProgram;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -21,8 +23,8 @@ class LJStaticAnalysisTest {
             "A {\n" +
                     "public intMember = 0\n" +
                     "private privateMember = 1.0\n" +
-                    "A(num) {\n" +
-                        "this.intMember = num\n" +
+                    "A(intMember) {\n" +
+                        "this.intMember = intMember\n" +
                     "}\n" +
                     "getNumber() {\n" +
                         "return this.intMember\n" +
@@ -32,9 +34,9 @@ class LJStaticAnalysisTest {
     private static final String CLASS_B =
             "B extends A {\n" +
                     "public strMember = \"\"\n" +
-                    "B(num, word) {\n" +
-                        "super(num)\n" +
-                        "this.strMember = word\n" +
+                    "B(intMember, strMember) {\n" +
+                        "super(intMember)\n" +
+                        "this.strMember = strMember\n" +
                     "}" +
             "}\n";
 
@@ -45,6 +47,16 @@ class LJStaticAnalysisTest {
         this.underTest = new LJStaticAnalysis();
         StaticAnalysis.resetErrors();
         BuildSymbolTables.nodeSymbolTableMap.clear();
+        LJASTBuildClassLinks.nameClassMap.clear();
+        LJASTBuildClassLinks.nameClassMap.put("Object",null);
+        LJASTBuildClassLinks.nameClassMap.put("String", null);
+        LJASTBuildClassLinks.nameClassMap.put("Integer", null);
+        LJASTBuildClassLinks.nameClassMap.put("Double", null);
+        LJASTBuildClassLinks.nameClassMap.put("Boolean", null);
+        LJASTBuildClassLinks.nameClassMap.put("Char", null);
+        LJASTBuildClassLinks.nameClassMap.put("LJList", null);
+        LJASTBuildClassLinks.nameClassMap.put("LJSet", null);
+        LJASTBuildClassLinks.nameClassMap.put("LJMap", null);
         ASTClass.nameClassMap.clear();
         ASTClassBlock.nameAttributeMap.clear();
         StaticAnalysis.collectErrors = true;
@@ -76,6 +88,9 @@ class LJStaticAnalysisTest {
         // Apply visitors to AST
         program.traverse(buildParentLinks);
         program.traverse(buildClassLinks);
+        if(!StaticAnalysis.getErrors().isEmpty()) {
+            return program;
+        }
         program.traverse(inferConstructors);
 
         do {
@@ -203,7 +218,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testIntMemberAccess_valid() {
         String program = CLASS_A +
                 "main() {\n" +
@@ -214,7 +228,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testIntMemberAssignStr_invalid() {
         String program = CLASS_A +
                 "main() {\n" +
@@ -243,7 +256,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testBExtendsAButANotDeclared_invalid() {
         String program =
                 CLASS_B +
@@ -254,12 +266,11 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testNoApplicableConstructor_invalid() {
         String program =
                 CLASS_A +
                 "main() {\n" +
-                        "a=A()\n" +
+                        "a=A(5, 10)\n" +
                 "}";
         assertInvalid(program);
     }
@@ -277,7 +288,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testAccessSuperclassMembers_valid() {
         String program = CLASS_A + CLASS_B +
                 "main() {\n" +
@@ -403,7 +413,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testAccessPrivateMembers_invalid() {
         String program = CLASS_A +
                 "main() {\n" +
@@ -414,7 +423,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testAccessSuperclassPrivateMembers_invalid() {
         String program = CLASS_A + CLASS_B +
                 "main() {\n" +
@@ -425,7 +433,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testClassNamedObject_invalid() {
         String program =
                 "Object {}\n" +
@@ -512,7 +519,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testCallMethodDefinedInSuper_valid() {
         String program = CLASS_A + CLASS_B +
                 "main() {\n" +
@@ -523,7 +529,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testMethodWithMultipleBindings_valid() {
         String program =
                 "Foo {\n" +
@@ -540,7 +545,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testMethodReturnTypeDependsOnParameterBinding_invalid() {
         String program =
                 "Foo {" +
@@ -557,7 +561,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testRebindInheritedMethods_valid() {
         String program =
                 "Foo {\n" +

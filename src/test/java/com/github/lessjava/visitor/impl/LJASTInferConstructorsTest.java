@@ -6,6 +6,7 @@ import com.github.lessjava.generated.LJLexer;
 import com.github.lessjava.generated.LJParser;
 import com.github.lessjava.types.ast.ASTBinaryExpr;
 import com.github.lessjava.types.ast.ASTClass;
+import com.github.lessjava.types.ast.ASTClassBlock;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTProgram;
@@ -16,6 +17,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class LJASTInferConstructorsTest {
@@ -46,9 +48,28 @@ class LJASTInferConstructorsTest {
         // Apply visitors to AST
         program.traverse(buildParentLinks);
         program.traverse(buildClassLinks);
+        if(!StaticAnalysis.getErrors().isEmpty()) {
+            return program;
+        }
         program.traverse(inferConstructors);
 
         return program;
+    }
+
+    @BeforeEach
+    public void init() {
+        ASTClass.nameClassMap.clear();
+        ASTClassBlock.nameAttributeMap.clear();
+        LJASTBuildClassLinks.nameClassMap.clear();
+        LJASTBuildClassLinks.nameClassMap.put("Object",null);
+        LJASTBuildClassLinks.nameClassMap.put("String", null);
+        LJASTBuildClassLinks.nameClassMap.put("Integer", null);
+        LJASTBuildClassLinks.nameClassMap.put("Double", null);
+        LJASTBuildClassLinks.nameClassMap.put("Boolean", null);
+        LJASTBuildClassLinks.nameClassMap.put("Char", null);
+        LJASTBuildClassLinks.nameClassMap.put("LJList", null);
+        LJASTBuildClassLinks.nameClassMap.put("LJSet", null);
+        LJASTBuildClassLinks.nameClassMap.put("LJMap", null);
     }
 
     @Test
