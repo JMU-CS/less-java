@@ -1,7 +1,7 @@
 getb() {
     a = []
     a.add("a")
-    b = a.remove(0)
+    b = a.removeAt(0)
     return b
 }
 

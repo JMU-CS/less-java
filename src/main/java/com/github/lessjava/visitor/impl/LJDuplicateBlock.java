@@ -320,7 +320,7 @@ public class LJDuplicateBlock extends LJDefaultASTVisitor {
     @Override
     public void postVisit(ASTVariable node) {
         ASTVariable varCopy;
-        if(node.isCollection) {
+        if(node.index != null) {
             varCopy = new ASTVariable(node.name, expressions.pop());
         } else {
             varCopy = new ASTVariable(node.name);
