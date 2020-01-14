@@ -1,5 +1,6 @@
 package com.github.lessjava.visitor.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.github.lessjava.types.Symbol;
@@ -32,7 +33,7 @@ import com.github.lessjava.types.inference.impl.HMTypeClass;
 
 public class LJStaticAnalysis extends StaticAnalysis {
 
-    private static final List<String> RESERVED_WORDS = List.of("this", "super", "class", "int", "boolean", "double", "char", "long", "float");
+    private static final List<String> RESERVED_WORDS = Arrays.asList("this", "super", "class", "int", "boolean", "double", "char", "long", "float");
     private ASTClass enclosingClass;
 
     @Override
