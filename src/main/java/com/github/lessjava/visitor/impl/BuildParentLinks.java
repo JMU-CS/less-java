@@ -228,7 +228,12 @@ public class BuildParentLinks extends LJDefaultASTVisitor {
         node.value.setParent(node);
     }
 
-    // no need for ASTLocation handler (no children)
+    @Override
+    public void preVisit(ASTVariable node) {
+        if(node.index != null) {
+            node.index.setParent(node);
+        }
+    }
 
     // no need for ASTLiteral handler (no children)
 }

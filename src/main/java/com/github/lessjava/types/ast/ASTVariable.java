@@ -29,7 +29,7 @@ public class ASTVariable extends ASTExpression {
         StringBuilder sb = new StringBuilder();
 
         sb.append(name);
-        if (type instanceof HMTypeList && index != null) {
+        if (index != null) {
             sb.append(String.format(".get(%s)", index.toString()));
         }
 
@@ -39,6 +39,9 @@ public class ASTVariable extends ASTExpression {
     @Override
     public void traverse(ASTVisitor visitor) {
         visitor.preVisit(this);
+        if(index != null) {
+            index.traverse(visitor);
+        }
         visitor.postVisit(this);
     }
 }

@@ -38,7 +38,7 @@ public class LJList<T> extends ArrayList<T> {
         this.add(index, element);
     }
 
-    public void removeAt(int index) {
-        this.remove(index);
+    public T removeAt(int index) {
+        return this.remove(index);
     }
 }

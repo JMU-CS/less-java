@@ -28,7 +28,6 @@ import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTSet;
 import com.github.lessjava.types.ast.ASTUnaryExpr;
 import com.github.lessjava.types.ast.ASTVariable;
-import com.github.lessjava.types.ast.ASTVoidAssignment;
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
@@ -85,6 +84,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         this.returnType = null;
         this.parameters = node.parameters;
+        StaticAnalysis.collectErrors = node.concrete;
     }
 
     @Override
@@ -92,6 +92,7 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.postVisit(node);
 
         this.parameters = null;
+        StaticAnalysis.collectErrors = true;
 
         if (node.body == null) {
             return;
@@ -188,6 +189,10 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
+        if(node.getParent() instanceof ASTMethodCall && ((ASTMethodCall) node.getParent()).funcCall == node) {
+            return;
+        }
+
         if (ASTClass.nameClassMap.containsKey(node.name)
                 && !ASTFunction.libraryFunctionStrings.containsKey(node.name)) {
             node.type = new HMTypeClass(node.name);
@@ -202,6 +207,9 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
                 }
             }
         }
+        if (collectionCopyConstructorCall(node)) {
+            ((HMTypeCollection)node.type).elementType = ((HMTypeCollection)node.arguments.get(0).type).elementType;
+        }
     }
 
     @Override
@@ -212,11 +220,27 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             return;
         }
 
-        BuildSymbolTables.searchScopesForSymbol(node, node.name, Symbol.SymbolType.VARIABLE).forEach(s -> node.type = unify(node, s.type, node.type));
+        List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name, Symbol.SymbolType.VARIABLE);
+
+        if(node.index != null) {
+            if(symbols.stream().allMatch(s -> s.type instanceof HMTypeCollection)) {
+                symbols.forEach(s -> node.type = unify(node, ((HMTypeCollection) s.type).elementType, node.type));
+            } else {
+                addError(node, "Cannot index into " + node.name + " because it is not a list. " + node.type);
+            }
+        } else {
+            symbols.forEach(s -> node.type = unify(node, s.type, node.type));
+        }
 
         for (Parameter p : parameters) {
             if (p.name.equals(node.name)) {
-                node.type = unify(node, node.type, p.type);
+                if(node.index == null) {
+                    node.type = unify(node, node.type, p.type);
+                } else if(p.type instanceof HMTypeCollection) {
+                    node.type = unify(node, node.type, ((HMTypeCollection) p.type).elementType);
+                } else {
+                    addError(node, "Cannot index into " + node.name + " because it is not a list. Type is " + p.type);
+                }
             }
         }
     }
@@ -233,7 +257,11 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         List<Symbol> symbols = BuildSymbolTables.searchScopesForSymbol(node, node.name, Symbol.SymbolType.VARIABLE);
 
         if (symbols != null && !symbols.isEmpty()) {
-            symbols.forEach(s -> node.type = s.variable == null ? node.type : unify(node, node.type, s.type));
+            if(node.index == null) {
+                symbols.forEach(s -> node.type = s.variable == null ? node.type : unify(node, node.type, s.type));
+            } else {
+                symbols.forEach((s -> node.type = s.variable == null ? node.type : unify(node, node.type, ((HMTypeCollection) s.type).elementType)));
+            }
         }
 
         node.isCollection = node.isCollection || node.type instanceof HMTypeCollection;
@@ -325,34 +353,115 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
     public void postVisit(ASTMethodCall node) {
         super.postVisit(node);
 
-        // TODO: Better way??
+        // Special cases for builtin classes with generics
         if (node.invoker.type instanceof HMTypeCollection) {
             HMTypeCollection t = (HMTypeCollection) node.invoker.type;
             List<ASTExpression> arguments = node.funcCall.arguments;
-            String name = node.funcCall.name;
-
-            if (name.equals("add")) {
-                t.elementType = unify(node, t.elementType, arguments.get(0).type);
-            } else if (name.equals("insert")) {
-                t.elementType = unify(node, t.elementType, arguments.get(1).type);
-            } else if (name.equals("remove")) {
-                if (!arguments.isEmpty()) {
-                    t.elementType = unify(node, t.elementType, arguments.get(0).type);
-                }
-            } else if (name.equals("put")) {
-                if (!arguments.isEmpty()) {
-                    HMTypeTuple tuple = (HMTypeTuple) t.elementType;
-
-                    HMType key = tuple.types.get(0);
-                    HMType value = tuple.types.get(1);
-
-                    key = unify(node, key, arguments.get(0).type);
-                    value = unify(node, value, arguments.get(1).type);
-
-                    t.elementType = new HMTypeTuple(Arrays.asList(new HMType[] { key, value }));
-                }
-            } else if(name.equals("get")) {
-                node.funcCall.type = unify(node, node.funcCall.type, t.elementType);
+            String methodName = node.funcCall.name;
+            switch (t.collectionName) {
+                case HMTypeMap.MAP:
+                    List<HMType> typeTuple = ((HMTypeTuple)t.elementType).types;
+                    HMType keyType = typeTuple.get(0);
+                    HMType valueType = typeTuple.get(1);
+                    switch (methodName) {
+                        case "get":
+                            requireArgs(node, 1, arguments);
+                            node.funcCall.type = unify(node, node.funcCall.type, valueType);
+                            break;
+                        case "put":
+                            if(requireArgs(node, 2, arguments)) {
+                                typeTuple.set(0, unify(node, keyType, arguments.get(0).type));
+                                typeTuple.set(1, unify(node, valueType, arguments.get(1).type));
+                            }
+                            node.funcCall.type = HMTypeBase.VOID;
+                            break;
+                        case "contains":
+                            requireArgs(node, 1, arguments);
+                            node.funcCall.type = HMTypeBase.BOOL;
+                            break;
+                        case "size":
+                            requireArgs(node, 0, arguments);
+                            node.funcCall.type = HMTypeBase.INT;
+                            break;
+                        default:
+                            addError(node, "Method does not exist");
+                    }
+                    break;
+                case HMTypeList.LIST:
+                    switch(methodName) {
+                        case "get":
+                            requireArgs(node, 1, arguments);
+                            node.funcCall.type = unify(node, node.funcCall.type, t.elementType);
+                            break;
+                        case "push":
+                        case "add":
+                        case "enqueue":
+                            if(requireArgs(node, 1, arguments)) {
+                                t.elementType = unify(node, t.elementType, arguments.get(0).type);
+                            }
+                            node.funcCall.type = HMTypeBase.VOID;
+                            break;
+                        case "size":
+                            requireArgs(node, 0, arguments);
+                            node.funcCall.type = HMTypeBase.INT;
+                            break;
+                        case "removeAt":
+                            if(requireArgs(node, 1, arguments)) {
+                                if(!arguments.get(0).type.equals(HMTypeBase.INT)) {
+                                    addError(node, "Method 'removeAt' requires an integer index, found " + arguments.get(0).type);
+                                }
+                            }
+                            node.funcCall.type = unify(node, node.funcCall.type, t.elementType);
+                            break;
+                        case "set":
+                            if(requireArgs(node, 2, arguments)) {
+                                if(!arguments.get(0).type.equals(HMTypeBase.INT)) {
+                                    addError(node, "Method 'set' requires an integer index, found " + arguments.get(0).type);
+                                }
+                                t.elementType = unify(node, t.elementType, arguments.get(1).type);
+                            }
+                            node.funcCall.type = unify(node, node.funcCall.type, t.elementType);
+                            break;
+                        case "remove":
+                            requireArgs(node, 1, arguments);
+                            node.funcCall.type = HMTypeBase.BOOL;
+                            break;
+                        case "pop":
+                        case "dequeue":
+                            requireArgs(node, 0, arguments);
+                            node.funcCall.type = unify(node, node.funcCall.type, t.elementType);
+                        case "insert":
+                            if(requireArgs(node, 2, arguments)) {
+                                if(!arguments.get(0).type.equals(HMTypeBase.INT)) {
+                                    addError(node, "Method 'insert' requires an integer index, found " + arguments.get(0).type);
+                                }
+                                t.elementType = unify(node, t.elementType, arguments.get(1).type);
+                            }
+                            node.funcCall.type = HMTypeBase.VOID;
+                        default:
+                            addError(node, "Method does not exist");
+                    }
+                    break;
+                case HMTypeSet.SET:
+                    switch(methodName) {
+                        case "add":
+                            if(requireArgs(node, 1, arguments)) {
+                                t.elementType = unify(node, t.elementType, arguments.get(0).type);
+                            }
+                            node.funcCall.type = HMTypeBase.VOID;
+                            break;
+                        case "remove":
+                        case "contains":
+                            requireArgs(node, 1, arguments);
+                            node.funcCall.type = HMTypeBase.BOOL;
+                            break;
+                        case "size":
+                            requireArgs(node, 0, arguments);
+                            node.funcCall.type = HMTypeBase.INT;
+                            break;
+                        default:
+                    }
+                    break;
             }
         }
 
@@ -363,17 +472,6 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             node.type = unify(node, node.type, returnType);
         }
 
-        // TODO: Determine if unnecessary
-        //if (idFunctionMap.containsKey(node.getIdentifyingString())) {
-            //List<ASTAbstractFunction> functions = idFunctionMap.get(node.getIdentifyingString());
-
-            //for (ASTAbstractFunction function: functions) {
-                //if (function.parameters.size() == node.funcCall.arguments.size()) {
-                    //node.type = unify(node.type, function.returnType);
-                //}
-            //}
-        //}
-
         node.type = unify(node, node.type, node.funcCall.type);
     }
 
@@ -382,5 +480,41 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
         super.preVisit(node);
 
         node.condition.type = unify(node, node.condition.type, new HMTypeBase(BaseDataType.BOOL));
+    }
+
+    /**
+     * Ensure that a method call has the correct number of arguments. Used for builtin methods primarily.
+     *
+     * @param node the method call to check
+     * @param requiredArgs the number of required arguments
+     * @param args the supplied arguments
+     * @return true iff the method call has the appropriate amount of arguments. If not, add an error and return false
+     */
+    private boolean requireArgs(ASTMethodCall node, int requiredArgs, List<ASTExpression> args) {
+        if(args.size() != requiredArgs) {
+            addError(node, "Method '" + node.funcCall.name + "' requires " + requiredArgs + " arguments");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Determines if a function call is a call to a copy constructor of a builtin collection
+     *
+     * @param node the function call
+     * @return true iff the call is to a copy constructor
+     */
+    private boolean collectionCopyConstructorCall(ASTFunctionCall node) {
+        if(node.arguments.size() == 0) {
+            return false;
+        }
+        ASTExpression arg = node.arguments.get(0);
+        if(node.name.equals("Map")) {
+            return arg.type instanceof HMTypeMap;
+        }
+        if(node.name.equals("List") || node.name.equals("Set")) {
+            return arg.type instanceof HMTypeList || arg.type instanceof HMTypeSet;
+        }
+        return false;
     }
 }

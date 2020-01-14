@@ -33,7 +33,7 @@ public class ASTClass extends ASTNode {
                 add("insert", HMTypeBase.VOID);
                 add("removeAt", new HMTypeVar());
                 add("get", new HMTypeVar());
-                add("set", HMTypeBase.VOID);
+                add("set", new HMTypeVar());
                 add("size", HMTypeBase.INT);
             }
 

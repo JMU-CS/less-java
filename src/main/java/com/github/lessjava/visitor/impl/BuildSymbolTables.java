@@ -240,6 +240,9 @@ public class BuildSymbolTables extends LJAbstractAssignTypes {
             return;
         }
 
-        insertVariableSymbol(node);
+        // Only insert a symbol if we're not indexing into a list
+        if(node.index == null) {
+            insertVariableSymbol(node);
+        }
     }
 }
