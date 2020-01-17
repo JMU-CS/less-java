@@ -504,7 +504,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testConstructorReturnsSomething_invalid() {
         String program =
                 "Foo {\n" +

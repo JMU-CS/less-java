@@ -49,6 +49,7 @@ class LJASTInferConstructorsTest {
         program.traverse(buildParentLinks);
         program.traverse(buildClassLinks);
         if(!StaticAnalysis.getErrors().isEmpty()) {
+            fail("Errors building class links:\n" + StaticAnalysis.getErrorString());
             return program;
         }
         program.traverse(inferConstructors);

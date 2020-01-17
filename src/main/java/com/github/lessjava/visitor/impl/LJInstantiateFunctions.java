@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.ast.ASTAbstractFunction;
 import com.github.lessjava.types.ast.ASTAbstractFunction.Parameter;
 import com.github.lessjava.types.ast.ASTBlock;
@@ -14,12 +15,18 @@ import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTFunctionCall;
 import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTMethodCall;
+import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
+import com.github.lessjava.types.ast.ASTStatement;
+import com.github.lessjava.types.ast.ASTVoidFunctionCall;
 import com.github.lessjava.types.inference.impl.HMTypeClass;
+import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
 public class LJInstantiateFunctions extends LJAbstractAssignTypes {
     private ASTProgram program;
+    private ASTClass currentClass;
+    private ASTMethod currentMethod;
 
     @Override
     public void preVisit(ASTProgram node) {
@@ -36,6 +43,30 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
     }
 
     @Override
+    public void preVisit(ASTClass node) {
+        super.postVisit(node);
+        currentClass = node;
+    }
+
+    @Override
+    public void postVisit(ASTClass node) {
+        super.postVisit(node);
+        currentClass = null;
+    }
+
+    @Override
+    public void preVisit(ASTMethod node) {
+        super.postVisit(node);
+        currentMethod = node;
+    }
+
+    @Override
+    public void postVisit(ASTMethod node) {
+        super.postVisit(node);
+        currentMethod = null;
+    }
+
+    @Override
     public void postVisit(ASTFunctionCall node) {
         super.postVisit(node);
 
@@ -44,12 +75,16 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             return;
         }
 
-        // Don't need to instantiate library functions
-        if(ASTAbstractFunction.libraryFunctions.stream().anyMatch(f -> f.name.equals(node.name))) {
-            return;
-        }
-
         if(node.name.equals(("super"))) {
+            if(currentMethod == null || !currentMethod.isConstructor) {
+                addError(node, "Cannot call super outside of a constructor");
+            } else if(currentClass.parent == null) {
+                addError(node, "Cannot call super constructor without a parent class");
+            } else if(currentClass.parent.block.constructors.stream().noneMatch(superConstructor -> superConstructor.parameters.size() == node.arguments.size())) {
+                addError(node, "No matching super constructor found");
+            } else if(!isFirstStatementInParent(node)) {
+                addError(node, "Call to super constructor must be the first statement in a constructor");
+            }
             return;
         }
 
@@ -57,13 +92,29 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         program.classes.forEach(c -> functions.addAll(c.block.constructors));
 
         ASTAbstractFunction prototype = functions.stream()
-            .filter(f -> f.name.equals(node.name) && f.parameters.size() == node.arguments.size())
+            .filter(f -> f.body != null && f.name.equals(node.name) && f.parameters.size() == node.arguments.size())
             .findAny()
             .orElse(null);
+
+        // Don't need to instantiate library functions
+        if(prototype == null && ASTAbstractFunction.libraryFunctions.stream().anyMatch(f -> f.name.equals(node.name))) {
+            return;
+        }
 
         if (prototype == null) {
             StaticAnalysis.addError(node, "Cannot find function " + node.name + " with " + node.arguments.size() + " arguments");
             return;
+        }
+
+        // Remove the library function if this function shadows a library function
+        if(ASTFunction.libraryFunctions.stream().anyMatch(f -> f.name.equals(node.name))) {
+            program.functions.removeIf(f -> f.name.equals(node.name) && f.body == null);
+            program.functions.stream().filter(f -> f.name.equals(node.name)).forEach(f -> f.returnType = new HMTypeVar());
+            idFunctionMap.get(node.getIdentifyingString()).removeIf(f -> f.body == null);
+            BuildSymbolTables.nodeSymbolTableMap.get(program).getSymbols().stream()
+                    .filter(s -> s.symbolType == Symbol.SymbolType.FUNCTION && s.function.name.equals(node.name))
+                    .forEach(f -> f.type = new HMTypeVar());
+            ASTFunction.libraryFunctions.removeIf(f -> f.name.equals(node.name));
         }
 
         // Don't instantiate if there's either already a concrete implementation or if the prototype is a constructor (ASTMethod)
@@ -180,5 +231,14 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         }
 
         return methodInstance;
+    }
+
+    private boolean isFirstStatementInParent(ASTFunctionCall node) {
+        ASTNode block = node.getParent();
+        while(!(block instanceof ASTBlock)) {
+            block = block.getParent();
+        }
+        ASTStatement firstStatement = ((ASTBlock) block).statements.get(0);
+        return firstStatement instanceof ASTVoidFunctionCall && ((ASTVoidFunctionCall) firstStatement).functionCall == node;
     }
 }
