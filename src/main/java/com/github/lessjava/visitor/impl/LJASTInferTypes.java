@@ -23,6 +23,7 @@ import com.github.lessjava.types.ast.ASTMap;
 import com.github.lessjava.types.ast.ASTMemberAccess;
 import com.github.lessjava.types.ast.ASTMethod;
 import com.github.lessjava.types.ast.ASTMethodCall;
+import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTReturn;
 import com.github.lessjava.types.ast.ASTSet;
@@ -131,6 +132,14 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
             }
         } else {
             this.returnType = unify(node, this.returnType, node.value.type);
+        }
+
+        ASTNode parent = node.getParent();
+        while(parent != null && !(parent instanceof ASTMethod)) {
+            parent = parent.getParent();
+        }
+        if(parent instanceof ASTMethod && ((ASTMethod) parent).isConstructor) {
+            addError(node, "Cannot return from a constructor");
         }
     }
 
