@@ -15,6 +15,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import com.github.lessjava.visitor.impl.LJConvertIntsToDoubles;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -82,6 +83,7 @@ public class LJCompiler {
         LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
         LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
         LJASTInferConstructors inferConstructors = new LJASTInferConstructors();
+        LJConvertIntsToDoubles convertIntsToDoubles = new LJConvertIntsToDoubles();
 
         // ANTLR Parsing
         ParseTree parseTree = parser.program();
@@ -113,6 +115,8 @@ public class LJCompiler {
                 System.out.println(message);
             }
         }
+
+        program.traverse(convertIntsToDoubles);
 
         // TODO: Determine if necessary
         // program.traverse(new LJUnifyVariables());

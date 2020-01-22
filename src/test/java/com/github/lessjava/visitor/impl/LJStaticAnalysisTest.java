@@ -77,6 +77,7 @@ class LJStaticAnalysisTest {
         LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
         LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
         LJASTInferConstructors inferConstructors = new LJASTInferConstructors();
+        LJConvertIntsToDoubles convertIntsToDoubles = new LJConvertIntsToDoubles();
 
         // ANTLR Parsing
         ParseTree parseTree = parser.program();
@@ -101,6 +102,8 @@ class LJStaticAnalysisTest {
             program.traverse(inferTypes);
             program.traverse(checkTypesHaveChanged);
         } while (LJASTCheckTypesHaveChanged.typesChanged);
+
+        program.traverse(convertIntsToDoubles);
 
         LJAssignTestVariables assignTestVariables = new LJAssignTestVariables();
 

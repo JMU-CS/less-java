@@ -144,4 +144,8 @@ public interface ASTVisitor {
     public void preVisit(ASTForLoop node);
 
     public void postVisit(ASTForLoop node);
+
+    public void preVisit(ASTConvertIntToDouble node);
+
+    public void postVisit(ASTConvertIntToDouble node);
 }

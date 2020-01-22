@@ -12,6 +12,7 @@ import com.github.lessjava.types.ast.ASTClassSignature;
 import com.github.lessjava.types.ast.ASTCollection;
 import com.github.lessjava.types.ast.ASTConditional;
 import com.github.lessjava.types.ast.ASTContinue;
+import com.github.lessjava.types.ast.ASTConvertIntToDouble;
 import com.github.lessjava.types.ast.ASTEntry;
 import com.github.lessjava.types.ast.ASTForLoop;
 import com.github.lessjava.types.ast.ASTFunction;
@@ -334,6 +335,16 @@ public class LJDefaultASTVisitor implements ASTVisitor {
 
     @Override
     public void postVisit(ASTAttribute node) {
+        defaultPostVisit(node);
+    }
+
+    @Override
+    public void preVisit(ASTConvertIntToDouble node) {
+        defaultPreVisit(node);
+    }
+
+    @Override
+    public void postVisit(ASTConvertIntToDouble node) {
         defaultPostVisit(node);
     }
 }
