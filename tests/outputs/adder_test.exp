@@ -1,12 +1,13 @@
 [36m╷[0m
 [36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
-[36m│  └─[0m [36mMain[0m [32m✔[0m
+[36m│  └─[0m [36mLJAdder[0m [32m✔[0m
 [36m│     ├─[0m [34mtest0()[0m [32m✔[0m
-[36m│     └─[0m [34mtest1()[0m [32m✔[0m
+[36m│     ├─[0m [34mtest1()[0m [32m✔[0m
+[36m│     └─[0m [34mtest2()[0m [32m✔[0m
 
-[         2 tests found           ]
+[         3 tests found           ]
 [         0 tests skipped         ]
-[         2 tests started         ]
+[         3 tests started         ]
 [         0 tests aborted         ]
-[         2 tests successful      ]
+[         3 tests successful      ]
 [         0 tests failed          ]
