@@ -47,5 +47,11 @@ if [ $# == 0 ]; then
 fi
 
 args="${args} -Ptestfile=${1}"
+base=$(basename $1)
+name=${base%.*}
+rm -r $name
+mkdir $name
+#tmp_dir=$(mktemp -d -t less-java-$name)
 "$GRADLE_WRAPPER" $args
+cp -r ./generated/* $name
 exit
