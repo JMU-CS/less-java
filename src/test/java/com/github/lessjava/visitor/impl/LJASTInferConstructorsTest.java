@@ -71,6 +71,7 @@ class LJASTInferConstructorsTest {
         LJASTBuildClassLinks.nameClassMap.put("LJList", null);
         LJASTBuildClassLinks.nameClassMap.put("LJSet", null);
         LJASTBuildClassLinks.nameClassMap.put("LJMap", null);
+        StaticAnalysis.resetErrors();
     }
 
     @Test
