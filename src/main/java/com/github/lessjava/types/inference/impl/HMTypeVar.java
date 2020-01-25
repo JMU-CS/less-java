@@ -9,7 +9,7 @@ public class HMTypeVar extends HMType {
 
     @Override
     public String toString() {
-        return String.format("T");
+        return String.format("$T");
 
     }
 

@@ -1,0 +1,16 @@
+main() {
+    funT(T())
+    fun(TT())
+}
+
+funT(a) {
+    return a
+}
+
+fun(a) {
+    return a
+}
+
+T {  }
+
+TT {  }

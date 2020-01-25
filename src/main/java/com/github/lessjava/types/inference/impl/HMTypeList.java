@@ -8,7 +8,7 @@ public class HMTypeList extends HMTypeCollection {
     public HMTypeList(HMType elementType) {
         super(LIST, elementType);
         super.collectionName = LIST;
-        super.isConcrete = true;
+        super.isConcrete = elementType.isConcrete;
     }
 
     @Override
