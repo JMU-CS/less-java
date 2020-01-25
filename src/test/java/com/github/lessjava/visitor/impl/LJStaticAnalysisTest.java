@@ -321,19 +321,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    public void testFunctionReturnDifferentTypesWithDifferentParameterBindings_invalid() {
-        String program =
-                "func(a) {\n" +
-                        "return a\n" +
-                "}\n" +
-                "main() {\n" +
-                        "x = func(5)\n" +
-                        "y = func(\"hi\")\n" +
-                "}";
-        assertInvalid(program);
-    }
-
-    @Test
     public void testFunctionReturnMultipleTypes_invalid() {
         String program =
                 "a() {\n" +

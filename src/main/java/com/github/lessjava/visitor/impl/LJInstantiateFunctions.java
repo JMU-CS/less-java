@@ -125,13 +125,15 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         ASTFunction f = instantiateFunction(prototype, node.arguments);
 
         if (f != null) {
+            // Use the new mangled function name as the function call name
+            node.name = f.name;
             if (program.functions.contains(f)) {
                 return;
             }
 
             program.functions.add(f);
 
-            idFunctionMap.get(node.getIdentifyingString()).add(f);
+            idFunctionMap.computeIfAbsent(node.getIdentifyingString(), k -> new ArrayList<>()).add(f);
         }
     }
 
@@ -167,6 +169,17 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         functionInstance.setParent(program);
         functionInstance.setDepth(2);
 
+        // Mangle function name to support multiple return types
+        String mangledName = String.format(
+                "%s%s",
+                prototype.name,
+                arguments.stream()
+                         .map(a -> a.type.toString().replaceAll("<", "LAB").replaceAll(">", "RAB"))
+                         .collect(Collectors.joining())
+            );
+        
+        functionInstance.name = mangledName;
+
         return functionInstance;
     }
 
@@ -190,6 +203,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         m = instantiateMethod(m, node.funcCall.arguments);
 
         if (m != null) {
+            // TODO: Mangle method name
             containingClass.block.methods.add(m);
         }
     }
