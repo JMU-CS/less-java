@@ -125,13 +125,15 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         ASTFunction f = instantiateFunction(prototype, node.arguments);
 
         if (f != null) {
+            // Use the new mangled function name as the function call name
+            node.name = f.name;
             if (program.functions.contains(f)) {
                 return;
             }
 
             program.functions.add(f);
 
-            idFunctionMap.get(node.getIdentifyingString()).add(f);
+            idFunctionMap.computeIfAbsent(node.getIdentifyingString(), k -> new ArrayList<>()).add(f);
         }
     }
 
@@ -167,6 +169,9 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         functionInstance.setParent(program);
         functionInstance.setDepth(2);
 
+        // Mangle function name to support multiple return types
+        functionInstance.name = mangleFunctionName(functionInstance.name, arguments);
+
         return functionInstance;
     }
 
@@ -190,6 +195,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         m = instantiateMethod(m, node.funcCall.arguments);
 
         if (m != null) {
+            node.funcCall.name = m.function.name;
             containingClass.block.methods.add(m);
         }
     }
@@ -209,6 +215,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
         blockCopy.setParent(functionInstance);
 
+        functionInstance.name = mangleFunctionName(functionInstance.name, arguments);
         functionInstance.concrete = true;
         functionInstance.parameters = new ArrayList<>();
         functionInstance.lineNumber = prototype.lineNumber;
@@ -240,5 +247,17 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         }
         ASTStatement firstStatement = ((ASTBlock) block).statements.get(0);
         return firstStatement instanceof ASTVoidFunctionCall && ((ASTVoidFunctionCall) firstStatement).functionCall == node;
+    }
+
+    private String mangleFunctionName(String name, List<ASTExpression> arguments) {
+        String mangledName = String.format(
+                "%s$%s",
+                name,
+                arguments.stream()
+                         .map(a -> a.type.toString().replaceAll("<", "LAB").replaceAll(">", "RAB"))
+                         .collect(Collectors.joining("$"))
+            );
+
+        return mangledName;
     }
 }
