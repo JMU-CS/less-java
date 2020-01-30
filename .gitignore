@@ -12,3 +12,5 @@ build/
 
 tests/**/outputs/*.diff
 tests/**/outputs/*.out
+
+javac.*.args

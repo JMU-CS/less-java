@@ -321,7 +321,7 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    public void testFunctionReturnDifferentTypesWithDifferentParameterBindings_invalid() {
+    public void testFunctionReturnDifferentTypesWithDifferentParameterBindings_valid() {
         String program =
                 "func(a) {\n" +
                         "return a\n" +
@@ -330,7 +330,7 @@ class LJStaticAnalysisTest {
                         "x = func(5)\n" +
                         "y = func(\"hi\")\n" +
                 "}";
-        assertInvalid(program);
+        assertValid(program);
     }
 
     @Test
@@ -374,7 +374,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testConstructorWithWrongTypes_invalid() {
         String program = CLASS_A +
                 "main() {\n" +
@@ -384,7 +383,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testSuperConstructorWithWrongTypes_invalid() {
         String program = CLASS_A + CLASS_B +
                 "main() {\n" +
@@ -544,7 +542,7 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    public void testMethodReturnTypeDependsOnParameterBinding_invalid() {
+    public void testMethodReturnTypeDependsOnParameterBinding_valid() {
         String program =
                 "Foo {" +
                         "bar(a) {\n" +
@@ -556,7 +554,7 @@ class LJStaticAnalysisTest {
                         "b = a.bar(0)\n" +
                         "c = a.bar(true)\n" +
                 "}";
-        assertInvalid(program);
+        assertValid(program);
     }
 
     @Test
