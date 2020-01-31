@@ -48,4 +48,8 @@ fi
 
 args="${args} -Ptestfile=${1}"
 "$GRADLE_WRAPPER" $args
+base=$(basename $1)
+upbase="$(tr '[:lower:]' '[:upper:]' <<< ${base:0:1})${base:1}"
+name="LJ${upbase%.*}"
+java -cp generated $name 
 exit
