@@ -1,7 +1,7 @@
 package com.github.lessjava.types.ast;
 
 /**
- * Decaf control structure; a block of code that is only executed if the
+ * Less-Java control structure; a block of code that is only executed if the
  * {@link condition} is true when the code is encountered during execution. The
  * conditional statement can optionally contain an additional block of code (the
  * "else" block) that is executed if the condition evaluates to false.

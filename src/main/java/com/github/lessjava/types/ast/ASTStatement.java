@@ -1,7 +1,7 @@
 package com.github.lessjava.types.ast;
 
 /**
- * Any Decaf statement that can be executed at runtime.
+ * Any Less-Java statement that can be executed at runtime.
  * 
  * Can be any of the following:
  *

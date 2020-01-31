@@ -4,7 +4,7 @@ import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.types.inference.impl.HMTypeList;
 
 /**
- * Decaf variable declaration. Contains a name, a data type, and an array flag.
+ * Less-Java variable declaration. Contains a name, a data type, and an array flag.
  * If the flag is set, the arrayLength field contains the size.
  */
 public class ASTVariable extends ASTExpression {

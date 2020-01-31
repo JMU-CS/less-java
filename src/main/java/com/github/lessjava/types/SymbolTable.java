@@ -42,7 +42,7 @@ public class SymbolTable {
      * Inserts a new symbol into the symbol table
      *
      * @param name
-     *            Decaf symbol name
+     *            Less-Java symbol name
      * @param symbol
      *            Symbol information
      */

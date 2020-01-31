@@ -1,7 +1,7 @@
 package com.github.lessjava.types.ast;
 
 /**
- * Decaf location. This could be a local variable or a global variable,
+ * Less-Java location. This could be a local variable or a global variable,
  * depending on the context. It could also be a local or global array location,
  * if the {@link index} member is not {@code null}.
  */

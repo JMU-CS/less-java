@@ -1,7 +1,7 @@
 package com.github.lessjava.types.ast;
 
 /**
- * Decaf "continue" statement (should be inside a loop structure). When
+ * Less-Java "continue" statement (should be inside a loop structure). When
  * executed, the program should jump to the next iteration of the loop.
  */
 public class ASTContinue extends ASTStatement {

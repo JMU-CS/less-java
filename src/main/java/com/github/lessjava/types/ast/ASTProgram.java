@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Decaf program. Basically just a list of {@link ASTVariable} and
+ * Less-Java program. Basically just a list of {@link ASTVariable} and
  * {@link ASTFunction} declarations.
  */
 public class ASTProgram extends ASTNode {
