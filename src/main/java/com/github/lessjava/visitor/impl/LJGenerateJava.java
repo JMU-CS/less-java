@@ -45,7 +45,7 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJGenerateJava extends LJDefaultASTVisitor {
 
-    private static String baseName = null;
+    private String baseName = null;
 
     public LJGenerateJava(String filename)
     {
@@ -64,7 +64,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
         }
     }
 
-    public static Path mainFile = null;
+    public Path mainFile = null;
 
     private static String[] imports = {"import static org.junit.jupiter.api.Assertions.*;",
                                        "import static wrappers.LJString.*;",
