@@ -374,7 +374,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testConstructorWithWrongTypes_invalid() {
         String program = CLASS_A +
                 "main() {\n" +
@@ -384,7 +383,6 @@ class LJStaticAnalysisTest {
     }
 
     @Test
-    @Disabled
     public void testSuperConstructorWithWrongTypes_invalid() {
         String program = CLASS_A + CLASS_B +
                 "main() {\n" +

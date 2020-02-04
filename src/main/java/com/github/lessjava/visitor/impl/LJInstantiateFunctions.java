@@ -3,7 +3,6 @@ package com.github.lessjava.visitor.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.github.lessjava.types.Symbol;
 import com.github.lessjava.types.ast.ASTAbstractFunction;
@@ -19,7 +18,10 @@ import com.github.lessjava.types.ast.ASTNode;
 import com.github.lessjava.types.ast.ASTProgram;
 import com.github.lessjava.types.ast.ASTStatement;
 import com.github.lessjava.types.ast.ASTVoidFunctionCall;
+import com.github.lessjava.types.inference.HMType;
+import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeClass;
+import com.github.lessjava.types.inference.impl.HMTypeCollection;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 import com.github.lessjava.visitor.LJAbstractAssignTypes;
 
@@ -80,10 +82,19 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
                 addError(node, "Cannot call super outside of a constructor");
             } else if(currentClass.parent == null) {
                 addError(node, "Cannot call super constructor without a parent class");
-            } else if(currentClass.parent.block.constructors.stream().noneMatch(superConstructor -> superConstructor.parameters.size() == node.arguments.size())) {
-                addError(node, "No matching super constructor found");
-            } else if(!isFirstStatementInParent(node)) {
-                addError(node, "Call to super constructor must be the first statement in a constructor");
+            } else {
+                if(!isFirstStatementInParent(node)) {
+                    addError(node, "Call to super constructor must be the first statement in a constructor");
+                }
+                ASTFunction superconstructor = currentClass.parent.block.constructors.stream()
+                        .map(c -> c.function)
+                        .filter(c -> c.parameters.size() == node.arguments.size())
+                        .findFirst().orElse(null);
+                if(superconstructor == null) {
+                    addError(node, "No matching super constructor found");
+                } else {
+                    verifyConstructorCall(node, superconstructor);
+                }
             }
             return;
         }
@@ -115,6 +126,11 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
                     .filter(s -> s.symbolType == Symbol.SymbolType.FUNCTION && s.function.name.equals(node.name))
                     .forEach(f -> f.type = new HMTypeVar());
             ASTFunction.libraryFunctions.removeIf(f -> f.name.equals(node.name));
+        }
+
+        // If this is a call to a constructor, verify that the arguments all match up
+        if(prototype instanceof ASTMethod) {
+            verifyConstructorCall(node, ((ASTMethod) prototype).function);
         }
 
         // Don't instantiate if there's either already a concrete implementation or if the prototype is a constructor (ASTMethod)
@@ -247,6 +263,38 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         }
         ASTStatement firstStatement = ((ASTBlock) block).statements.get(0);
         return firstStatement instanceof ASTVoidFunctionCall && ((ASTVoidFunctionCall) firstStatement).functionCall == node;
+    }
+
+    /**
+     * Verify that each argument sent to a constructor is of the type that the constructor requires
+     * @param node the call to the constructor
+     * @param constructor the constructor implementation
+     */
+    public void verifyConstructorCall(ASTFunctionCall node, ASTFunction constructor) {
+        for (int i = 0; i < constructor.parameters.size(); i++) {
+            HMType arg = node.arguments.get(i).type;
+            HMType param = constructor.parameters.get(i).type;
+            boolean fits = false;
+            if (arg instanceof HMTypeBase || arg instanceof HMTypeCollection) {
+                fits = arg.equals(param);
+            } else if (arg instanceof HMTypeClass) {
+                if (!(param instanceof HMTypeClass)) {
+                    fits = false;
+                } else {
+                    ASTClass argClass = ASTClass.nameClassMap.get(((HMTypeClass) arg).name);
+                    ASTClass paramClass = ASTClass.nameClassMap.get(((HMTypeClass) param).name);
+                    while (argClass != null && paramClass != argClass) {
+                        argClass = argClass.parent;
+                    }
+                    if (argClass == null) {
+                        fits = false;
+                    }
+                }
+            }
+            if (!fits) {
+                addError(node, "Argument " + i + " to " + node.name + " is of type " + arg + "; expected " + param);
+            }
+        }
     }
 
     private String mangleFunctionName(String name, List<ASTExpression> arguments) {
