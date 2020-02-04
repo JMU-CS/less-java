@@ -72,7 +72,7 @@ public abstract class ASTNode {
      * @return
      */
     public String getASTTypeStr() {
-        return getClass().getName().replace("edu.jmu.decaf.AST", "");
+        return getClass().getName().replace("edu.jmu.less-java.AST", "");
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.github.lessjava.types.ast;
 
 /**
- * Decaf loop structure; contains a "guard" expression and a loop body block.
+ * Less-Java loop structure; contains a "guard" expression and a loop body block.
  * The block is executed an arbitrary number of times as long as the guard
  * expression evaluates to true.
  */

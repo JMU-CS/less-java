@@ -4,7 +4,7 @@ import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 
 /**
- * Decaf binary operation with an operation tag and two child sub-expressions.
+ * Less-Java binary operation with an operation tag and two child sub-expressions.
  * When executed, the program should evaluate the left-hand side and the
  * right-hand side separately and then perform the given operation on the two
  * values. Some operations (e.g., boolean AND and OR) can be short-circuited.

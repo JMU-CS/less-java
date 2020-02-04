@@ -34,18 +34,25 @@ For example,
 ```
 ## Running
 
-It is possible to just run the most recently compiled program, run the tests in
-the most-recently compiled file, or run the tests for all files in the `tests/`
-directory.
+It is possible to just run the most recently compiled program, or run a specific
+previously compiled Less-Java program.
 
 ### Running A Less-Java Program
 
 Ensure that the program you wish to run has already been compiled following the
-instructions above. Then simply run:
+instructions above. To run the most recently compiled or ran program, simply type:
 
 ```
 ./run.sh
 ```
+
+To run a specific Less-Java program, use the name of the file you compiled. The
+extension is optional. For example:
+
+```
+./run.sh fact.lj
+```
+
 You will need to make sure that your program has a `main()` method if you want to
 run it. If it does not have a `main()` method, you will receive an error similar
 to the following.
@@ -55,6 +62,16 @@ Error: Main method not found in class Main, please define the main method as:
    public static void main(String[] args)
 or a JavaFX application class must extend javafx.application.Application
 ```
+
+You can also compile and run a Less-Java program with a single instruction using the 
+go script. It works the same way as compilation:
+
+```
+./go.sh tests/fact.lj
+```
+
+##Testing
+
 ### Running Tests From A File
 
 Ensure that the file you wish to run the test from has been compiled following the
@@ -64,7 +81,7 @@ instructions above. Then simply run:
 ./test.sh
 ```
 
-## Running All Tests
+### Running All Tests
 
 It is possible to run all the tests in the `tests/` directory and to set the
 expected output for any of those tests.

@@ -4,7 +4,7 @@ import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 /**
- * Any Decaf expression that can be evaluated to a value at runtime.
+ * Any Less-Java expression that can be evaluated to a value at runtime.
  *
  * Can be any of the following:
  *

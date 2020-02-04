@@ -5,10 +5,10 @@ import com.github.lessjava.types.inference.HMType.BaseDataType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
 
 /**
- * Decaf literal value.
+ * Less-Java literal value.
  *
  * <p>
- * Here are the Decaf data types and their corresponding Java data types:
+ * Here are the Less-Java data types and their corresponding Java data types:
  *
  * <table border="1">
  * <tr>

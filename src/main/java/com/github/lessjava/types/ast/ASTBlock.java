@@ -3,7 +3,7 @@ package com.github.lessjava.types.ast;
 import java.util.*;
 
 /**
- * Lexical scope in a Decaf program; e.g., a function body or a while-loop body.
+ * Lexical scope in a Less-Java program; e.g., a function body or a while-loop body.
  * Blocks are denoted in the source code using curly braces ("{" and "}").
  * Contains lists of local variable definitions and enclosed statements.
  */
