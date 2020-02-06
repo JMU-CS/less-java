@@ -86,6 +86,10 @@ public class LJCompiler {
         // ANTLR Parsing
         ParseTree parseTree = parser.program();
 
+        if (parser.getNumberOfSyntaxErrors() != 0) {
+            System.exit(1);
+        }
+
         // Convert to AST
         walker.walk(converter, parseTree);
         ASTProgram program = converter.getAST();
