@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: set filetype=bash
 
 GRADLE_WRAPPER="./gradlew"
 
