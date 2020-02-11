@@ -18,68 +18,30 @@ Gradle wrapper so installing Gradle is not necessary.
 ```
 ./gradlew build
 ````
-### Compiling a Less-Java Program
+### Compiling and Running a Less-Java Program
 
-A script is provided to compile any Less-Java program, and there are several
-examples in the `tests/` directory. Compiling is fairly straightforward.
-
+A script is provided to compile, run, and test any Less-Java program with a single command.
 ```
-./compile.sh <file-name>
+./lj <file-name>
 ````
 
 For example,
 
 ```
-./compile.sh tests/fact.lj
-```
-## Running
-
-It is possible to just run the most recently compiled program, or run a specific
-previously compiled Less-Java program.
-
-### Running A Less-Java Program
-
-Ensure that the program you wish to run has already been compiled following the
-instructions above. To run the most recently compiled or ran program, simply type:
-
-```
-./run.sh
-```
-
-To run a specific Less-Java program, use the name of the file you compiled. The
-extension is optional. For example:
-
-```
-./run.sh fact.lj
+./lj tests/fact.lj
 ```
 
 You will need to make sure that your program has a `main()` method if you want to
-run it. If it does not have a `main()` method, you will receive an error similar
+run it. If it does not have a `main()` method, you will receive a warning similar
 to the following.
 
 ```
-Error: Main method not found in class Main, please define the main method as:
-   public static void main(String[] args)
-or a JavaFX application class must extend javafx.application.Application
+Warning: This program does not contain a main() function and will not be run
 ```
 
-You can also compile and run a Less-Java program with a single instruction using the 
-go script. It works the same way as compilation:
-
-```
-./go.sh tests/fact.lj
-```
-
+The program will still be compiled and tested correctly even without a main() method, but no program output
+will be released.
 ##Testing
-
-### Running Tests From A File
-
-Ensure that the file you wish to run the test from has been compiled following the
-instructions above. Then simply run:
-
-```
-./test.sh
-```
 
 ### Running All Tests
 

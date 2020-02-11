@@ -78,7 +78,7 @@ public class LJCompiler {
         BuildSymbolTables buildSymbolTables = new BuildSymbolTables();
         LJASTInferTypes inferTypes = new LJASTInferTypes();
         // PrintDebugTree printTree = new PrintDebugTree();
-        LJGenerateJava generateJava = new LJGenerateJava(fileName);
+        LJGenerateJava generateJava = new LJGenerateJava();
         LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
         LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
         LJASTInferConstructors inferConstructors = new LJASTInferConstructors();
