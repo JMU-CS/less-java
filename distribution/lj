@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# vim: set filetype=bash
+
+help() {
+    echo "Usage: $0 [options] file"
+    echo ""
+    echo "  Options:"
+    echo "    -h  Print this help message and exit"
+    echo "    -t  Print type changes found by type inference"
+}
+
+args="run"
+verbose=false
+while getopts :thv flag; do
+  case $flag in
+    h)
+      help
+      exit
+      ;;
+    t)
+      args="${args} -PprintTypeChanges"
+      ;;
+    \?)
+      echo "Unrecognized option $OPTARG" 1>&2
+      echo
+      help
+      exit
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if ! $verbose; then
+  args="${args} -q"
+fi
+
+if [ $# == 0 ]; then
+  echo "Expecting a file" 1>&2
+  echo
+  help
+  exit
+fi
+
+args="${args} ${1}"
+java -jar lj.jar ${args}
+base=$(basename $1)
+upbase="$(tr '[:lower:]' '[:upper:]' <<< ${base:0:1})${base:1}"
+name="LJ${upbase%.*}"
+java -cp generated $name
+exit
