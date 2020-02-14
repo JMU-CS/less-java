@@ -28,26 +28,6 @@ p1 (0) is less than p2 (10)
 7
 8
 9
-0
-1
-2
-3
-4
-6
-7
-8
-9
-p1 (0) is less than p2 (10)
-0
-1
-2
-3
-4
-5
-6
-7
-8
-9
 p2 (0) is less than p1 (10)
 [36m╷[0m
 [36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m

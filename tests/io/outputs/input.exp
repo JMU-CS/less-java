@@ -1,8 +1,8 @@
-Integer: Exception in thread "main" java.util.NoSuchElementException: No line found
-	at java.base/java.util.Scanner.nextLine(Scanner.java:1651)
-	at wrappers.LJIO.buffer(LJIO.java:48)
-	at wrappers.LJIO.readInt(LJIO.java:22)
-	at Main.main(Main.java:15)
+Integer: 5
+Double: 3.14
+Character: x
+Word: hello
+Line: This is a line-based test.
 [36m╷[0m
 [36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
 

@@ -22,7 +22,7 @@ test() {
         mkdir -p $outdir
         echo "Compiling, Running, and Testing $file"
         if [ -e "$parent/$name.in" ]; then
-            ./lj $file < "$parent/$name.in" 2>&1
+            ./lj $file < "$parent/$name.in" 2>&1 > $base.out
         else
             ./lj $file 2>&1 | grep -wvi time > $base.out
         fi

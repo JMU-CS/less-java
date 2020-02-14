@@ -52,10 +52,16 @@ args="${args} -Ptestfile=${1}"
 
 # If the less-java file contains the string "main()", attempt to run it.
 # Otherwise, release a warning and continue
+parent=$(dirname $1)
+base=$(basename $1)
+name=${base%.*}
 count=$(grep -c "main()" "$1")
 if [ "$count" -gt "0" ];
 then
-    java -cp generated Main
+    if [ -e "$parent/$name.in" ];
+    then
+        java -cp generated Main < "$parent/$name.in"
+    fi
 else
     echo "Warning: This program does not contain a main() function and will not be run"
 fi
