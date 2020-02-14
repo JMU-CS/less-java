@@ -29,7 +29,7 @@ dependencies {
 
 // Tasks
 run {
-    mainClassName = 'com.github.lessjava.LJCompiler'
+    mainClassName = 'com.github.lessjava.LJUI'
 
     def defaultTestfile = 'tests/fact.lj'
     args = (project.hasProperty('testfile')) ? [testfile] : [defaultTestfile]
