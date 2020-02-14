@@ -1,0 +1,24 @@
+line 1:2 no viable alternative at input 'a='
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':run'.
+> Process 'command '/usr/lib/jvm/java-11-openjdk-amd64/bin/java'' finished with non-zero exit value 1
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output. Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 1s
+Warning: This program does not contain a main() function and will not be run
+[36m╷[0m
+[36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
+
+[         0 tests found           ]
+[         0 tests skipped         ]
+[         0 tests started         ]
+[         0 tests aborted         ]
+[         0 tests successful      ]
+[         0 tests failed          ]

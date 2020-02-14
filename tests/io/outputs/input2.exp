@@ -1,0 +1,14 @@
+Exception in thread "main" java.util.NoSuchElementException: No line found
+	at java.base/java.util.Scanner.nextLine(Scanner.java:1651)
+	at wrappers.LJIO.buffer(LJIO.java:48)
+	at wrappers.LJIO.readWord(LJIO.java:37)
+	at Main.main(Main.java:14)
+[36m╷[0m
+[36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
+
+[         0 tests found           ]
+[         0 tests skipped         ]
+[         0 tests started         ]
+[         0 tests aborted         ]
+[         0 tests successful      ]
+[         0 tests failed          ]
