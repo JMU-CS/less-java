@@ -1,4 +1,9 @@
-how are you?
+Enter positive integers to sum, one per line (-1 to exit):
+3
+4
+9
+11
+Sum: 11
 [36m╷[0m
 [36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
 
