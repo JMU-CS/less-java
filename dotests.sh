@@ -14,19 +14,24 @@ help() {
 test() {
     local file=${1%"/"}
     if [ -f $file ] && [[ $file =~ .*\.lj ]]; then
-        parent=$(dirname %file)
+        parent=$(dirname $file)
         base=$(basename $file)
         name=${base%.*}
         outdir=$parent/outputs
-        #base=$outdir/$name
-        base=tests/outputs/$name
+        base=$outdir/$name
         mkdir -p $outdir
         echo "Compiling, Running, and Testing $file"
-        ./lj $file 2>&1 | grep -wvi time > $base.out
+        if [ -e "$parent/$name.in" ]; then
+            ./lj $file < "$parent/$name.in" 2>&1 | tee $base.out
+        else
+            ./lj $file 2>&1 | grep -wvi time > $base.out
+        fi
         echo "Finished"
         echo
         if $set_expected; then
             cp $base.out $base.exp
+            echo "Setting the expected output of $file to this actual output."
+            echo
         else
             #touch $base.out
             diff -uB $base.out $base.exp > $base.diff
@@ -37,6 +42,7 @@ test() {
                 echo
             else
                 echo "No differences detected between expected and actual output."
+                echo
             fi
         fi
     elif [ -d $file ] && $recursive; then
