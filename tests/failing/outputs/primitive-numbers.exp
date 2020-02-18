@@ -7,9 +7,9 @@ Warning: This program does not contain a main() function and will not be run
 [36m│     ├─[0m [34mtest2()[0m [32m✔[0m
 [36m│     ├─[0m [31mtest3()[0m [31m✘[0m [31mexpected: <0> but was: <0.0>[0m
 [36m│     ├─[0m [31mtest4()[0m [31m✘[0m [31mexpected: <-9> but was: <-9.0>[0m
-[36m│     └─[0m [31mtest5()[0m [31m✘[0m [31mexpected: <1.0E-4> but was: <9.999999999998899E-5>[0m
+[36m│     └─[0m [34mtest5()[0m [32m✔[0m
 
-Failures (3):
+Failures (2):
   JUnit Jupiter:Main:test3()
     MethodSource [className = 'Main', methodName = 'test3', methodParameterTypes = '']
     => org.opentest4j.AssertionFailedError: expected: <0> but was: <0.0>
@@ -38,24 +38,10 @@ Failures (3):
        java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
        java.base/java.lang.reflect.Method.invoke(Method.java:566)
        [...]
-  JUnit Jupiter:Main:test5()
-    MethodSource [className = 'Main', methodName = 'test5', methodParameterTypes = '']
-    => org.opentest4j.AssertionFailedError: expected: <1.0E-4> but was: <9.999999999998899E-5>
-       org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
-       org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:195)
-       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:184)
-       org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:179)
-       org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:898)
-       Main.test5(Main.java:64)
-       java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-       java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-       java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-       java.base/java.lang.reflect.Method.invoke(Method.java:566)
-       [...]
 
 [         6 tests found           ]
 [         0 tests skipped         ]
 [         6 tests started         ]
 [         0 tests aborted         ]
-[         3 tests successful      ]
-[         3 tests failed          ]
+[         4 tests successful      ]
+[         2 tests failed          ]

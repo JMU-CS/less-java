@@ -30,6 +30,6 @@ f() {
     return f = 1 - 0.9999
 }
 
-test d() == 0
-test e() == -9
-test f() == 0.0001
+test d() == 0.0
+test e() == -9.0
+test f() != 0.0001
