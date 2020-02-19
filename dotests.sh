@@ -20,6 +20,7 @@ test() {
         outdir=$parent/outputs
         base=$outdir/$name
         mkdir -p $outdir
+        echo "***************************************"
         echo "Compiling, Running, and Testing $file"
         if [ -e "$parent/$name.in" ]; then
             ./lj $file < "$parent/$name.in" 2>&1 > $base.out
@@ -40,6 +41,7 @@ test() {
                 echo
                 cat $base.diff
                 echo
+                exit 1
             else
                 echo "No differences detected between expected and actual output."
                 echo
@@ -72,7 +74,7 @@ while getopts :hrs flag; do
             echo "Unexpected flag $OPTARG" 1>&2
             echo
             help
-            exit
+            exit 1
             ;;
     esac
 done
@@ -88,7 +90,7 @@ if [ $# == 0 ]; then
     echo "Expecting at least one file" 1>&2
     echo
     help
-    exit
+    exit 1
 fi
 
 for f in $@; do
