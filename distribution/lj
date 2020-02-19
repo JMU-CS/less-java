@@ -46,5 +46,5 @@ java -jar lj.jar ${args}
 base=$(basename $1)
 upbase="$(tr '[:lower:]' '[:upper:]' <<< ${base:0:1})${base:1}"
 name="LJ${upbase%.*}"
-java -cp generated $name
+java -cp "generated:lj.jar" $name
 exit
