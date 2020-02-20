@@ -6,3 +6,4 @@ Adder {
 
 test Adder().add(1, 2) == 3
 test Adder().add(1.0, 2.0) == 3.0
+test Adder().add(1, 1.5) == 2.5

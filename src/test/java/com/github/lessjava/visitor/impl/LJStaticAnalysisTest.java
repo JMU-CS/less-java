@@ -4,8 +4,6 @@ import com.github.lessjava.generated.LJLexer;
 import com.github.lessjava.generated.LJParser;
 import com.github.lessjava.types.ast.ASTClass;
 import com.github.lessjava.types.ast.ASTClassBlock;
-import com.github.lessjava.types.ast.ASTClassSignature;
-import com.github.lessjava.types.ast.ASTFunction;
 import com.github.lessjava.types.ast.ASTProgram;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -77,6 +75,7 @@ class LJStaticAnalysisTest {
         LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
         LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
         LJASTInferConstructors inferConstructors = new LJASTInferConstructors();
+        LJCoerceIntsToDoubles coerceIntsToDoubles = new LJCoerceIntsToDoubles();
 
         // ANTLR Parsing
         ParseTree parseTree = parser.program();
@@ -101,6 +100,8 @@ class LJStaticAnalysisTest {
             program.traverse(inferTypes);
             program.traverse(checkTypesHaveChanged);
         } while (LJASTCheckTypesHaveChanged.typesChanged);
+
+        program.traverse(coerceIntsToDoubles);
 
         LJAssignTestVariables assignTestVariables = new LJAssignTestVariables();
 

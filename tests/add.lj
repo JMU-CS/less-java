@@ -4,3 +4,9 @@ add(a, b) {
 
 test add(1, 2) == 3
 test add(1.0, 2.0) == 3.0
+
+// test coerce int to double in equality check
+test add(1.0, 2.0) == 3
+
+// test coerce int + double = double
+test add(1, 2.5) == 3.5
