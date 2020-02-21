@@ -94,6 +94,10 @@ public class LJUI extends JFrame
 
     public String compile(String code)
     {
+        // add newline to avoid EOL/EOF issues w/ ANTLR:
+        //   https://www.antlr3.org/pipermail/antlr-interest/2011-January/040642.html
+        code += "\n";
+
         // lexing and parsing (TODO: report errors in UI)
         LJLexer lexer = new LJLexer(new ANTLRInputStream(code));
         LJParser parser = new LJParser(new CommonTokenStream(lexer));
