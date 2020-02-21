@@ -15,6 +15,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import com.github.lessjava.visitor.impl.LJCoerceIntsToDoubles;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -28,7 +29,6 @@ import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 import static org.junit.platform.engine.discovery.DiscoverySelectors.*;
-import static org.junit.platform.engine.discovery.ClassNameFilter.*;
 
 import com.github.lessjava.generated.LJLexer;
 import com.github.lessjava.generated.LJParser;
@@ -82,6 +82,7 @@ public class LJCompiler {
         LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
         LJInstantiateFunctions instantiateFunctions = new LJInstantiateFunctions();
         LJASTInferConstructors inferConstructors = new LJASTInferConstructors();
+        LJCoerceIntsToDoubles coerceIntsToDoubles = new LJCoerceIntsToDoubles();
 
         // ANTLR Parsing
         ParseTree parseTree = parser.program();
@@ -117,6 +118,9 @@ public class LJCompiler {
                 System.out.println(message);
             }
         }
+
+        // If we decide to stop coercing ints to doubles, remove this line and associated classes
+        program.traverse(coerceIntsToDoubles);
 
         // TODO: Determine if necessary
         // program.traverse(new LJUnifyVariables());
