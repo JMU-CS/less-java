@@ -66,6 +66,7 @@ task fatJar(type:Jar) {
     }
     baseName = 'lj-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from files(project('ljwrappers').sourceSets.main.runtimeClasspath)
     with jar
 }
 
