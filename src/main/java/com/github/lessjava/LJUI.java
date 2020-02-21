@@ -24,6 +24,8 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import com.github.lessjava.generated.LJLexer;
 import com.github.lessjava.generated.LJParser;
 import com.github.lessjava.types.ast.ASTProgram;
+import com.github.lessjava.types.ast.ASTClass;
+import com.github.lessjava.types.ast.ASTClassBlock;
 import com.github.lessjava.visitor.impl.BuildParentLinks;
 import com.github.lessjava.visitor.impl.BuildSymbolTables;
 import com.github.lessjava.visitor.impl.PrintDebugTree;
@@ -119,6 +121,24 @@ public class LJUI extends JFrame
         LJASTInferTypes inferTypes = new LJASTInferTypes();
         LJASTInferConstructors inferConstructors = new LJASTInferConstructors();
         LJASTCheckTypesHaveChanged checkTypesHaveChanged = new LJASTCheckTypesHaveChanged();
+
+        // reset static analysis (TODO: use fewer static data structures to
+        // avoid having to do this)
+        StaticAnalysis.resetErrors();
+        BuildSymbolTables.nodeSymbolTableMap.clear();
+        LJASTBuildClassLinks.nameClassMap.clear();
+        LJASTBuildClassLinks.nameClassMap.put("Object",null);
+        LJASTBuildClassLinks.nameClassMap.put("String", null);
+        LJASTBuildClassLinks.nameClassMap.put("Integer", null);
+        LJASTBuildClassLinks.nameClassMap.put("Double", null);
+        LJASTBuildClassLinks.nameClassMap.put("Boolean", null);
+        LJASTBuildClassLinks.nameClassMap.put("Char", null);
+        LJASTBuildClassLinks.nameClassMap.put("LJList", null);
+        LJASTBuildClassLinks.nameClassMap.put("LJSet", null);
+        LJASTBuildClassLinks.nameClassMap.put("LJMap", null);
+        ASTClass.nameClassMap.clear();
+        ASTClassBlock.nameAttributeMap.clear();
+        StaticAnalysis.collectErrors = true;
 
         // initial processing
         program.traverse(buildParentLinks);
