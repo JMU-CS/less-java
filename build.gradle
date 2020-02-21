@@ -29,7 +29,7 @@ dependencies {
 
 // Tasks
 run {
-    mainClassName = 'com.github.lessjava.LJUI'
+    mainClassName = 'com.github.lessjava.LJCompiler'
 
     def defaultTestfile = 'tests/fact.lj'
     args = (project.hasProperty('testfile')) ? [testfile] : [defaultTestfile]
@@ -65,6 +65,18 @@ task fatJar(type:Jar) {
         attributes 'Main-Class': 'com.github.lessjava.LJCompiler'
     }
     baseName = 'lj-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+task ui(type:Jar) {
+    group 'LessJava'
+    description 'Assemble UI JAR'
+
+    manifest {
+        attributes 'Main-Class': 'com.github.lessjava.LJUI'
+    }
+    baseName = 'lj-ui'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
