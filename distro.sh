@@ -2,5 +2,11 @@
 
 GRADLE_WRAPPER="./gradlew"
 
+"$GRADLE_WRAPPER" clean
+
 "$GRADLE_WRAPPER" fatJar
-cp build/libs/*-all.jar distribution/lj.jar
+cp build/libs/lj-all.jar distribution/lj.jar
+
+"$GRADLE_WRAPPER" ui
+cp build/libs/lj-ui.jar distribution/lj-ui.jar
+

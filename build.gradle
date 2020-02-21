@@ -79,6 +79,7 @@ task ui(type:Jar) {
     }
     baseName = 'lj-ui'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from files(project('ljwrappers').sourceSets.main.runtimeClasspath)
     with jar
 }
 
