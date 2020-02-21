@@ -178,12 +178,13 @@ public class LJUI extends JFrame
     private String test()
     {
         // TODO: fix output formatting
-        return runShellCommand("./test.sh");
+        return runShellCommand("java -jar ../libs/junit-platform-console-standalone-1.4.2.jar"
+                + " --class-path generated:lj-ui.jar --include-classname='.*' --disable-banner -c LJTmp");
     }
 
     private String run()
     {
-        return "Output:\n" + runShellCommand("java -cp generated LJTmp");
+        return "Output:\n" + runShellCommand("java -cp generated:lj-ui.jar LJTmp");
     }
 
     /**
