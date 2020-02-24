@@ -49,7 +49,9 @@ test() {
         fi
     elif [ -d $file ] && $recursive; then
         for sub in $(ls $file); do
-            test $file/$sub
+            if [ ! "$(basename $file)" == "failing" ]; then
+                test $file/$sub
+            fi
         done
     fi           
 }

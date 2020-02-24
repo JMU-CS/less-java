@@ -61,6 +61,8 @@ then
     if [ -e "$parent/$name.in" ];
     then
         java -cp generated Main < "$parent/$name.in"
+    else
+        java -cp generated Main
     fi
 else
     echo "Warning: This program does not contain a main() function and will not be run"
