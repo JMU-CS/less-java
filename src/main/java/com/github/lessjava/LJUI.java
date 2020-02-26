@@ -167,7 +167,7 @@ public class LJUI extends JFrame
         }
 
         // code generation
-        program.traverse(new LJGenerateJava("tmp.lj"));
+        program.traverse(new LJGenerateJava());
 
         // run Java compiler (TODO: report error messages in UI)
         LJCompiler.JCompiler.compile();
