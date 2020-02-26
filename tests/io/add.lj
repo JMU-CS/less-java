@@ -1,4 +1,6 @@
-a = readInt()
-b = readInt()
-c = a + b
-print(c)
+main() {
+    a = readInt()
+    b = readInt()
+    c = a + b
+    print(c)
+}

@@ -45,14 +45,9 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJGenerateJava extends LJDefaultASTVisitor {
 
-    private String baseName = null;
-
-    public LJGenerateJava(String filename)
+    public LJGenerateJava()
     {
-        String[] parts = filename.split("[\\.\\\\\\/]");
-        baseName = parts[parts.length-2];
-        baseName = baseName.substring(0, 1).toUpperCase() + baseName.substring(1);
-        mainFile = Paths.get("generated/LJ" + baseName + ".java");
+        mainFile = Paths.get("generated/Main.java");
     }
 
     // Create generated directory if it doesn't exist
@@ -100,7 +95,7 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
 
         lines.addAll(Arrays.asList(imports));
 
-        lines.add("public class LJ" + baseName);
+        lines.add("public class Main");
         lines.add("{");
     }
 

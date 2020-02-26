@@ -9,22 +9,4 @@ cache:
 install:
   - ./gradlew clean build
 script:
-  - ./compile.sh tests/bracket-access.lj && ./test.sh
-  - ./compile.sh tests/comp/3np1for.lj && ./test.sh
-  - ./compile.sh tests/comp/3np1while.lj && ./test.sh
-  - ./compile.sh tests/comp/different.lj && ./test.sh
-  - ./compile.sh tests/comp/oddgnome.lj && ./test.sh
-  - ./compile.sh tests/collections.lj && ./test.sh
-  - ./compile.sh tests/demo.lj && ./test.sh
-  - ./compile.sh tests/dog.lj && ./test.sh
-  - ./compile.sh tests/eqtests.lj && ./test.sh
-  - ./compile.sh tests/fact.lj && ./test.sh
-  - ./compile.sh tests/forloop.lj && ./test.sh
-  - ./compile.sh tests/format.lj && ./test.sh
-  - ./compile.sh tests/fp.lj && ./test.sh
-  - ./compile.sh tests/oop.lj && ./test.sh
-  - ./compile.sh tests/precedence.lj && ./test.sh
-  - ./compile.sh tests/quicksort.lj && ./test.sh
-  - ./compile.sh tests/shadow.lj && ./test.sh
-  - ./compile.sh tests/type-inference.lj && ./test.sh
-  - ./compile.sh tests/unit-test.lj && ./test.sh
+  - ./dotests.sh -r tests/
