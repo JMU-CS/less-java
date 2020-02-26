@@ -1,3 +1,5 @@
-for (i: ["a","b","c"]) {
-    print(i)
+main() {
+    for (i: ["a","b","c"]) {
+        print(i)
+    }
 }
