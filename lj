@@ -18,7 +18,7 @@ args="run"
 verbose=false
 running=true
 testing=true
-while getopts :thv flag; do
+while getopts :rxthv flag; do
   case $flag in
     r)
       testing=false
