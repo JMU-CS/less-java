@@ -10,6 +10,7 @@ import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.JSplitPane;
+import javax.swing.JScrollPane;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -58,7 +59,7 @@ public class LJUI extends JFrame
         JTextArea outputField = new JTextArea();
         editField.setFont(new Font(Font.MONOSPACED, Font.BOLD, 13));
         JSplitPane splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                editField, outputField);
+                new JScrollPane(editField), new JScrollPane(outputField));
         splitPanel.setResizeWeight(0.33);
 
         // toolbar
