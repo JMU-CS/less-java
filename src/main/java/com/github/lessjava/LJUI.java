@@ -236,12 +236,10 @@ public class LJUI extends JFrame
             while ((line = stderrReader.readLine()) != null) {
                 str.append(line + "\n");
             }
+
+            cmdProc.waitFor();
         } catch (IOException ex) {
             str.append("ERROR: " + ex.getMessage());
-        }
-
-        try {
-            Thread.sleep(100);
         } catch (InterruptedException ex) {
             str.append("ERROR: " + ex.getMessage());
         }
