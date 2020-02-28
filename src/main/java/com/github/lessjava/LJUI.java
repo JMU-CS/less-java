@@ -128,7 +128,7 @@ public class LJUI extends JFrame
         LJParser parser = new LJParser(new CommonTokenStream(lexer));
         ParseTree parseTree = parser.program();
         if (parser.getNumberOfSyntaxErrors() != 0) {
-            return "";
+            return "Syntax error";
         }
 
         // conversion to AST
