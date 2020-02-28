@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.File;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -201,15 +202,37 @@ public class LJUI extends JFrame
 
     private String test()
     {
-        // TODO: fix output formatting
-        return runShellCommand("java -jar junit-platform-console-standalone-1.4.2.jar" +
-                " --class-path generated --include-classname='.*'" +
-                " --disable-banner -c Main");
+        // TODO: fix and re-enable this (and remove all use of test.sh)
+        //return runShellCommand("java -jar junit-platform-console-standalone-1.4.2.jar" +
+                //" --class-path generated --include-classname='.*'" +
+                //" --disable-banner -c Main");
+        try {
+            PrintWriter script = new PrintWriter("test.sh");
+            script.println("java -jar junit-platform-console-standalone-1.4.2.jar" +
+                    " --class-path generated --include-classname='.*'" +
+                    " --disable-banner -c Main");
+            script.close();
+        } catch (FileNotFoundException ex) {
+            return ex.getMessage();
+        }
+        String[] results = runShellCommand("sh test.sh").split("\n");
+        StringBuilder str = new StringBuilder();
+        for (String line : results) {
+            if (line.contains("tests found") ||
+                line.contains("tests successful") ||
+                line.contains("tests failed") ||
+                line.contains("tests aborted") ||
+                line.contains("tests successful") ||
+                line.contains("AssertionFailedError")) {
+                str.append(line + "\n");
+            }
+        }
+        return str.toString();
     }
 
     private String run()
     {
-        return "Output:\n" + runShellCommand("java -cp generated:lj-ui.jar Main");
+        return runShellCommand("java -cp generated:lj-ui.jar Main");
     }
 
     /**
