@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.File;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -94,8 +95,30 @@ public class LJUI extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    private void deleteFile(String path)
+    {
+        File f = new File(path);
+        if (f.isDirectory()) {
+            String[] children = f.list();
+            if (children == null) {
+                // empty folder; just delete it
+                f.delete();
+            } else {
+                // non-empty folder; delete all children first
+                for (String c : children) {
+                    deleteFile(f.getAbsolutePath() + File.separator + c);
+                }
+            }
+        }
+        f.delete();
+    }
+
     public String compile(String code)
     {
+        // remove any old generated files
+        deleteFile("generated");
+        new File("generated").mkdir();
+
         // add newline to avoid EOL/EOF issues w/ ANTLR:
         //   https://www.antlr3.org/pipermail/antlr-interest/2011-January/040642.html
         code += "\n";
@@ -178,13 +201,14 @@ public class LJUI extends JFrame
     private String test()
     {
         // TODO: fix output formatting
-        return runShellCommand("java -jar ../libs/junit-platform-console-standalone-1.4.2.jar"
-                + " --class-path generated:lj-ui.jar --include-classname='.*' --disable-banner -c LJTmp");
+        return runShellCommand("java -jar junit-platform-console-standalone-1.4.2.jar" +
+                " --class-path generated --include-classname='.*'" +
+                " --disable-banner -c Main");
     }
 
     private String run()
     {
-        return "Output:\n" + runShellCommand("java -cp generated:lj-ui.jar LJTmp");
+        return "Output:\n" + runShellCommand("java -cp generated:lj-ui.jar Main");
     }
 
     /**
