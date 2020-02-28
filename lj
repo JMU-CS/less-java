@@ -7,6 +7,8 @@ help() {
     echo "Usage: $0 [options] file"
     echo ""
     echo "  Options:"
+    echo "    -r  Compile and run the program without testing"
+    echo "    -x  Compile and test the program without running"
     echo "    -h  Print this help message and exit"
     echo "    -t  Print type changes found by type inference"
     echo "    -v  Print output from Gradle"
@@ -14,8 +16,16 @@ help() {
 
 args="run"
 verbose=false
+running=true
+testing=true
 while getopts :thv flag; do
   case $flag in
+    r)
+      testing=false
+      ;;
+    x)
+      running=false
+      ;;
     h)
       help
       exit
@@ -49,37 +59,45 @@ fi
 
 args="${args} -Ptestfile=${1}"
 "$GRADLE_WRAPPER" $args
-
-# If the less-java file contains the string "main()", attempt to run it.
-# Otherwise, release a warning and continue
-parent=$(dirname $1)
-base=$(basename $1)
-name=${base%.*}
-count=$(grep -c "main()" "$1")
-if [ "$count" -gt "0" ];
-then
-    if [ -e "$parent/$name.in" ];
-    then
-        java -cp generated Main < "$parent/$name.in"
-    else
-        java -cp generated Main
-    fi
-else
-    echo "Warning: This program does not contain a main() function and will not be run"
+compile_status="$?"
+if [ "$compile_status" -gt "0" ]; then
+    exit 
 fi
 
-# --class-path allows specifying where JUnit should look for tests
-# --include-classname allows the name to be anything
-# --disable-banner disables the banner asking contributing to JUnit
-# --scan-class-path checks the full classpath for tests
-# Get the output but do not print it yet
-test_output="$(java -jar libs/junit-platform-console-standalone-1.4.2.jar --class-path ".:generated" --include-classname='.*' --disable-banner --scan-class-path)"
-# Preserve  the exit code of the tests
-test_status="$?"
+if $testing; then
+    # --class-path allows specifying where JUnit should look for tests
+    # --include-classname allows the name to be anything
+    # --disable-banner disables the banner asking contributing to JUnit
+    # --scan-class-path checks the full classpath for tests
+    # Get the output but do not print it yet
+    test_output="$(java -jar libs/junit-platform-console-standalone-1.4.2.jar --class-path ".:generated" --include-classname='.*' --disable-banner --scan-class-path)"
+    # Preserve  the exit code of the tests
+    test_status="$?"
 
-# The grep -v filter removes lines that are unnecessary or potentially
-#    confusing to an end user.
-echo "$test_output" | grep -v -e '\[.*containers.*\]' -e 'JUnit Vintage' -e 'Test run finished after'
+    # The grep -v filter removes lines that are unnecessary or potentially
+    #    confusing to an end user.
+    echo "$test_output" | grep -v -e '\[.*containers.*\]' -e 'JUnit Vintage' -e 'Test run finished after'
 
-# Ensure the exit code from the tests is the exit code of the script
-exit "$test_status"
+    # Ensure the exit code from the tests is the exit code of the script
+    if [ "$test_status" -gt "0" ]; then
+        exit 1
+    fi
+fi
+
+if $running; then
+    # IF the less-java file contains the string "main()", attempt to run it.
+    # Otherwise, release a warning and continue
+    parent=$(dirname $1)
+    base=$(basename $1)
+    name=${base%.*}
+    count=$(grep -c "main()" "$1")
+    if [ "$count" -gt "0" ]; then
+        if [ -e "$parent/$name.in" ]; then
+            java -cp generated Main < "$parent/$name.in"
+        else
+            java -cp generated Main
+        fi
+    else
+        echo "Warning: This program does not contain a main() function and will not be run."
+    fi
+fi
