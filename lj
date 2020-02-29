@@ -7,31 +7,40 @@ help() {
     echo "Usage: $0 [options] file"
     echo ""
     echo "  Options:"
-    echo "    -r  Compile and run the program without testing"
-    echo "    -x  Compile and test the program without running"
-    echo "    -h  Print this help message and exit"
-    echo "    -t  Print type changes found by type inference"
-    echo "    -v  Print output from Gradle"
+    echo "    -r      Compile and run the program without testing"
+    echo "    -t      Compile and test the program without running"
+    echo "    -h      Print this help message and exit"
+    echo "    --types Print type changes found by type inference"
+    echo "    -v      Print output from Gradle"
 }
 
 args="run"
 verbose=false
 running=true
 testing=true
-while getopts :rxthv flag; do
+while getopts :rthv-: flag; do
   case $flag in
+    -)
+      case "${OPTARG}" in
+        types)
+          args="${args} -PprintTypeChanges"
+          ;;
+        *)
+            echo "Unrecognized option $OPTARG" 1>&2
+            echo
+            help
+            exit
+            ;;
+      esac;;
     r)
       testing=false
       ;;
-    x)
+    t)
       running=false
       ;;
     h)
       help
       exit
-      ;;
-    t)
-      args="${args} -PprintTypeChanges"
       ;;
     v)
       verbose=true
@@ -77,6 +86,7 @@ if $testing; then
     # The grep -v filter removes lines that are unnecessary or potentially
     #    confusing to an end user.
     echo "$test_output" | grep -v -e '\[.*containers.*\]' -e 'JUnit Vintage' -e 'Test run finished after'
+    echo
 
     # Ensure the exit code from the tests is the exit code of the script
     if [ "$test_status" -gt "0" ]; then
