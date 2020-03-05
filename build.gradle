@@ -70,6 +70,19 @@ task fatJar(type:Jar) {
     with jar
 }
 
+task ui(type:Jar) {
+    group 'LessJava'
+    description 'Assemble UI JAR'
+
+    manifest {
+        attributes 'Main-Class': 'com.github.lessjava.LJUI'
+    }
+    baseName = 'lj-ui'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from files(project('ljwrappers').sourceSets.main.runtimeClasspath)
+    with jar
+}
+
 task copyWrappers (type:Copy, dependsOn:':ljwrappers:classes') {
     group 'LessJava'
     description 'Copy compiled source from wrappers subproject'
