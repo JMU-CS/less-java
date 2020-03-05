@@ -8,10 +8,10 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
 
 public class LJASTBuildClassLinks extends LJDefaultASTVisitor {
 
-    public final static Map<String, ASTClass> nameClassMap = new HashMap<>();
+    public final Map<String, ASTClass> nameClassMap;
 
-    // Add some undeclarable classes to the map
-    static {
+    public LJASTBuildClassLinks() {
+        nameClassMap = new HashMap<>();
         nameClassMap.put("Object",null);
         nameClassMap.put("String", null);
         nameClassMap.put("Integer", null);

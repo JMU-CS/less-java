@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ASTClassBlock extends ASTNode {
-    public static Map<String, ASTAttribute> nameAttributeMap = new HashMap<>();
+    public Map<String, ASTAttribute> nameAttributeMap;
 
     public Set<ASTAttribute> classAttributes;
     public Set<ASTMethod> methods;
@@ -14,10 +14,12 @@ public class ASTClassBlock extends ASTNode {
 
     public ASTClassBlock() {
         this(null, null, null);
+        nameAttributeMap = new HashMap<>();
     }
 
     public ASTClassBlock(Set<ASTAttribute> attributes, Set<ASTMethod> methods) {
         this(attributes, methods, null);
+        nameAttributeMap = new HashMap<>();
     }
 
     public ASTClassBlock(Set<ASTAttribute> attributes, Set<ASTMethod> methods, ASTMethod constructor) {
@@ -28,6 +30,7 @@ public class ASTClassBlock extends ASTNode {
             this.constructors.add(constructor);
         }
 
+        nameAttributeMap = new HashMap<>();
         for (ASTAttribute a: classAttributes) {
             nameAttributeMap.put(a.assignment.variable.name, a);
         }

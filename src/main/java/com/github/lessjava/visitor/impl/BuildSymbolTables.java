@@ -32,7 +32,7 @@ import com.github.lessjava.visitor.LJAbstractAssignTypes;
 public class BuildSymbolTables extends LJAbstractAssignTypes {
     public static final String SYMBOL_TABLE = "symbolTable";
 
-    public static Map<ASTNode, SymbolTable> nodeSymbolTableMap = new HashMap<>();
+    public Map<ASTNode, SymbolTable> nodeSymbolTableMap;
 
     /**
      * Stack of symbol tables, representing all active nested scopes.
@@ -65,6 +65,7 @@ public class BuildSymbolTables extends LJAbstractAssignTypes {
     public BuildSymbolTables() {
         tableStack = new ArrayDeque<SymbolTable>();
         nameVarMap = new HashMap<>();
+        nodeSymbolTableMap = new HashMap<>();
     }
 
     /**
