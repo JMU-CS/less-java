@@ -1,0 +1,32 @@
+intIntIncr() {
+    a = 5
+    a += 3
+    a -= 2
+    return a
+}
+
+intDoubleIncr() {
+    a = 5
+    a += 0.5
+    a -= 1.5
+    return a
+}
+
+doubleIntIncr() {
+    a = 5.5
+    a += 2
+    a -= 1
+    return a
+}
+
+doubleDoubleIncr() {
+    a = 5.5
+    a += 2.5
+    a -= 1.5
+    return a
+}
+
+test intIntIncr() == 6
+test intDoubleIncr() == 4.0
+test doubleIntIncr() == 6.5
+test doubleDoubleIncr() == 6.5
