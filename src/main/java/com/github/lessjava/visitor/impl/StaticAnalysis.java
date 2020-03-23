@@ -1,8 +1,9 @@
 package com.github.lessjava.visitor.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import com.github.lessjava.exceptions.InvalidProgramException;
 import com.github.lessjava.types.ast.ASTNode;
@@ -15,7 +16,7 @@ import com.github.lessjava.visitor.LJDefaultASTVisitor;
  * the end of the static analysis phase of compilation.
  */
 public class StaticAnalysis extends LJDefaultASTVisitor {
-    protected static List<String> errors = new ArrayList<String>();
+    protected static Set<StaticAnalysisError> errors = new TreeSet<>();
     public static boolean collectErrors = true;
 
     /**
@@ -26,7 +27,7 @@ public class StaticAnalysis extends LJDefaultASTVisitor {
      * @param ex
      */
     public static void addError(InvalidProgramException ex) {
-        errors.add(ex.getMessage());
+        errors.add(new StaticAnalysisError(ex.getMessage()));
     }
 
     /**
@@ -36,7 +37,7 @@ public class StaticAnalysis extends LJDefaultASTVisitor {
      */
     public static void addError(ASTNode node, String msg) {
         if(collectErrors) {
-            errors.add("Line " + node.lineNumber + ": " + msg);
+            errors.add(new StaticAnalysisError(node.lineNumber, msg));
         }
     }
 
@@ -44,7 +45,7 @@ public class StaticAnalysis extends LJDefaultASTVisitor {
      * Clear all existing errors
      */
     public static void resetErrors() {
-        errors = new ArrayList<String>();
+        errors = new TreeSet<>();
     }
 
     /**
@@ -54,7 +55,7 @@ public class StaticAnalysis extends LJDefaultASTVisitor {
      * @return List of error strings
      */
     public static List<String> getErrors() {
-        return errors;
+        return errors.stream().map(StaticAnalysisError::toString).collect(Collectors.toList());
     }
 
     /**
@@ -65,11 +66,67 @@ public class StaticAnalysis extends LJDefaultASTVisitor {
      */
     public static String getErrorString() {
         StringBuffer str = new StringBuffer();
-        for (String s : new ArrayList<>(new HashSet<>(errors))) {
-            str.append(s);
+        for (StaticAnalysisError error : errors) {
+            str.append(error.toString());
             str.append("\n");
         }
 
         return str.toString();
+    }
+
+    /**
+     * A class to represent static analysis errors in a sortable fashion.
+     */
+    private static class StaticAnalysisError implements Comparable<StaticAnalysisError> {
+        private int lineNumber;
+        private String errorString;
+
+        /**
+         * Generate a static analysis error assiciated with a line number
+         *
+         * @param lineNumber the line the error was found in
+         * @param errorString a description of the error
+         */
+        public StaticAnalysisError(int lineNumber, String errorString) {
+            this.lineNumber = lineNumber;
+            this.errorString = errorString;
+        }
+
+        /**
+         * Generate a static analysis error that is not associated with a line number
+         *
+         * @param errorString a description of the error
+         */
+        public StaticAnalysisError(String errorString) {
+            this.lineNumber = -1;
+            this.errorString = errorString;
+        }
+
+        /**
+         * Generate a String representation of the error
+         *
+         * @return a string representing the error
+         */
+        @Override
+        public String toString() {
+            if(this.lineNumber == -1) {
+                return errorString;
+            }
+            return String.format("Line %d: %s", lineNumber, errorString);
+        }
+
+        /**
+         * Sort errors by line number first, then alphabetically if the line number is the same.
+         *
+         * @param other the error to compare to
+         * @return an integer reflecting the ordering of the two errors
+         */
+        @Override
+        public int compareTo(StaticAnalysisError other) {
+            if(this.lineNumber == other.lineNumber) {
+                return this.errorString.compareTo(other.errorString);
+            }
+            return this.lineNumber - other.lineNumber;
+        }
     }
 }
