@@ -1,5 +1,4 @@
-enter 3 space-separated words
-[dog, flapjack, potable][36m╷[0m
+[36m╷[0m
 [36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
 
 [         0 tests found           ]
@@ -8,3 +7,6 @@ enter 3 space-separated words
 [         0 tests aborted         ]
 [         0 tests successful      ]
 [         0 tests failed          ]
+
+enter 3 space-separated words
+[dog, flapjack, potable]

@@ -1,4 +1,3 @@
-Warning: This program does not contain a main() function and will not be run
 [36m╷[0m
 [36m├─[0m [36mJUnit Jupiter[0m [32m✔[0m
 [36m│  └─[0m [36mMain[0m [32m✔[0m
@@ -15,3 +14,5 @@ Warning: This program does not contain a main() function and will not be run
 [         0 tests aborted         ]
 [         6 tests successful      ]
 [         0 tests failed          ]
+
+Warning: This program does not contain a main() function and will not be run.
