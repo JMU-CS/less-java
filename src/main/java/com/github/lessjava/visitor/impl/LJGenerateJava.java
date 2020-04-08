@@ -400,9 +400,12 @@ public class LJGenerateJava extends LJDefaultASTVisitor {
     @Override
     public void preVisit(ASTForLoop node) {
         if (node.lowerBound == null) {
-            HMType cType = ((HMTypeCollection) node.upperBound.type).elementType;
-            String line = String.format("for (%s i : %s)", cType, node.upperBound);
-            addLine(node, line);
+            // If we're not in a concrete function the cast may fail
+            if(currentFunction != null && currentFunction.concrete) {
+                HMType cType = ((HMTypeCollection) node.upperBound.type).elementType;
+                String line = String.format("for (%s %s : %s)", cType, node.var.name, node.upperBound);
+                addLine(node, line);
+            }
         } else {
             String lowerBound = node.lowerBound == null ? "0" : node.lowerBound.toString();
             String upperBound = node.upperBound.toString();

@@ -392,6 +392,10 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
                             requireArgs(node, 0, arguments);
                             node.funcCall.type = HMTypeBase.INT;
                             break;
+                        case "keys":
+                            requireArgs(node, 0, arguments);
+                            node.funcCall.type = new HMTypeSet(keyType);
+                            break;
                         default:
                             addError(node, "Method does not exist");
                     }

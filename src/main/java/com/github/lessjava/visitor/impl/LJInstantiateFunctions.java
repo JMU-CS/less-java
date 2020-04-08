@@ -302,7 +302,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
                 "%s$%s",
                 name,
                 arguments.stream()
-                         .map(a -> a.type.toString().replaceAll("<", "LAB").replaceAll(">", "RAB"))
+                         .map(a -> a.type.toString().replaceAll("<", "LAB").replaceAll(">", "RAB").replaceAll(", ", "\\$"))
                          .collect(Collectors.joining("$"))
             );
 

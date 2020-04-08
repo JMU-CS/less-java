@@ -1,0 +1,18 @@
+mapFind(map, value, err) {
+    for(k: map.keys()) {
+        if(map[k] == value) {
+            return k
+        }
+    }
+    return err
+}
+
+main() {
+    map = <"Hello": 5, "Bye": 3>
+    println(mapFind(map, 5, "FAILED"))
+    println(mapFind(map, 2, "FAILED"))
+}
+
+test mapFind(<"a": 3, "b": 2>, 2, "FAILED") == "b"
+test mapFind(<"a": 3, "b": 2>, 100, "FAILED") == "FAILED"
+test mapFind(<5: 3, 4: 2>, 10, -1) == -1
