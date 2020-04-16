@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.github.lessjava.types.inference.HMType;
 import com.github.lessjava.types.inference.impl.HMTypeBase;
+import com.github.lessjava.types.inference.impl.HMTypeSet;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public class ASTClass extends ASTNode {
@@ -73,6 +74,7 @@ public class ASTClass extends ASTNode {
                 add("get", new HMTypeVar());
                 add("contains", HMTypeBase.BOOL);
                 add("size", HMTypeBase.INT);
+                add("keys", new HMTypeSet(new HMTypeVar()));
             }
 
             public void add(String name, HMType type) {

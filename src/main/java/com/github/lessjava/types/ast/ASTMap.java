@@ -10,6 +10,9 @@ public class ASTMap extends ASTCollection {
 
     @Override
     public String toString() {
+        if(!(type instanceof HMTypeMap)) {
+            return "ASTMap";
+        }
         StringBuilder initialization = new StringBuilder();
         StringBuilder entries = new StringBuilder();
 
