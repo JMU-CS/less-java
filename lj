@@ -7,11 +7,11 @@ help() {
     echo "Usage: $0 [options] file"
     echo ""
     echo "  Options:"
-    echo "    -r      Compile and run the program without testing"
-    echo "    -t      Compile and test the program without running"
-    echo "    -h      Print this help message and exit"
-    echo "    --types Print type changes found by type inference"
-    echo "    -v      Print output from Gradle"
+    echo "    -r            Compile and run the program without testing"
+    echo "    -t            Compile and test the program without running"
+    echo "    -h            Print this help message and exit"
+    echo "    --print-types Print type changes found by type inference"
+    echo "    -v            Print output from Gradle"
 }
 
 args="run"
@@ -22,7 +22,7 @@ while getopts :rthv-: flag; do
   case $flag in
     -)
       case "${OPTARG}" in
-        types)
+        print-types)
           args="${args} -PprintTypeChanges"
           ;;
         *)

@@ -11,13 +11,15 @@ public class ASTAssignment extends ASTBinaryExpr {
     public ASTMemberAccess memberAccess;
 
     public ASTAssignment(BinOp op, ASTVariable variable, ASTExpression value) {
-        super(BinOp.ASGN, variable, value);
+        super(op, variable, value);
+        this.op = op;
         this.variable = (ASTVariable) super.leftChild;
         this.value = value;
     }
 
     public ASTAssignment(BinOp op, ASTMemberAccess memberAccess, ASTExpression value) {
-        this(BinOp.ASGN, memberAccess.var, value);
+        this(op, memberAccess.var, value);
+        this.op = op;
         this.memberAccess = memberAccess;
         this.value = value;
     }
@@ -37,9 +39,9 @@ public class ASTAssignment extends ASTBinaryExpr {
     @Override
     public String toString() {
         if (memberAccess != null) {
-            return String.format("%s = %s", memberAccess, value);
+            return String.format("%s %s %s", memberAccess, ASTBinaryExpr.opToString(op), value);
         } else {
-            return String.format("%s = %s", variable, value);
+            return String.format("%s %s %s", variable, ASTBinaryExpr.opToString(op), value);
         }
     }
 }

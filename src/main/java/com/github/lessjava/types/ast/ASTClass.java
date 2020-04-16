@@ -12,7 +12,7 @@ import com.github.lessjava.types.inference.impl.HMTypeBase;
 import com.github.lessjava.types.inference.impl.HMTypeVar;
 
 public class ASTClass extends ASTNode {
-    public Map<String, ASTClass> nameClassMap;
+    public static Map<String, ASTClass> nameClassMap = new HashMap<>();
     public static Set<ASTClass> libraryClasses = new HashSet<>();
     public static Map<String, String> methodTranslations = new HashMap<>();
 
@@ -108,7 +108,6 @@ public class ASTClass extends ASTNode {
         this.signature = signature;
         this.block = block;
         this.parent = null;
-        nameClassMap = new HashMap<>();
 
         if (!libraryClasses.contains(this)) {
             nameClassMap.put(signature.className, this);

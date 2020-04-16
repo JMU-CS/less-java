@@ -182,7 +182,7 @@ public class LJCompiler {
         summary.printTo(new PrintWriter(System.out));
     }
 
-    public static class JCompiler {
+    private static class JCompiler {
         private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
         private static final StandardJavaFileManager FM = COMPILER.getStandardFileManager(null, null, null);
         private static final List<String> OPTIONS = new ArrayList<>(
