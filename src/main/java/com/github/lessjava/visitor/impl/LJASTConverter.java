@@ -324,12 +324,33 @@ public class LJASTConverter extends LJBaseListener {
         ASTBlock ifBlock;
         ASTBlock elseBlock;
 
-        condition = (ASTExpression) parserASTMap.get(ctx.expr());
+        condition = (ASTExpression) parserASTMap.get(ctx.expr().get(0));
         ifBlock = (ASTBlock) parserASTMap.get(ctx.block().get(0));
 
         if (ctx.block().size() > 1) {
-            elseBlock = (ASTBlock) parserASTMap.get(ctx.block().get(1));
-            conditional = new ASTConditional(condition, ifBlock, elseBlock);
+            if (ctx.expr().size() == 1) {
+                elseBlock = (ASTBlock) parserASTMap.get(ctx.block().get(1));
+                conditional = new ASTConditional(condition, ifBlock, elseBlock);
+            } else {
+                elseBlock = new ASTBlock();
+                conditional = new ASTConditional(condition, ifBlock, elseBlock);
+                //There must be a placeholder of the last conditional so the user's else block can be placed in it
+                ASTConditional newConditional = new ASTConditional(condition, ifBlock, elseBlock);
+                for (int i = 1; i < ctx.expr().size(); i++) {
+                    //Make a new else block and the next conditional
+                    ASTBlock newElseBlock = new ASTBlock();
+                    newConditional = new ASTConditional((ASTExpression) parserASTMap.get(ctx.expr().get(i)),
+                            (ASTBlock) parserASTMap.get(ctx.block().get(i)), newElseBlock);
+                    //Attach that conditional to the else block of the previous conditional
+                    elseBlock.statements.add(newConditional);
+                    //Set the current else block to the new one that was made
+                    elseBlock = newElseBlock;
+                }
+                //Set the else block of the deepest nested conditional to the user's else block
+                if (ctx.block().size() > ctx.expr().size()) {
+                    newConditional.elseBlock = (ASTBlock) parserASTMap.get(ctx.block().get(ctx.block().size()-1));
+                }
+            }
         } else {
             conditional = new ASTConditional(condition, ifBlock);
         }
