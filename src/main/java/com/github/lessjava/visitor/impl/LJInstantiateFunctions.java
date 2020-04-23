@@ -118,7 +118,7 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
         }
 
         // Remove the library function if this function shadows a library function
-        if(ASTFunction.libraryFunctions.stream().anyMatch(f -> f.name.equals(node.name))) {
+        /*if(ASTFunction.libraryFunctions.stream().anyMatch(f -> f.name.equals(node.name))) {
             program.functions.removeIf(f -> f.name.equals(node.name) && f.body == null);
             program.functions.stream().filter(f -> f.name.equals(node.name)).forEach(f -> f.returnType = new HMTypeVar());
             idFunctionMap.get(node.getIdentifyingString()).removeIf(f -> f.body == null);
@@ -126,8 +126,8 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
                     .filter(s -> s.symbolType == Symbol.SymbolType.FUNCTION && s.function.name.equals(node.name))
                     .forEach(f -> f.type = new HMTypeVar());
             ASTFunction.libraryFunctions.removeIf(f -> f.name.equals(node.name));
-        }
-
+        }*/
+        
         // If this is a call to a constructor, verify that the arguments all match up
         if(prototype instanceof ASTMethod) {
             verifyConstructorCall(node, ((ASTMethod) prototype).function);

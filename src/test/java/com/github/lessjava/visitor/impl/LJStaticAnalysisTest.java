@@ -44,19 +44,7 @@ class LJStaticAnalysisTest {
     public void init() {
         this.underTest = new LJStaticAnalysis();
         StaticAnalysis.resetErrors();
-        BuildSymbolTables.nodeSymbolTableMap.clear();
-        LJASTBuildClassLinks.nameClassMap.clear();
-        LJASTBuildClassLinks.nameClassMap.put("Object",null);
-        LJASTBuildClassLinks.nameClassMap.put("String", null);
-        LJASTBuildClassLinks.nameClassMap.put("Integer", null);
-        LJASTBuildClassLinks.nameClassMap.put("Double", null);
-        LJASTBuildClassLinks.nameClassMap.put("Boolean", null);
-        LJASTBuildClassLinks.nameClassMap.put("Char", null);
-        LJASTBuildClassLinks.nameClassMap.put("LJList", null);
-        LJASTBuildClassLinks.nameClassMap.put("LJSet", null);
-        LJASTBuildClassLinks.nameClassMap.put("LJMap", null);
         ASTClass.nameClassMap.clear();
-        ASTClassBlock.nameAttributeMap.clear();
         StaticAnalysis.collectErrors = true;
     }
 
