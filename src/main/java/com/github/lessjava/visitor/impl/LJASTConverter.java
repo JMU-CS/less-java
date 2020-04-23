@@ -341,6 +341,8 @@ public class LJASTConverter extends LJBaseListener {
                     ASTBlock newElseBlock = new ASTBlock();
                     newConditional = new ASTConditional((ASTExpression) parserASTMap.get(ctx.expr().get(i)),
                             (ASTBlock) parserASTMap.get(ctx.block().get(i)), newElseBlock);
+                    //Set the line number for each new conditional
+                    newConditional.lineNumber = ctx.expr().get(i).getStart().getLine();
                     //Attach that conditional to the else block of the previous conditional
                     elseBlock.statements.add(newConditional);
                     //Set the current else block to the new one that was made
