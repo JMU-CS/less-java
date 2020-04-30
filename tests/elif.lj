@@ -1,0 +1,13 @@
+main() {
+    if (3 < 2) {
+        print ("Hi")
+    } else if (2 < 2) {
+        print ("Ho")
+    } else if (false) {
+        print ("Howdy")
+    } else if (2 == 10) {
+        print ("Expelliarmus")
+    } else {
+        print ("Finally")
+    }
+}

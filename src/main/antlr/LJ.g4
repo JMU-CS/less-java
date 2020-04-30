@@ -19,7 +19,7 @@ global:         GLOBAL assignment EOL;
 
 test:           TEST expr EOL;
 
-statement:      IF LP expr RP block (ELSE block)?           #Conditional
+statement:      IF LP expr RP block (ELSE IF LP expr RP block)* (ELSE block)?           #Conditional
                 | WHILE LP expr RP block                    #While
                 | FOR LP var ':' (expr '->')? expr RP block #For
                 | RETURN expr EOL                           #Return
