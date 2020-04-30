@@ -116,17 +116,6 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
             StaticAnalysis.addError(node, "Cannot find function " + node.name + " with " + node.arguments.size() + " arguments");
             return;
         }
-
-        // Remove the library function if this function shadows a library function
-        /*if(ASTFunction.libraryFunctions.stream().anyMatch(f -> f.name.equals(node.name))) {
-            program.functions.removeIf(f -> f.name.equals(node.name) && f.body == null);
-            program.functions.stream().filter(f -> f.name.equals(node.name)).forEach(f -> f.returnType = new HMTypeVar());
-            idFunctionMap.get(node.getIdentifyingString()).removeIf(f -> f.body == null);
-            BuildSymbolTables.nodeSymbolTableMap.get(program).getSymbols().stream()
-                    .filter(s -> s.symbolType == Symbol.SymbolType.FUNCTION && s.function.name.equals(node.name))
-                    .forEach(f -> f.type = new HMTypeVar());
-            ASTFunction.libraryFunctions.removeIf(f -> f.name.equals(node.name));
-        }*/
         
         // If this is a call to a constructor, verify that the arguments all match up
         if(prototype instanceof ASTMethod) {
