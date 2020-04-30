@@ -10,8 +10,6 @@ public class ASTConditional extends ASTStatement {
     public ASTExpression condition;
     public ASTBlock ifBlock;
     public ASTBlock elseBlock; // could be null (no else-block)
-    public boolean ifBlockEmitted;
-    public boolean elseBlockEmitted;
 
     public ASTConditional(ASTExpression condition, ASTBlock ifBlock) {
         this(condition, ifBlock, null);
@@ -21,8 +19,6 @@ public class ASTConditional extends ASTStatement {
         this.condition = condition;
         this.ifBlock = ifBlock;
         this.elseBlock = elseBlock;
-        this.ifBlockEmitted = false;
-        this.elseBlockEmitted = false;
     }
 
     public boolean hasElseBlock() {
