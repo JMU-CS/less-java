@@ -480,9 +480,13 @@ public class LJASTInferTypes extends LJAbstractAssignTypes {
 
         if (node.invoker.type instanceof HMTypeClass) {
             HMTypeClass type = (HMTypeClass) node.invoker.type;
-            HMType returnType = ASTClass.nameClassMap.get(type.name).getMethod(node.funcCall.name).returnType;
+            ASTClass containingClass = ASTClass.nameClassMap.get(type.name);
 
-            node.type = unify(node, node.type, returnType);
+            if(containingClass.getMethod(node.funcCall.name) != null) {
+                HMType returnType = containingClass.getMethod(node.funcCall.name).returnType;
+
+                node.type = unify(node, node.type, returnType);
+            }
         }
 
         node.type = unify(node, node.type, node.funcCall.type);
