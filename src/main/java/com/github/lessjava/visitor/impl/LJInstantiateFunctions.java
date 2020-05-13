@@ -191,6 +191,15 @@ public class LJInstantiateFunctions extends LJAbstractAssignTypes {
 
         HMTypeClass type = (HMTypeClass) node.invoker.type;
         ASTClass containingClass = ASTClass.nameClassMap.get(type.name);
+        while(containingClass != null && containingClass.getMethod(node.funcCall.name) == null) {
+            containingClass = containingClass.parent;
+        }
+
+        if(containingClass == null) {
+            StaticAnalysis.addError(node, "Method " + node.funcCall.name + " not found for " + node.invoker.type);
+            return;
+        }
+
         ASTMethod m = containingClass.getMethod(node.funcCall.name);
 
         if (m != null && m.concrete) {

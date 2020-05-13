@@ -563,4 +563,15 @@ class LJStaticAnalysisTest {
         assertValid(program);
     }
 
+    @Test
+    public void testMethodNotFound_invalid() {
+        String program =
+                CLASS_A +
+                "main() {\n" +
+                        "a = A()\n" +
+                        "a.badMethodCall()\n" +
+                "}\n";
+        assertInvalid(program);
+    }
+
 }
